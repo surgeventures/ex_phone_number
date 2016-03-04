@@ -7,6 +7,6 @@
   "meck": {:hex, :meck, "0.8.4"},
   "metrics": {:hex, :metrics, "1.0.1"},
   "mimerl": {:hex, :mimerl, "1.0.2"},
-  "pavlov": {:hex, :pavlov, "0.2.3"},
+  "pavlov": {:git, "https://github.com/sproutapp/pavlov.git", "7f3c0d7c75c8c2875e21b495511a291194bfc85a", []},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"},
   "sweet_xml": {:hex, :sweet_xml, "0.6.1"}}

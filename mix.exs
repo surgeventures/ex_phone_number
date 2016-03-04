@@ -8,7 +8,7 @@ defmodule ExPhoneNumber.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test]
+     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test],
      deps: deps]
   end
 
@@ -30,9 +30,9 @@ defmodule ExPhoneNumber.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:sweet_xml, "~> 0.6.0"},
-      {:pavlov, ">= 0.1.0", only: :test},
-      {:excoveralls, "~> 0.4", only: :test}
+      {:sweet_xml, "~> 0.6"},
+      {:pavlov, git: "https://github.com/sproutapp/pavlov.git", only: :test},
+      {:excoveralls, "~> 0.5", only: :test}
     ]
   end
 end
