@@ -19,4 +19,5 @@ defmodule ExPhoneNumber.ValidationSpec do
       end
     end
   end
+
 end

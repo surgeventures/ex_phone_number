@@ -32,7 +32,8 @@ defmodule ExPhoneNumber.Mixfile do
     [
       {:sweet_xml, "~> 0.6"},
       {:pavlov, git: "https://github.com/sproutapp/pavlov.git", only: :test},
-      {:excoveralls, "~> 0.5", only: :test}
+      {:excoveralls, "~> 0.5", only: :test},
+      {:credo, "~> 0.3", only: [:dev, :test]}
     ]
   end
 end
