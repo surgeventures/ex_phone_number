@@ -9,7 +9,7 @@ defmodule ExPhoneNumber.PhoneNumber do
             preferred_domestic_carrier_code: nil # string
 
   alias ExPhoneNumber.PhoneNumber
-  alias ExPhoneNumber.PhoneNumber.CountryCodeSource
+  alias ExPhoneNumber.Constant.CountryCodeSource
 
   def has_country_code?(phone_number = %PhoneNumber{}) do
     not is_nil(phone_number.country_code)
