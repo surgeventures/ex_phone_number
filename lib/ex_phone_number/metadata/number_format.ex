@@ -9,6 +9,7 @@ defmodule ExPhoneNumber.Metadata.NumberFormat do
   import SweetXml
   alias ExPhoneNumber.Metadata.NumberFormat
 
+  def from_xpath_node(nil), do: nil
   def from_xpath_node(xpath_node) do
     kwlist =
       xpath_node |> xmap(

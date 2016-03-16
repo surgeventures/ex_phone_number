@@ -1,19 +1,20 @@
 defmodule ExPhoneNumber.Metadata.PhoneNumberMetadata do
   import ExPhoneNumber.Metadata
   import SweetXml
+  alias ExPhoneNumber.Metadata.PhoneMetadata
 
-  @resources_dir "resources"
+  @resources_dir "./resources"
   @xml_file "PhoneNumberMetadata.xml"
-  @xml_path Path.join([@resources_dir, @xml_file])
+  @document_path Path.join([@resources_dir, @xml_file])
+  @external_resource @document_path
 
-  defp stream_document(), do: stream_document(@xml_path)
+  defp document(), do: load_document(@document_path)
 
-  @xml_document load_document(@xml_path)
-  defp document(), do: @xml_document
-
-  def valid_region_code?(region_code) do
-    region_code_xpath = ~x"//phoneNumberMetadata/territories/territory[@id='#{String.upcase(region_code)}']"
+  def parse() do
     document()
-    |> xpath(region_code_xpath)
+    |> xpath(
+      ~x"//phoneNumberMetadata/territories/territory"el,
+      territories: ~x"." |> transform_by(&PhoneMetadata.from_xpath_node/1)
+      )
   end
 end

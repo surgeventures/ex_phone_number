@@ -6,6 +6,7 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
   import SweetXml
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
 
+  def from_xpath_node(nil), do: nil
   def from_xpath_node(xpath_node) do
     kwlist =
       xpath_node |> xmap(

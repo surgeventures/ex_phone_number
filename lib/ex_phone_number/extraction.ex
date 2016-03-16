@@ -12,5 +12,4 @@ defmodule ExPhoneNumber.Extraction do
       nil -> ""
     end
   end
-
 end
