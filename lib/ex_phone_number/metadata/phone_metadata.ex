@@ -64,7 +64,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         national_prefix_for_parsing: ~x"./nationalPrefixForParsing"o |> transform_by(&normalize_string/1),
         national_prefix_tranform_rule: ~x"./@nationalPrefixTransformRule"o |> transform_by(&normalize_string/1),
         #same_mobile_and_fixed_line_pattern: nil,
-        available_formats: [
+        number_formats: [
           ~x"./availableFormats/numberFormat"el,
           number_format: ~x"."e |> transform_by(&NumberFormat.from_xpath_node/1)
           #intl_number_format: nil,
@@ -122,5 +122,9 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     else
       phone_metadata.mobile_number_portable_region
     end
+  end
+
+  def has_national_prefix?(phone_metadata = %PhoneMetadata{}) do
+    not is_nil(phone_metadata.international_prefix)
   end
 end
