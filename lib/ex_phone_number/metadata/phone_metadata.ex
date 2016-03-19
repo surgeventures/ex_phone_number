@@ -24,7 +24,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
             national_prefix_for_parsing: nil,        # string
             national_prefix_tranform_rule: nil,      # string
             same_mobile_and_fixed_line_pattern: nil, # boolean
-            number_format: nil,                      # %NumberFormat{}
+            available_formats: [],                   # [%NumberFormat{}]
             intl_number_format: nil,                 # %NumberFormat{}
             main_country_for_code: nil,              # boolean
             leading_digits: nil,                     # string
@@ -64,7 +64,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         national_prefix_for_parsing: ~x"./nationalPrefixForParsing"o |> transform_by(&normalize_string/1),
         national_prefix_tranform_rule: ~x"./@nationalPrefixTransformRule"o |> transform_by(&normalize_string/1),
         #same_mobile_and_fixed_line_pattern: nil,
-        number_formats: [
+        available_formats: [
           ~x"./availableFormats/numberFormat"el,
           number_format: ~x"."e |> transform_by(&NumberFormat.from_xpath_node/1)
           #intl_number_format: nil,
