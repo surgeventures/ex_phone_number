@@ -3,7 +3,7 @@ defmodule ExPhoneNumber.Metadata do
   alias ExPhoneNumber.Metadata.PhoneMetadata
 
   @resources_dir "./resources"
-  @xml_file "PhoneNumberMetadata.xml"
+  @xml_file Application.fetch_env!(:ex_phone_number, :metadata_file)
   @document_path Path.join([@resources_dir, @xml_file])
   @external_resource @document_path
 
@@ -18,7 +18,7 @@ defmodule ExPhoneNumber.Metadata do
   Module.register_attribute(__MODULE__, :list_country_code_to_region_code, accumulate: true)
 
   for metadata <- metadata_collection do
-    phone_metadata = Map.get(metadata, :territory)
+    phone_metadata = PhoneMetadata.put_default_values(Map.get(metadata, :territory))
 
     region = Map.get(phone_metadata, :id)
     region_atom = String.to_atom(region)

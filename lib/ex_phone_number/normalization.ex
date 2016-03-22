@@ -1,6 +1,4 @@
 defmodule ExPhoneNumber.Normalization do
-  alias ExPhoneNumber.Constant.Pattern
-  alias ExPhoneNumber.Constant.Value
 
   def split_at_match_and_return_head(string, pattern) when is_binary(string) and is_map(pattern) do
     case Regex.run(pattern, string, return: :index) do
@@ -19,4 +17,8 @@ defmodule ExPhoneNumber.Normalization do
       :nomatch -> string
     end
   end
+
+  def is_nil_or_empty?(nil), do: true
+  def is_nil_or_empty?(string) when is_binary(string), do: String.length(string) == 0
+  def is_nil_or_empty?(_), do: false
 end

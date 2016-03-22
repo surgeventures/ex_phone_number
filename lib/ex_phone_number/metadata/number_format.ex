@@ -4,7 +4,8 @@ defmodule ExPhoneNumber.Metadata.NumberFormat do
             leading_digits_pattern: nil,                   # string
             national_prefix_formatting_rule: nil,          # string
             national_prefix_optional_when_formatting: nil, # boolean
-            domestic_carrier_code_formatting_rule: nil     # string
+            domestic_carrier_code_formatting_rule: nil,    # string
+            intl_format: nil                               # string
 
   import SweetXml
   alias ExPhoneNumber.Metadata.NumberFormat
@@ -15,13 +16,20 @@ defmodule ExPhoneNumber.Metadata.NumberFormat do
       xpath_node |> xmap(
         pattern: ~x"./@pattern"s,
         format: ~x"./format/text()"s,
-        leading_digits_pattern: ~x"./leadingDigits/text()"s |> transform_by(&normalize_pattern/1),
-        national_prefix_formatting_rule: ~x"./@nationalPrefixFormattingRule"o,
+        leading_digits_pattern: [
+          ~x"./leadingDigits"el,
+          pattern: ~x"./text()"s |> transform_by(&normalize_pattern/1)
+        ],
+        national_prefix_formatting_rule: ~x"./@nationalPrefixFormattingRule"o |> transform_by(&normalize_string/1),
         national_prefix_optional_when_formatting: ~x"./@nationalPrefixOptionalWhenFormatting"o |> transform_by(&normalize_boolean/1),
-        domestic_carrier_code_formatting_rule: ~x"./@carrierCodeFormattingRule"o
+        domestic_carrier_code_formatting_rule: ~x"./@carrierCodeFormattingRule"o |> transform_by(&normalize_string/1),
+        intl_format: ~x"./intlFormat/text()"o |> transform_by(&normalize_string/1)
       )
     struct(%NumberFormat{}, kwlist)
   end
+
+  defp normalize_boolean(nil), do: nil
+  defp normalize_boolean(true_char_list) when is_list(true_char_list) and length(true_char_list) == 4, do: true
 
   defp normalize_pattern(nil), do: nil
   defp normalize_pattern(string) when length(string) == 0, do: nil
@@ -31,6 +39,11 @@ defmodule ExPhoneNumber.Metadata.NumberFormat do
     |> List.to_string()
   end
 
-  defp normalize_boolean(nil), do: nil
-  defp normalize_boolean(true_char_list) when is_list(true_char_list) and length(true_char_list) == 4, do: true
+  defp normalize_string(nil), do: nil
+  defp normalize_string(char_list) when is_list(char_list) do
+    char_list
+    |> List.to_string()
+    |> String.split(["\n", " "], trim: true)
+    |> List.to_string()
+  end
 end

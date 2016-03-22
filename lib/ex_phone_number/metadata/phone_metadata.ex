@@ -1,37 +1,42 @@
 defmodule ExPhoneNumber.Metadata.PhoneMetadata do
-  defstruct general_description: nil,                # %PhoneNumberDescription{}
-            fixed_line: nil,                         # %PhoneNumberDescription{}
-            mobile: nil,                             # %PhoneNumberDescription{}
-            toll_free: nil,                          # %PhoneNumberDescription{}
-            premium_rate: nil,                       # %PhoneNumberDescription{}
-            shared_cost: nil,                        # %PhoneNumberDescription{}
-            personal_number: nil,                    # %PhoneNumberDescription{}
-            voip: nil,                               # %PhoneNumberDescription{}
-            pager: nil,                              # %PhoneNumberDescription{}
-            uan: nil,                                # %PhoneNumberDescription{}
-            emergency: nil,                          # %PhoneNumberDescription{}
-            voicemail: nil,                          # %PhoneNumberDescription{}
-            short_code: nil,                         # %PhoneNumberDescription{}
-            standard_rate: nil,                      # %PhoneNumberDescription{}
-            carrier_specific: nil,                   # %PhoneNumberDescription{}
-            no_international_dialing: nil,           # %PhoneNumberDescription{}
-            id: nil,                                 # string
-            country_code: nil,                       # number
-            international_prefix: nil,               # string
-            preferred_international_prefix: nil,     # string
-            national_prefix: nil,                    # string
-            preferred_extn_prefix: nil,              # string
-            national_prefix_for_parsing: nil,        # string
-            national_prefix_tranform_rule: nil,      # string
-            same_mobile_and_fixed_line_pattern: nil, # boolean
-            available_formats: [],                   # [%NumberFormat{}]
-            intl_number_format: nil,                 # %NumberFormat{}
-            main_country_for_code: nil,              # boolean
-            leading_digits: nil,                     # string
-            leading_zero_possible: nil,              # boolean
-            mobile_number_portable_region: nil       # boolean
+  defstruct id: nil,                                       # string
+            country_code: nil,                             # number
+            leading_digits: nil,                           # string
+            international_prefix: nil,                     # string
+            preferred_international_prefix: nil,           # string
+            national_prefix: nil,                          # string
+            national_prefix_for_parsing: nil,              # string
+            national_prefix_transform_rule: nil,           # string
+            national_prefix_formatting_rule: nil,          # string
+            national_prefix_optional_when_formatting: nil, # string
+            preferred_extn_prefix: nil,                    # string
+            main_country_for_code: nil,                    # boolean
+            leading_zero_possible: nil,                    # boolean
+            mobile_number_portable_region: nil,            # boolean
+            carrier_code_formatting_rule: nil,             # string
+            general: nil,                                  # %PhoneNumberDescription{}
+            fixed_line: nil,                               # %PhoneNumberDescription{}
+            mobile: nil,                                   # %PhoneNumberDescription{}
+            toll_free: nil,                                # %PhoneNumberDescription{}
+            premium_rate: nil,                             # %PhoneNumberDescription{}
+            shared_cost: nil,                              # %PhoneNumberDescription{}
+            personal_number: nil,                          # %PhoneNumberDescription{}
+            voip: nil,                                     # %PhoneNumberDescription{}
+            pager: nil,                                    # %PhoneNumberDescription{}
+            uan: nil,                                      # %PhoneNumberDescription{}
+            emergency: nil,                                # %PhoneNumberDescription{}
+            voicemail: nil,                                # %PhoneNumberDescription{}
+            short_code: nil,                               # %PhoneNumberDescription{}
+            standard_rate: nil,                            # %PhoneNumberDescription{}
+            carrier_specific: nil,                         # %PhoneNumberDescription{}
+            no_international_dialing: nil,                 # %PhoneNumberDescription{}
+            same_mobile_and_fixed_line_pattern: nil,       # boolean
+            number_format: [],                             # [%NumberFormat{}]
+            intl_number_format: []                         # [%NumberFormat{}]
 
+  require Logger
   import SweetXml
+  import ExPhoneNumber.Normalization
   alias ExPhoneNumber.Metadata.PhoneMetadata
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
   alias ExPhoneNumber.Metadata.NumberFormat
@@ -39,7 +44,21 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   def from_xpath_node(xpath_node) do
     kwlist =
       xpath_node |> xmap(
-        general_description: ~x"./generalDesc"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
+        id: ~x"./@id"s,
+        country_code: ~x"./@countryCode"i,
+        leading_digits: ~x"./@leadingDigits"o |> transform_by(&normalize_string/1),
+        international_prefix: ~x"./@internationalPrefix"s,
+        preferred_international_prefix: ~x"./@preferredInternationalPrefix"o |> transform_by(&normalize_string/1),
+        national_prefix: ~x"./@nationalPrefix"s,
+        national_prefix_for_parsing: ~x"./nationalPrefixForParsing"o |> transform_by(&normalize_string/1),
+        national_prefix_transform_rule: ~x"./@nationalPrefixTransformRule"o |> transform_by(&normalize_string/1),
+        national_prefix_formatting_rule: ~x"./@nationalPrefixFormattingRule"s,
+        preferred_extn_prefix: ~x"./@preferredExtnPrefix"o |> transform_by(&normalize_string/1),
+        main_country_for_code: ~x"./@mainCountryForCode"o |> transform_by(&normalize_boolean/1),
+        leading_zero_possible: ~x"./leadingZeroPossible"o |> transform_by(&normalize_boolean/1),
+        mobile_number_portable_region: ~x"./@mobileNumberPortableRegion"o |> transform_by(&normalize_boolean/1),
+        carrier_code_formatting_rule: ~x"./@carrierCodeFormattingRule"s,
+        general: ~x"./generalDesc"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         fixed_line: ~x"./fixedLine"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         mobile: ~x"./mobile"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         toll_free: ~x"./tollFree"o |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
@@ -55,24 +74,11 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         #standard_rate: nil,
         #carrier_specific: nil,
         no_international_dialing: ~x"./noInternationalDialling"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
-        id: ~x"./@id"s,
-        country_code: ~x"./@countryCode"i,
-        international_prefix: ~x"./@internationalPrefix"o |> transform_by(&normalize_string/1),
-        preferred_international_prefix: ~x"./@preferredInternationalPrefix"o |> transform_by(&normalize_string/1),
-        national_prefix: ~x"./@nationalPrefix"o |> transform_by(&normalize_string/1),
-        preferred_extn_prefix: ~x"./@preferredExtnPrefix"o |> transform_by(&normalize_string/1),
-        national_prefix_for_parsing: ~x"./nationalPrefixForParsing"o |> transform_by(&normalize_string/1),
-        national_prefix_tranform_rule: ~x"./@nationalPrefixTransformRule"o |> transform_by(&normalize_string/1),
         #same_mobile_and_fixed_line_pattern: nil,
-        available_formats: [
+        number_format: [
           ~x"./availableFormats/numberFormat"el,
           number_format: ~x"."e |> transform_by(&NumberFormat.from_xpath_node/1)
-          #intl_number_format: nil,
-        ],
-        main_country_for_code: ~x"./@mainCountryForCode"o |> transform_by(&normalize_boolean/1),
-        leading_digits: ~x"./@leadingDigits"o |> transform_by(&normalize_string/1),
-        leading_zero_possible: ~x"./leadingZeroPossible"o |> transform_by(&normalize_boolean/1),
-        mobile_number_portable_region: ~x"./@mobileNumberPortableRegion"o |> transform_by(&normalize_boolean/1)
+        ]
       )
     struct(%PhoneMetadata{}, kwlist)
   end
@@ -125,6 +131,124 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   end
 
   def has_national_prefix?(phone_metadata = %PhoneMetadata{}) do
-    not is_nil(phone_metadata.international_prefix)
+    not is_nil_or_empty?(phone_metadata.national_prefix)
   end
+
+  def has_national_prefix_for_parsing?(phone_metadata = %PhoneMetadata{}) do
+    not is_nil_or_empty?(phone_metadata.national_prefix_for_parsing)
+  end
+
+  def has_national_prefix_optional_when_formatting?(phone_metadata = %PhoneMetadata{}) do
+    not is_nil_or_empty?(phone_metadata.national_prefix_optional_when_formatting)
+  end
+
+  def put_default_values(phone_metadata = %PhoneMetadata{}) do
+    Logger.debug "----- Territory -----"
+    Logger.debug "region_code: #{inspect(phone_metadata.id)}"
+
+    if has_national_prefix?(phone_metadata) do
+      Logger.debug "has national_prefix"
+      if not has_national_prefix_for_parsing?(phone_metadata) do
+        Logger.debug "has not national_prefix_for_parsing"
+        phone_metadata = %{phone_metadata | national_prefix_for_parsing: phone_metadata.national_prefix}
+        Logger.debug "national_prefix_for_parsing: #{inspect(phone_metadata.national_prefix_for_parsing)}"
+      end
+    else
+      Logger.debug "has not national_prefix"
+    end
+
+    phone_metadata = %{phone_metadata | national_prefix_formatting_rule: get_national_prefix_formatting_rule(phone_metadata)}
+    Logger.debug "national_prefix_formatting_rule: #{inspect(phone_metadata.national_prefix_formatting_rule)}"
+
+    phone_metadata = %{phone_metadata | carrier_code_formatting_rule: get_domestic_carrier_code_formatting_rule(phone_metadata)}
+    Logger.debug "carrier_code_formatting_rule: #{inspect(phone_metadata.carrier_code_formatting_rule)}"
+
+    Logger.debug "number_format count: #{inspect(length(phone_metadata.number_format))}"
+    formats = get_number_format(phone_metadata)
+    number_format = List.foldl(formats, [], fn(x,acc) -> acc ++ [destructure_to_number_format(x)] end)
+    intl_number_format = List.foldl(formats, [], fn(x,acc) -> acc ++ [destructure_to_intl_number_format(x)] end)
+    %{phone_metadata | number_format: number_format, intl_number_format: intl_number_format}
+  end
+
+  defp get_national_prefix_formatting_rule(%PhoneMetadata{national_prefix: prefix, national_prefix_formatting_rule: rule}), do: get_national_prefix_formatting_rule(prefix, rule)
+  defp get_national_prefix_formatting_rule(%NumberFormat{national_prefix_formatting_rule: rule}, prefix), do: get_national_prefix_formatting_rule(prefix, rule)
+  defp get_national_prefix_formatting_rule(prefix, rule) do
+    rule = String.replace(rule, "\\$NP", prefix, global: false)
+    String.replace(rule, "\\$FG", "\\$1", global: false)
+  end
+
+  defp get_domestic_carrier_code_formatting_rule(%PhoneMetadata{national_prefix: prefix, carrier_code_formatting_rule: rule}), do: get_domestic_carrier_code_formatting_rule(prefix, rule)
+  defp get_domestic_carrier_code_formatting_rule(%NumberFormat{domestic_carrier_code_formatting_rule: rule}, prefix), do: get_domestic_carrier_code_formatting_rule(prefix, rule)
+  defp get_domestic_carrier_code_formatting_rule(prefix, rule) do
+    rule = String.replace(rule, "\\$FG", "\\$1", global: false)
+    String.replace(rule, "\\$NP", prefix, global: false)
+  end
+
+  defp get_number_format(%PhoneMetadata{} = phone_metadata), do: get_number_format(phone_metadata.number_format, phone_metadata)
+  defp get_number_format([head|tail], %PhoneMetadata{} = phone_metadata) do
+    [get_number_format(head, phone_metadata) | get_number_format(tail, phone_metadata)]
+  end
+  defp get_number_format(%{number_format: number_format}, %PhoneMetadata{} = phone_metadata) do
+    Logger.debug "---> number_format"
+    Logger.debug "\t#{inspect(number_format)}"
+
+    number_format = Map.merge(number_format,
+      if not is_nil_or_empty?(number_format.national_prefix_formatting_rule) do
+        %{national_prefix_formatting_rule: get_national_prefix_formatting_rule(number_format, phone_metadata.national_prefix)}
+      else
+        %{national_prefix_formatting_rule: phone_metadata.national_prefix_formatting_rule}
+      end)
+    Logger.debug "\tnational_prefix_formatting_rule: #{inspect(number_format.national_prefix_formatting_rule)}"
+
+    number_format = Map.merge(number_format,
+      if is_nil_or_empty?(number_format.national_prefix_optional_when_formatting) do
+        %{national_prefix_optional_when_formatting: has_national_prefix_optional_when_formatting?(phone_metadata)}
+      else
+        %{}
+      end)
+    Logger.debug "\tnational_prefix_optional_when_formatting: #{inspect(number_format.national_prefix_optional_when_formatting)}"
+
+    number_format = Map.merge(number_format,
+      if not is_nil_or_empty?(number_format.domestic_carrier_code_formatting_rule) do
+        %{domestic_carrier_code_formatting_rule: get_domestic_carrier_code_formatting_rule(number_format, phone_metadata.national_prefix)}
+      else
+        %{domestic_carrier_code_formatting_rule: phone_metadata.carrier_code_formatting_rule}
+      end)
+    Logger.debug "\tdomestic_carrier_code_formatting_rule: #{inspect(number_format.domestic_carrier_code_formatting_rule)}"
+
+    number_format = Map.merge(number_format,
+      %{leading_digits_pattern: List.wrap(Enum.reduce(number_format.leading_digits_pattern, [], fn(%{pattern: pattern}, _) -> pattern end))}
+    )
+    Logger.debug "\tleading_digits_pattern: #{inspect(number_format.leading_digits_pattern)}"
+
+    intl_number_format = get_intl_format(number_format)
+    Logger.debug "---> intl_number_format"
+    Logger.debug "\t#{inspect(intl_number_format)}"
+    %{number_format: number_format, intl_number_format: intl_number_format}
+  end
+  defp get_number_format([], _), do: []
+
+  defp get_intl_format(%NumberFormat{} = number_format) do
+    intl_number_format =
+      if is_nil_or_empty?(number_format.intl_format) do
+        Map.merge(%NumberFormat{}, number_format)
+      else
+        intl_number_format = %NumberFormat{pattern: number_format.pattern, leading_digits_pattern: number_format.leading_digits_pattern}
+        unless number_format.intl_format == "NA" do
+          intl_number_format = Map.merge(intl_number_format, %{format: number_format.intl_format})
+        end
+        intl_number_format
+      end
+
+    unless is_nil_or_empty?(intl_number_format.format) do
+      intl_number_format
+    else
+      nil
+    end
+  end
+
+  defp destructure_to_number_format([]), do: []
+  defp destructure_to_number_format(%{number_format: number_format}), do: number_format
+  defp destructure_to_intl_number_format([]), do: []
+  defp destructure_to_intl_number_format(%{intl_number_format: number_format}), do: number_format
 end

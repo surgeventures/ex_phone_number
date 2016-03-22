@@ -1,13 +1,12 @@
 defmodule ExPhoneNumber.PhoneNumberUtil do
   import ExPhoneNumber.Extraction
   import ExPhoneNumber.Normalization
-  import ExPhoneNumber.Util
   import ExPhoneNumber.Validation
   alias ExPhoneNumber.Constant.ErrorMessage
   alias ExPhoneNumber.Constant.Pattern
   alias ExPhoneNumber.Constant.Value
 
-  def parse(number_to_parse, region) when is_nil(number_to_parse), do: {:error, ErrorMessage.not_a_number}
+  def parse(number_to_parse, _region) when is_nil(number_to_parse), do: {:error, ErrorMessage.not_a_number}
   def parse(number_to_parse, region) when is_binary(number_to_parse) and is_binary(region) do
     validate_length(number_to_parse) # {:ok // {:error
     build_national_number_for_parsing(number_to_parse) # string
