@@ -24,13 +24,10 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
             voip: nil,                                     # %PhoneNumberDescription{}
             pager: nil,                                    # %PhoneNumberDescription{}
             uan: nil,                                      # %PhoneNumberDescription{}
-            emergency: nil,                                # %PhoneNumberDescription{}
             voicemail: nil,                                # %PhoneNumberDescription{}
-            short_code: nil,                               # %PhoneNumberDescription{}
-            standard_rate: nil,                            # %PhoneNumberDescription{}
-            carrier_specific: nil,                         # %PhoneNumberDescription{}
             no_international_dialing: nil,                 # %PhoneNumberDescription{}
             same_mobile_and_fixed_line_pattern: nil,       # boolean
+            available_formats: [],                         # [%NumberFormat{}]
             number_format: [],                             # [%NumberFormat{}]
             intl_number_format: []                         # [%NumberFormat{}]
 
@@ -50,7 +47,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         international_prefix: ~x"./@internationalPrefix"s,
         preferred_international_prefix: ~x"./@preferredInternationalPrefix"o |> transform_by(&normalize_string/1),
         national_prefix: ~x"./@nationalPrefix"s,
-        national_prefix_for_parsing: ~x"./nationalPrefixForParsing"o |> transform_by(&normalize_string/1),
+        national_prefix_for_parsing: ~x"./@nationalPrefixForParsing"o |> transform_by(&normalize_string/1),
         national_prefix_transform_rule: ~x"./@nationalPrefixTransformRule"o |> transform_by(&normalize_string/1),
         national_prefix_formatting_rule: ~x"./@nationalPrefixFormattingRule"s,
         preferred_extn_prefix: ~x"./@preferredExtnPrefix"o |> transform_by(&normalize_string/1),
@@ -68,14 +65,9 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         voip: ~x"./voip"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         pager: ~x"./pager"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         uan: ~x"./uan"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
-        #emergency: nil,
         voicemail: ~x"./voicemail"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
-        #short_code: nil,
-        #standard_rate: nil,
-        #carrier_specific: nil,
         no_international_dialing: ~x"./noInternationalDialling"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
-        #same_mobile_and_fixed_line_pattern: nil,
-        number_format: [
+        available_formats: [
           ~x"./availableFormats/numberFormat"el,
           number_format: ~x"."e |> transform_by(&NumberFormat.from_xpath_node/1)
         ]
@@ -144,6 +136,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
   def put_default_values(phone_metadata = %PhoneMetadata{}) do
     Logger.debug "----- Territory -----"
+    Logger.debug "#{inspect(phone_metadata)}"
     Logger.debug "region_code: #{inspect(phone_metadata.id)}"
 
     if has_national_prefix?(phone_metadata) do
@@ -163,11 +156,27 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     phone_metadata = %{phone_metadata | carrier_code_formatting_rule: get_domestic_carrier_code_formatting_rule(phone_metadata)}
     Logger.debug "carrier_code_formatting_rule: #{inspect(phone_metadata.carrier_code_formatting_rule)}"
 
-    Logger.debug "number_format count: #{inspect(length(phone_metadata.number_format))}"
+    Logger.debug "available_formats count: #{inspect(length(phone_metadata.available_formats))}"
     formats = get_number_format(phone_metadata)
     number_format = List.foldl(formats, [], fn(x,acc) -> acc ++ [destructure_to_number_format(x)] end)
+    Logger.debug "number_format count: #{inspect(length(number_format))}"
     intl_number_format = List.foldl(formats, [], fn(x,acc) -> acc ++ [destructure_to_intl_number_format(x)] end)
-    %{phone_metadata | number_format: number_format, intl_number_format: intl_number_format}
+    Logger.debug "intl_number_format count: #{inspect(length(intl_number_format))}"
+    phone_metadata = %{phone_metadata | number_format: number_format, intl_number_format: intl_number_format}
+    phone_metadata = %{phone_metadata | general: process_phone_number_description(phone_metadata.general, phone_metadata)}
+    phone_metadata = %{phone_metadata | fixed_line: process_phone_number_description(phone_metadata.fixed_line, phone_metadata)}
+    phone_metadata = %{phone_metadata | mobile: process_phone_number_description(phone_metadata.mobile, phone_metadata)}
+    phone_metadata = %{phone_metadata | toll_free: process_other_phone_number_description(phone_metadata.toll_free, phone_metadata)}
+    phone_metadata = %{phone_metadata | premium_rate: process_other_phone_number_description(phone_metadata.premium_rate, phone_metadata)}
+    phone_metadata = %{phone_metadata | shared_cost: process_other_phone_number_description(phone_metadata.shared_cost, phone_metadata)}
+    phone_metadata = %{phone_metadata | voip: process_other_phone_number_description(phone_metadata.voip, phone_metadata)}
+    phone_metadata = %{phone_metadata | personal_number: process_other_phone_number_description(phone_metadata.personal_number, phone_metadata)}
+    phone_metadata = %{phone_metadata | pager: process_other_phone_number_description(phone_metadata.pager, phone_metadata)}
+    phone_metadata = %{phone_metadata | uan: process_other_phone_number_description(phone_metadata.uan, phone_metadata)}
+    phone_metadata = %{phone_metadata | voicemail: process_other_phone_number_description(phone_metadata.voicemail, phone_metadata)}
+    phone_metadata = %{phone_metadata | no_international_dialing: process_other_phone_number_description(phone_metadata.no_international_dialing, phone_metadata)}
+    phone_metadata = %{phone_metadata | same_mobile_and_fixed_line_pattern: phone_metadata.mobile.national_number_pattern == phone_metadata.fixed_line.national_number_pattern}
+    phone_metadata
   end
 
   defp get_national_prefix_formatting_rule(%PhoneMetadata{national_prefix: prefix, national_prefix_formatting_rule: rule}), do: get_national_prefix_formatting_rule(prefix, rule)
@@ -184,8 +193,8 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     String.replace(rule, "\\$NP", prefix, global: false)
   end
 
-  defp get_number_format(%PhoneMetadata{} = phone_metadata), do: get_number_format(phone_metadata.number_format, phone_metadata)
-  defp get_number_format([head|tail], %PhoneMetadata{} = phone_metadata) do
+  defp get_number_format(%PhoneMetadata{} = phone_metadata), do: get_number_format(phone_metadata.available_formats, phone_metadata)
+  defp get_number_format([head | tail], %PhoneMetadata{} = phone_metadata) do
     [get_number_format(head, phone_metadata) | get_number_format(tail, phone_metadata)]
   end
   defp get_number_format(%{number_format: number_format}, %PhoneMetadata{} = phone_metadata) do
@@ -251,4 +260,42 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   defp destructure_to_number_format(%{number_format: number_format}), do: number_format
   defp destructure_to_intl_number_format([]), do: []
   defp destructure_to_intl_number_format(%{intl_number_format: number_format}), do: number_format
+
+  defp process_phone_number_description(description, %PhoneMetadata{general: general}) when is_nil(description) and is_nil(general), do: process_phone_number_description(%PhoneNumberDescription{}, %PhoneNumberDescription{})
+  defp process_phone_number_description(description, %PhoneMetadata{general: general}) when is_nil(general), do: process_phone_number_description(description, %PhoneNumberDescription{})
+  defp process_phone_number_description(description, %PhoneMetadata{general: general}) when is_nil(description), do: process_phone_number_description(%PhoneNumberDescription{}, general)
+  defp process_phone_number_description(%PhoneNumberDescription{} = description, %PhoneMetadata{general: general}), do: process_phone_number_description(description, general)
+  defp process_phone_number_description(description, general) do
+    national_number_pattern =
+      if is_nil_or_empty?(description.national_number_pattern) do
+        general.national_number_pattern
+      else
+        description.national_number_pattern
+      end
+    possible_number_pattern =
+      if is_nil_or_empty?(description.possible_number_pattern) do
+        general.possible_number_pattern
+      else
+        description.possible_number_pattern
+      end
+    example_number =
+      if is_nil_or_empty?(description.example_number) do
+        general.example_number
+      else
+        description.example_number
+      end
+    %PhoneNumberDescription{
+      national_number_pattern: national_number_pattern,
+      possible_number_pattern: possible_number_pattern,
+      example_number: example_number
+    }
+  end
+
+  defp process_other_phone_number_description(description, %PhoneMetadata{general: general}) do
+    if is_nil(description) do
+      %PhoneNumberDescription{national_number_pattern: "NA", possible_number_pattern: "NA"}
+    else
+      process_phone_number_description(description, general)
+    end
+  end
 end

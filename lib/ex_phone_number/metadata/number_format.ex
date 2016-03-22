@@ -43,7 +43,5 @@ defmodule ExPhoneNumber.Metadata.NumberFormat do
   defp normalize_string(char_list) when is_list(char_list) do
     char_list
     |> List.to_string()
-    |> String.split(["\n", " "], trim: true)
-    |> List.to_string()
   end
 end
