@@ -1,5 +1,6 @@
 defmodule ExPhoneNumber.Metadata do
   import SweetXml
+  import ExPhoneNumber.Normalization
   alias ExPhoneNumber.Metadata.PhoneMetadata
 
   @resources_dir "./resources"
@@ -45,7 +46,6 @@ defmodule ExPhoneNumber.Metadata do
   end
 
   def get_region_code_for_country_code(country_code) when is_number(country_code) do
-    #Keyword.get(list_country_code_to_region_code, String.to_atom(Integer.to_string(country_code)))
     possible_region_codes = get_region_codes_for_country_code(country_code)
     possible_metadatas = Enum.map(possible_region_codes, fn(region_code) -> get_for_region_code(region_code) end)
     metadata = Enum.find(possible_metadatas, fn(metadata) -> metadata.main_country_for_code end)
@@ -83,7 +83,7 @@ defmodule ExPhoneNumber.Metadata do
   end
 
   def get_supported_regions() do
-    Enum.filter(list_region_code_to_metadata, fn({region_code, metadata}) -> Integer.parse(metadata.id) == :error end)
+    Enum.filter(list_region_code_to_metadata, fn({_region_code, metadata}) -> Integer.parse(metadata.id) == :error end)
   end
 
   def is_supported_region?(region_code) when is_binary(region_code) do
@@ -91,10 +91,22 @@ defmodule ExPhoneNumber.Metadata do
   end
 
   def get_supported_global_network_calling_codes() do
-    Enum.filter(list_region_code_to_metadata, fn({region_code, metadata}) -> Integer.parse(metadata.id) != :error end)
+    Enum.filter(list_region_code_to_metadata, fn({_region_code, metadata}) -> Integer.parse(metadata.id) != :error end)
   end
 
   def is_supported_global_network_calling_code?(calling_code) when is_number(calling_code) do
     Enum.any?(get_supported_global_network_calling_codes, fn({_, metadata}) -> metadata.country_code == calling_code end)
+  end
+
+  def is_supported_country_calling_code?(calling_code) when is_number(calling_code) do
+    Enum.any?(list_country_code_to_region_code, fn({_, metadata}) -> metadata.country_code == calling_code end)
+  end
+
+  def get_for_region_code_or_calling_code(calling_code, region_code) do
+    unless is_nil_or_empty?(region_code) do
+      get_for_region_code(region_code)
+    else
+      get_for_non_geographical_region(calling_code)
+    end
   end
 end
