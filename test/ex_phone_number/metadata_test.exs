@@ -233,7 +233,7 @@ defmodule ExPhoneNumber.MetadataSpec do
         refute is_supported_region?("001")
       end
 
-      it "returns false" do
+      it "returns false for calling code" do
         refute is_supported_region?("800")
       end
     end
