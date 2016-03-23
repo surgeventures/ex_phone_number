@@ -6,6 +6,7 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
   alias ExPhoneNumber.Constant.Pattern
   alias ExPhoneNumber.Constant.Value
   alias ExPhoneNumber.PhoneNumber
+  alias ExPhoneNumber.Metadata
 
   def parse(number_to_parse, default_region) do
     parse_helper(number_to_parse, default_region, false, true)
