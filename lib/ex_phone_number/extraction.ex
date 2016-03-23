@@ -18,7 +18,7 @@ defmodule ExPhoneNumber.Extraction do
     case Regex.run(Pattern.extn_pattern, phone_number) do
       [{index, match_length}] ->
         {phone_number_head, phone_number_tail} = String.split_at(phone_number, index)
-        if viable_phone_number?(phone_number_head) do
+        if is_viable_phone_number?(phone_number_head) do
           {ext_head, ext_tail} = String.split_at(phone_number_tail, match_length)
           ext_head
         else
