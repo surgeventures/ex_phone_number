@@ -10,8 +10,8 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
   def from_xpath_node(xpath_node) do
     kwlist =
       xpath_node |> xmap(
-        national_number_pattern: ~x"./nationalNumberPattern/text()"o |> transform_by(&normalize_string/1),
-        possible_number_pattern: ~x"./possibleNumberPattern/text()"o |> transform_by(&normalize_string/1),
+        national_number_pattern: ~x"./nationalNumberPattern/text()"o |> transform_by(&normalize_pattern/1),
+        possible_number_pattern: ~x"./possibleNumberPattern/text()"o |> transform_by(&normalize_pattern/1),
         example_number: ~x"./exampleNumber/text()"o |> transform_by(&normalize_string/1)
       )
     struct(%PhoneNumberDescription{}, kwlist)
@@ -23,5 +23,14 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
     |> List.to_string()
     |> String.split(["\n", " "], trim: true)
     |> List.to_string()
+  end
+
+  defp normalize_pattern(nil), do: nil
+  defp normalize_pattern(char_list) when is_list(char_list) do
+    char_list
+    |> List.to_string()
+    |> String.split(["\n", " "], trim: true)
+    |> List.to_string()
+    |> Regex.compile!()
   end
 end

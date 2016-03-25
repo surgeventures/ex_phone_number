@@ -57,6 +57,6 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
   end
 
   defp check_region_for_parsing(number_to_parse, default_region) do
-    Metadata.valid_region_code?(default_region) or Regex.match?(Pattern.leading_plus_char_pattern, number_to_parse)
+    Metadata.is_valid_region_code?(default_region) or Regex.match?(Pattern.leading_plus_char_pattern, number_to_parse)
   end
 end

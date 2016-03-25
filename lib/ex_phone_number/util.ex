@@ -1,4 +1,5 @@
 defmodule ExPhoneNumber.Util do
+  alias ExPhoneNumber.Constant.Value
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
 
   @doc ~S"""
@@ -6,6 +7,7 @@ defmodule ExPhoneNumber.Util do
   is the same size as the `string` parameter.
   """
   @spec matches_entirely?(Regex.t, String.t) :: boolean
+  def matches_entirely?(nil, string), do: false
   def matches_entirely?(regex, string) do
     case Regex.run(regex, string, return: :index) do
       [{_index, length}] -> Kernel.byte_size(string) == length
@@ -14,7 +16,11 @@ defmodule ExPhoneNumber.Util do
   end
 
   def is_number_matching_description?(number, %PhoneNumberDescription{} = description) when is_binary(number) do
-    matches_entirely?(description.possible_number_pattern, number) and
-      matches_entirely?(description.national_number_pattern, number)
+    if description.possible_number_pattern == Value.description_default_pattern or description.national_number_pattern == Value.description_default_pattern do
+      false
+    else
+      matches_entirely?(description.possible_number_pattern, number) and
+        matches_entirely?(description.national_number_pattern, number)
+    end
   end
 end

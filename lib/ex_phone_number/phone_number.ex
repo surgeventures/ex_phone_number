@@ -60,4 +60,20 @@ defmodule ExPhoneNumber.PhoneNumber do
   def has_preferred_domestic_carrier_code?(phone_number = %PhoneNumber{}) do
     not is_nil(phone_number.preferred_domestic_carrier_code)
   end
+
+  def get_national_significant_number(phone_number = %PhoneNumber{}) do
+    national_number = if has_national_number?(phone_number) do
+      phone_number.national_number
+    else
+      ""
+    end
+
+    if has_italian_leading_zero?(phone_number) and phone_number.italian_leading_zero do
+      upper_bound = get_number_of_leading_zeros_or_default(phone_number)
+      prefix = for x <- 1..upper_bound, do: "0"
+      List.to_string(prefix) <> Integer.to_string(national_number)
+    else
+      Integer.to_string(national_number)
+    end
+  end
 end

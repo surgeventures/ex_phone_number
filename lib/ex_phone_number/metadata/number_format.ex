@@ -14,7 +14,7 @@ defmodule ExPhoneNumber.Metadata.NumberFormat do
   def from_xpath_node(xpath_node) do
     kwlist =
       xpath_node |> xmap(
-        pattern: ~x"./@pattern"s,
+        pattern: ~x"./@pattern"s |> transform_by(&normalize_pattern/1),
         format: ~x"./format/text()"s,
         leading_digits_pattern: [
           ~x"./leadingDigits"el,
@@ -37,6 +37,7 @@ defmodule ExPhoneNumber.Metadata.NumberFormat do
     string
     |> String.split(["\n", " "], trim: true)
     |> List.to_string()
+    |> Regex.compile!()
   end
 
   defp normalize_string(nil), do: nil

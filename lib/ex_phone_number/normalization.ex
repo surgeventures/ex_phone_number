@@ -4,6 +4,13 @@ defmodule ExPhoneNumber.Normalization do
   alias ExPhoneNumber.Constant.Pattern
   alias ExPhoneNumber.Constant.Value
 
+  def match_at_start?(string, pattern) when is_binary(string) and is_map(pattern) do
+    case Regex.run(pattern, string, return: :index) do
+      [{index, _length}] -> index == 0
+      nil -> false
+    end
+  end
+
   def split_at_match_and_return_head(string, pattern) when is_binary(string) and is_map(pattern) do
     case Regex.run(pattern, string, return: :index) do
       [{index, _length}] ->

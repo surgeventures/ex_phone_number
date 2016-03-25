@@ -3,6 +3,8 @@ defmodule ExPhoneNumber.ValidationSpec do
 
   doctest ExPhoneNumber.Validation
   import ExPhoneNumber.Validation
+  alias PhoneNumberFixture
+  alias RegionCodeFixture
 
   describe ".validate_length" do
     context "length less or equal to Constant.Value.max_input_string_length" do
@@ -64,4 +66,149 @@ defmodule ExPhoneNumber.ValidationSpec do
     end
   end
 
+  describe ".is_valid_number/1" do
+    context "test US number" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.us_number)
+      end
+    end
+
+    context "test IT number" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.it_number)
+      end
+    end
+
+    context "test GB mobile" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.gb_mobile)
+      end
+    end
+
+    context "test International Toll Free" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.international_toll_free)
+      end
+    end
+
+    context "test Universal Premium Rate" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.universal_premium_rate)
+      end
+    end
+
+    context "test NZ number 2" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.nz_number2)
+      end
+    end
+
+    context "test invalid BS number" do
+      it "returns true" do
+        refute is_valid_number?(PhoneNumberFixture.bs_number_invalid)
+      end
+    end
+  end
+
+  describe ".is_valid_number_for_region?/2" do
+    context "test BS number" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.bs_number)
+      end
+
+      it "returns true #2" do
+        assert is_valid_number_for_region?(PhoneNumberFixture.bs_number, RegionCodeFixture.bs)
+      end
+
+      it "returns false" do
+        refute is_valid_number_for_region?(PhoneNumberFixture.bs_number, RegionCodeFixture.us)
+      end
+    end
+
+    context "test RE number" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.re_number)
+      end
+
+      it "returns true #2" do
+        assert is_valid_number_for_region?(PhoneNumberFixture.re_number, RegionCodeFixture.re)
+      end
+
+      it "returns false" do
+        refute is_valid_number_for_region?(PhoneNumberFixture.re_number, RegionCodeFixture.yt)
+      end
+    end
+
+    context "test RE number invalid" do
+      it "returns false" do
+        refute is_valid_number?(PhoneNumberFixture.re_number_invalid)
+      end
+
+      it "returns false #2" do
+        refute is_valid_number_for_region?(PhoneNumberFixture.re_number_invalid, RegionCodeFixture.re)
+      end
+
+      it "returns false #3" do
+        refute is_valid_number_for_region?(PhoneNumberFixture.re_number_invalid, RegionCodeFixture.yt)
+      end
+    end
+
+    context "test YT number" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.yt_number)
+      end
+
+      it "returns true #2" do
+        assert is_valid_number_for_region?(PhoneNumberFixture.yt_number, RegionCodeFixture.yt)
+      end
+
+      it "returns false" do
+        refute is_valid_number_for_region?(PhoneNumberFixture.yt_number, RegionCodeFixture.re)
+      end
+    end
+
+    context "test multi country number" do
+      it "returns true" do
+        assert is_valid_number_for_region?(PhoneNumberFixture.re_yt_number, RegionCodeFixture.re)
+      end
+
+      it "returns true #2" do
+        assert is_valid_number_for_region?(PhoneNumberFixture.re_yt_number, RegionCodeFixture.yt)
+      end
+    end
+
+    context "test International Toll Free number" do
+      it "returns true" do
+        assert is_valid_number_for_region?(PhoneNumberFixture.international_toll_free, RegionCodeFixture.un001)
+      end
+
+      it "returns false #1" do
+        refute is_valid_number_for_region?(PhoneNumberFixture.international_toll_free, RegionCodeFixture.us)
+      end
+
+      it "returns false #2" do
+        refute is_valid_number_for_region?(PhoneNumberFixture.international_toll_free, RegionCodeFixture.zz)
+      end
+    end
+  end
+
+  describe ".is_number_geographical?/1" do
+    context "test BS mobile" do
+      it "returns false" do
+        refute is_number_geographical?(PhoneNumberFixture.bs_mobile)
+      end
+    end
+
+    context "test AU number" do
+      it "returns true" do
+        assert is_number_geographical?(PhoneNumberFixture.au_number)
+      end
+    end
+
+    context "test International Toll Free number" do
+      it "returns false" do
+        refute is_number_geographical?(PhoneNumberFixture.international_toll_free)
+      end
+    end
+  end
 end

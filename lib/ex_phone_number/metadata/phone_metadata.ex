@@ -34,6 +34,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   require Logger
   import SweetXml
   import ExPhoneNumber.Normalization
+  alias ExPhoneNumber.Constant.Value
   alias ExPhoneNumber.Metadata.PhoneMetadata
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
   alias ExPhoneNumber.Metadata.NumberFormat
@@ -43,7 +44,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
       xpath_node |> xmap(
         id: ~x"./@id"s,
         country_code: ~x"./@countryCode"i,
-        leading_digits: ~x"./@leadingDigits"o |> transform_by(&normalize_string/1),
+        leading_digits: ~x"./@leadingDigits"o |> transform_by(&normalize_pattern/1),
         international_prefix: ~x"./@internationalPrefix"s,
         preferred_international_prefix: ~x"./@preferredInternationalPrefix"o |> transform_by(&normalize_string/1),
         national_prefix: ~x"./@nationalPrefix"s,
@@ -75,6 +76,15 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     struct(%PhoneMetadata{}, kwlist)
   end
 
+  defp normalize_pattern(nil), do: nil
+  defp normalize_pattern(char_list) when is_list(char_list) do
+    char_list
+    |> List.to_string()
+    |> String.split(["\n", " "], trim: true)
+    |> List.to_string()
+    |> Regex.compile!()
+  end
+
   defp normalize_string(nil), do: nil
   defp normalize_string(char_list) when is_list(char_list) do
     char_list
@@ -85,6 +95,19 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
   defp normalize_boolean(nil), do: nil
   defp normalize_boolean(true_char_list) when is_list(true_char_list) and length(true_char_list) == 4, do: true
+
+  defp get_map_key(%PhoneMetadata{} = phone_metadata) do
+    if Integer.parse(phone_metadata.id) != :error do
+      Integer.to_string(phone_metadata.country_code)
+    else
+      phone_metadata.id
+    end
+  end
+
+  def is_main_country_for_code?(nil), do: nil
+  def is_main_country_for_code?(%PhoneMetadata{} = phone_metadata) do
+    not is_nil(phone_metadata.main_country_for_code) and phone_metadata.main_country_for_code
+  end
 
   @same_mobile_and_fixed_line_pattern_default false
   def get_same_mobile_and_fixed_line_pattern_or_default(phone_metadata = %PhoneMetadata{}) do
@@ -120,6 +143,10 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     else
       phone_metadata.mobile_number_portable_region
     end
+  end
+
+  def has_leading_digits(%PhoneMetadata{} = phone_metadata) do
+    not is_nil_or_empty?(phone_metadata.leading_digits)
   end
 
   def has_national_prefix?(phone_metadata = %PhoneMetadata{}) do
@@ -176,7 +203,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     phone_metadata = %{phone_metadata | voicemail: process_other_phone_number_description(phone_metadata.voicemail, phone_metadata)}
     phone_metadata = %{phone_metadata | no_international_dialing: process_other_phone_number_description(phone_metadata.no_international_dialing, phone_metadata)}
     phone_metadata = %{phone_metadata | same_mobile_and_fixed_line_pattern: phone_metadata.mobile.national_number_pattern == phone_metadata.fixed_line.national_number_pattern}
-    phone_metadata
+    {get_map_key(phone_metadata), phone_metadata}
   end
 
   defp get_national_prefix_formatting_rule(%PhoneMetadata{national_prefix: prefix, national_prefix_formatting_rule: rule}), do: get_national_prefix_formatting_rule(prefix, rule)
@@ -243,7 +270,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         Map.merge(%NumberFormat{}, number_format)
       else
         intl_number_format = %NumberFormat{pattern: number_format.pattern, leading_digits_pattern: number_format.leading_digits_pattern}
-        unless number_format.intl_format == "NA" do
+        unless number_format.intl_format == Value.description_default_pattern do
           intl_number_format = Map.merge(intl_number_format, %{format: number_format.intl_format})
         end
         intl_number_format
@@ -261,11 +288,11 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   defp destructure_to_intl_number_format([]), do: []
   defp destructure_to_intl_number_format(%{intl_number_format: number_format}), do: number_format
 
-  defp process_phone_number_description(description, %PhoneMetadata{general: general}) when is_nil(description) and is_nil(general), do: process_phone_number_description(%PhoneNumberDescription{}, %PhoneNumberDescription{})
-  defp process_phone_number_description(description, %PhoneMetadata{general: general}) when is_nil(general), do: process_phone_number_description(description, %PhoneNumberDescription{})
-  defp process_phone_number_description(description, %PhoneMetadata{general: general}) when is_nil(description), do: process_phone_number_description(%PhoneNumberDescription{}, general)
+  defp process_phone_number_description(nil, nil), do: process_phone_number_description(%PhoneNumberDescription{}, %PhoneNumberDescription{})
+  defp process_phone_number_description(nil, %PhoneMetadata{general: general}), do: process_phone_number_description(%PhoneNumberDescription{}, general)
+  defp process_phone_number_description(%PhoneNumberDescription{} = description, nil), do: process_phone_number_description(description, %PhoneNumberDescription{})
   defp process_phone_number_description(%PhoneNumberDescription{} = description, %PhoneMetadata{general: general}), do: process_phone_number_description(description, general)
-  defp process_phone_number_description(description, general) do
+  defp process_phone_number_description(%PhoneNumberDescription{} = description, %PhoneNumberDescription{} = general) do
     national_number_pattern =
       if is_nil_or_empty?(description.national_number_pattern) do
         general.national_number_pattern
@@ -293,7 +320,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
   defp process_other_phone_number_description(description, %PhoneMetadata{general: general}) do
     if is_nil(description) do
-      %PhoneNumberDescription{national_number_pattern: "NA", possible_number_pattern: "NA"}
+      %PhoneNumberDescription{national_number_pattern: Value.description_default_pattern, possible_number_pattern: Value.description_default_pattern}
     else
       process_phone_number_description(description, general)
     end

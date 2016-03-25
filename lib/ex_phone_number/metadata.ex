@@ -1,7 +1,11 @@
 defmodule ExPhoneNumber.Metadata do
   import SweetXml
   import ExPhoneNumber.Normalization
+  import ExPhoneNumber.Validation
+  alias ExPhoneNumber.Constant.PhoneNumberType
+  alias ExPhoneNumber.Constant.Value
   alias ExPhoneNumber.Metadata.PhoneMetadata
+  alias ExPhoneNumber.PhoneNumber
 
   @resources_dir "./resources"
   @xml_file Application.fetch_env!(:ex_phone_number, :metadata_file)
@@ -19,94 +23,159 @@ defmodule ExPhoneNumber.Metadata do
   Module.register_attribute(__MODULE__, :list_country_code_to_region_code, accumulate: true)
 
   for metadata <- metadata_collection do
-    phone_metadata = PhoneMetadata.put_default_values(Map.get(metadata, :territory))
+    {region_key, phone_metadata} = PhoneMetadata.put_default_values(Map.get(metadata, :territory))
 
-    region = Map.get(phone_metadata, :id)
-    region_atom = String.to_atom(region)
+    region_atom = String.to_atom(region_key)
     Module.put_attribute(__MODULE__, :list_region_code_to_metadata, {region_atom, phone_metadata})
 
     country_code = Map.get(phone_metadata, :country_code)
     country_code_atom = String.to_atom(Integer.to_string(country_code))
-    Module.put_attribute(__MODULE__, :list_country_code_to_region_code, {country_code_atom, region})
+    Module.put_attribute(__MODULE__, :list_country_code_to_region_code, {country_code_atom, phone_metadata.id})
   end
 
-  def get_for_non_geographical_region(calling_code) when is_number(calling_code) do
-    region_code = get_region_code_for_country_code(calling_code)
-    get_for_region_code(region_code, calling_code)
+  list_cctrc = Module.get_attribute(__MODULE__, :list_country_code_to_region_code)
+  uniq_keys_cctrc = Enum.uniq(Keyword.keys(list_cctrc))
+  map_cctrc = Enum.reduce(uniq_keys_cctrc, %{}, fn(key, acc) ->
+    {new_key, _} = Integer.parse(Atom.to_string(key))
+    Map.put(acc, new_key, Keyword.get_values(list_cctrc, key))
+  end)
+  defp country_code_to_region_code_map() do
+    unquote(Macro.escape(map_cctrc))
   end
+  Module.delete_attribute(__MODULE__, :list_country_code_to_region_code)
 
-  def get_for_region_code(region_code) when is_binary(region_code) do
-    Keyword.get(list_region_code_to_metadata, String.to_atom(String.upcase(region_code)))
+  list_rctm = Module.get_attribute(__MODULE__, :list_region_code_to_metadata)
+  uniq_keys_rctm = Enum.uniq(Keyword.keys(list_rctm))
+  map_rctm = Enum.reduce(uniq_keys_rctm, %{}, fn(key, acc) -> Map.put(acc, Atom.to_string(key), Keyword.get(list_rctm, key)) end)
+  defp region_code_to_metadata_map() do
+    unquote(Macro.escape(map_rctm))
   end
-  def get_for_region_code(_), do: nil
+  Module.delete_attribute(__MODULE__, :list_region_code_to_metadata)
 
-  def get_for_region_code(region_code, country_code) when is_binary(region_code) and is_number(country_code) do
-    possible_metadatas = Keyword.get_values(list_region_code_to_metadata, String.to_atom(String.upcase(region_code)))
-    Enum.find(possible_metadatas, fn(metadata) -> country_code == metadata.country_code end)
-  end
-
-  def get_region_code_for_country_code(country_code) when is_number(country_code) do
-    possible_region_codes = get_region_codes_for_country_code(country_code)
-    possible_metadatas = Enum.map(possible_region_codes, fn(region_code) -> get_for_region_code(region_code) end)
-    metadata = Enum.find(possible_metadatas, fn(metadata) -> metadata.main_country_for_code end)
-    if is_nil(metadata) do
-      List.last(possible_metadatas).id
-    else
-      metadata.id
-    end
-  end
-  def get_region_code_for_country_code(_), do: nil
-
-  def get_region_codes_for_country_code(country_code) when is_number(country_code) do
-    Keyword.get_values(list_country_code_to_region_code, String.to_atom(Integer.to_string(country_code)))
-  end
-
-  def list_region_code_to_metadata, do: @list_region_code_to_metadata
-
-  def list_country_code_to_region_code, do: @list_country_code_to_region_code
-
-  def valid_region_code?(region_code) when is_binary(region_code) do
-    unless Integer.parse(region_code) == :error do
-      false
-    else
-      Keyword.has_key?(list_region_code_to_metadata, String.to_atom(String.upcase(region_code)))
-    end
-  end
-  def valid_region_code?(_), do: nil
-
-  def get_country_code_for_region_code(region_code) do
-    if valid_region_code?(region_code) do
-      get_for_region_code(region_code).country_code
-    else
+  def get_country_code_for_region_code(nil), do: 0
+  def get_country_code_for_region_code(region_code) when is_binary(region_code) do
+    if not is_valid_region_code?(region_code) do
       0
+    else
+      get_country_code_for_valid_region(region_code)
     end
   end
 
-  def get_supported_regions() do
-    Enum.filter(list_region_code_to_metadata, fn({_region_code, metadata}) -> Integer.parse(metadata.id) == :error end)
+  def get_country_code_for_valid_region(region_code) when is_binary(region_code) do
+    if metadata = get_for_region_code(region_code) do
+      metadata.country_code
+    else
+      {:error, "Invalid region code"}
+    end
   end
 
   def is_supported_region?(region_code) when is_binary(region_code) do
-    Enum.any?(get_supported_regions, fn({_, metadata}) -> metadata.id == region_code end)
+    not is_nil(region_code_to_metadata_map[String.upcase(region_code)])
   end
-
-  def get_supported_global_network_calling_codes() do
-    Enum.filter(list_region_code_to_metadata, fn({_region_code, metadata}) -> Integer.parse(metadata.id) != :error end)
-  end
+  def is_supported_region?(_), do: false
 
   def is_supported_global_network_calling_code?(calling_code) when is_number(calling_code) do
-    Enum.any?(get_supported_global_network_calling_codes, fn({_, metadata}) -> metadata.country_code == calling_code end)
+    not is_nil(region_code_to_metadata_map[Integer.to_string(calling_code)])
+  end
+  def is_supported_global_network_calling_code?(_), do: false
+
+  def is_valid_region_code?(nil), do: nil
+  def is_valid_region_code?(region_code) when is_binary(region_code) do
+    Integer.parse(region_code) == :error and not is_nil(region_code_to_metadata_map[String.upcase(region_code)])
   end
 
-  def is_supported_country_calling_code?(calling_code) when is_number(calling_code) do
-    Enum.any?(list_country_code_to_region_code, fn({_, metadata}) -> metadata.country_code == calling_code end)
+  def get_for_region_code(nil), do: nil
+  def get_for_region_code(region_code) do
+    region_code_to_metadata_map[String.upcase(region_code)]
+  end
+
+  def get_region_code_for_country_code(country_code) when is_number(country_code) do
+    region_codes = country_code_to_region_code_map[country_code]
+    unless region_codes do
+      Value.unknown_region
+    else
+      main_country = Enum.find(region_codes, fn(region_code) ->
+        metadata = region_code_to_metadata_map[region_code]
+        if is_nil(metadata) do
+          false
+        else
+          metadata.main_country_for_code
+        end
+      end)
+      if is_nil(main_country) do
+        Enum.at(Enum.reverse(region_codes), 0)
+      else
+        main_country
+      end
+    end
+  end
+
+  def get_region_codes_for_country_code(country_code) when is_number(country_code) do
+    List.wrap(country_code_to_region_code_map[country_code])
   end
 
   def get_for_region_code_or_calling_code(calling_code, region_code) do
-    unless is_nil_or_empty?(region_code) do
-      get_for_region_code(region_code)
-    else
+    if region_code == Value.region_code_for_non_geo_entity do
       get_for_non_geographical_region(calling_code)
+    else
+      get_for_region_code(region_code)
     end
+  end
+
+  def get_region_code_for_number(nil), do: nil
+  def get_region_code_for_number(%PhoneNumber{} = phone_number) do
+    regions = country_code_to_region_code_map[phone_number.country_code]
+    if is_nil(regions) do
+      nil
+    else
+      if length(regions) == 1 do
+        Enum.at(regions, 0)
+      else
+        get_region_code_for_number_from_region_list(phone_number, regions)
+      end
+    end
+  end
+
+  def get_region_code_for_number_from_region_list(%PhoneNumber{} = phone_number, region_codes) when is_list(region_codes) do
+    national_number = PhoneNumber.get_national_significant_number(phone_number)
+    find_matching_region_code(region_codes, national_number)
+  end
+
+  defp find_matching_region_code([], _), do: nil
+  defp find_matching_region_code([head | tail], national_number) do
+    if region_code = find_matching_region_code(head, national_number) do
+      region_code
+    else
+      find_matching_region_code(tail, national_number)
+    end
+  end
+  defp find_matching_region_code(region_code, national_number) when is_binary(region_code) and is_binary(national_number) do
+    metadata = get_for_region_code(region_code)
+    if PhoneMetadata.has_leading_digits(metadata) do
+      if match_at_start?(national_number, metadata.leading_digits) do
+        region_code
+      end
+    else
+      if get_number_type_helper(national_number, metadata) != PhoneNumberType.unknown do
+        region_code
+      end
+    end
+  end
+
+  def get_for_non_geographical_region(calling_code) when is_number(calling_code), do: get_for_non_geographical_region(Integer.to_string(calling_code))
+  def get_for_non_geographical_region(region_code) when is_binary(region_code) do
+    get_for_region_code(region_code)
+  end
+
+  def get_supported_regions() do
+    Enum.filter(Map.keys(region_code_to_metadata_map), fn(key) -> Integer.parse(key) == :error end)
+  end
+
+  def get_supported_global_network_calling_codes() do
+    region_codes_as_strings = Enum.filter(Map.keys(region_code_to_metadata_map), fn(key) -> Integer.parse(key) != :error end)
+    Enum.map(region_codes_as_strings, fn(calling_code) ->
+      {number, _} = Integer.parse(calling_code)
+      number
+    end)
   end
 end

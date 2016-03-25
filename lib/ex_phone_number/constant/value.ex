@@ -26,4 +26,7 @@ defmodule ExPhoneNumber.Constant.Value do
 
   def rfc3966_isdn_subaddress(), do: ";isub="
 
+  def region_code_for_non_geo_entity(), do: "001"
+
+  def description_default_pattern(), do: "NA"
 end

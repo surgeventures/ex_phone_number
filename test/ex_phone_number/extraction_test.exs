@@ -4,7 +4,7 @@ defmodule ExPhoneNumber.ExtractionSpec do
   doctest ExPhoneNumber.Extraction
   import ExPhoneNumber.Extraction
 
-  describe ".extract_possible_number" do
+  describe ".extract_possible_number/1" do
     context "removes preceding funky punctuation and letters" do
       it "should return the correct value" do
         assert "0800-345-600" == extract_possible_number("Tel:0800-345-600")
@@ -45,5 +45,4 @@ defmodule ExPhoneNumber.ExtractionSpec do
       end
     end
   end
-
 end

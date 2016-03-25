@@ -79,6 +79,4 @@ defmodule ExPhoneNumber.Constant.Pattern do
   def cc_pattern(), do: ~r/\$CC/u
 
   def first_group_only_prefix_pattern(), do: ~r/^\(?\$1\)?$/u
-
-  def region_code_for_non_geo_entity(), do: "001"
 end
