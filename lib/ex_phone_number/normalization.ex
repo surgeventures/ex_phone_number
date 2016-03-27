@@ -6,14 +6,14 @@ defmodule ExPhoneNumber.Normalization do
 
   def match_at_start?(string, pattern) when is_binary(string) and is_map(pattern) do
     case Regex.run(pattern, string, return: :index) do
-      [{index, _length}] -> index == 0
+      [{index, _length} | tail] -> index == 0
       nil -> false
     end
   end
 
   def split_at_match_and_return_head(string, pattern) when is_binary(string) and is_map(pattern) do
     case Regex.run(pattern, string, return: :index) do
-      [{index, _length}] ->
+      [{index, _length} | tail] ->
         {head, _tail} = String.split_at(string, index)
         head
       nil -> string

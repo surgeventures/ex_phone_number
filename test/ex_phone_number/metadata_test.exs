@@ -412,4 +412,36 @@ defmodule ExPhoneNumber.MetadataSpec do
       end
     end
   end
+
+  describe ".is_leading_zero_possible?/1" do
+    context "Italy" do
+      it "returns true" do
+        assert is_leading_zero_possible?(39)
+      end
+    end
+
+    context "USA" do
+      it "returns false" do
+        refute is_leading_zero_possible?(1)
+      end
+    end
+
+    context "International Toll Free" do
+      it "returns true" do
+        assert is_leading_zero_possible?(800)
+      end
+    end
+
+    context "Internatioal Premium Rate" do
+      it "returns false" do
+        refute is_leading_zero_possible?(979)
+      end
+    end
+
+    context "Invalid" do
+      it "returns false" do
+        refute is_leading_zero_possible?(888)
+      end
+    end
+  end
 end

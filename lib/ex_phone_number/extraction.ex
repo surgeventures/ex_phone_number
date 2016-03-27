@@ -5,7 +5,7 @@ defmodule ExPhoneNumber.Extraction do
 
   def extract_possible_number(number_to_parse) do
     case Regex.run(Pattern.valid_start_char_pattern, number_to_parse, return: :index) do
-      [{index, _length}] ->
+      [{index, _length} | tail] ->
         {_head, tail} = String.split_at(number_to_parse, index)
         tail
         |> split_at_match_and_return_head(Pattern.unwanted_end_char_pattern)

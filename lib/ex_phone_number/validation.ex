@@ -30,6 +30,7 @@ defmodule ExPhoneNumber.Validation do
     is_valid_number_for_region?(number, region_code)
   end
 
+  def is_valid_number_for_region?(%PhoneNumber{} = number, nil), do: false
   def is_valid_number_for_region?(%PhoneNumber{} = number, region_code) when is_binary(region_code) do
     metadata = Metadata.get_for_region_code_or_calling_code(number.country_code, region_code)
     is_invalid_code = Value.region_code_for_non_geo_entity != region_code and number.country_code != Metadata.get_country_code_for_valid_region(region_code)

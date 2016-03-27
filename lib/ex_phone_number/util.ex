@@ -10,7 +10,7 @@ defmodule ExPhoneNumber.Util do
   def matches_entirely?(nil, string), do: false
   def matches_entirely?(regex, string) do
     case Regex.run(regex, string, return: :index) do
-      [{_index, length}] -> Kernel.byte_size(string) == length
+      [{_index, length} | tail] -> Kernel.byte_size(string) == length
       _ -> false
     end
   end

@@ -53,7 +53,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         national_prefix_formatting_rule: ~x"./@nationalPrefixFormattingRule"s,
         preferred_extn_prefix: ~x"./@preferredExtnPrefix"o |> transform_by(&normalize_string/1),
         main_country_for_code: ~x"./@mainCountryForCode"o |> transform_by(&normalize_boolean/1),
-        leading_zero_possible: ~x"./leadingZeroPossible"o |> transform_by(&normalize_boolean/1),
+        leading_zero_possible: ~x"./@leadingZeroPossible"o |> transform_by(&normalize_boolean/1),
         mobile_number_portable_region: ~x"./@mobileNumberPortableRegion"o |> transform_by(&normalize_boolean/1),
         carrier_code_formatting_rule: ~x"./@carrierCodeFormattingRule"s,
         general: ~x"./generalDesc"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
@@ -93,7 +93,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     |> List.to_string()
   end
 
-  defp normalize_boolean(nil), do: nil
+  defp normalize_boolean(nil), do: false
   defp normalize_boolean(true_char_list) when is_list(true_char_list) and length(true_char_list) == 4, do: true
 
   defp get_map_key(%PhoneMetadata{} = phone_metadata) do
@@ -128,7 +128,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   end
 
   @leading_zero_possible_default false
-  def get_leading_zero_possible_or_default(phone_metadata = %PhoneMetadata{}) do
+  def get_leading_zero_possible_or_default(%PhoneMetadata{} = phone_metadata) do
     if is_nil(phone_metadata.leading_zero_possible) do
       @leading_zero_possible_default
     else

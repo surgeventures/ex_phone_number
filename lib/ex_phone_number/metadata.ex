@@ -178,4 +178,9 @@ defmodule ExPhoneNumber.Metadata do
       number
     end)
   end
+
+  def is_leading_zero_possible?(country_code) when is_number(country_code) do
+    metadata = get_for_region_code_or_calling_code(country_code, get_region_code_for_country_code(country_code))
+    not is_nil(metadata) and PhoneMetadata.get_leading_zero_possible_or_default(metadata)
+  end
 end
