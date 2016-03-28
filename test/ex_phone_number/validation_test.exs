@@ -3,6 +3,7 @@ defmodule ExPhoneNumber.ValidationSpec do
 
   doctest ExPhoneNumber.Validation
   import ExPhoneNumber.Validation
+  alias ExPhoneNumber.Constant.PhoneNumberType
   alias PhoneNumberFixture
   alias RegionCodeFixture
 
@@ -211,4 +212,35 @@ defmodule ExPhoneNumber.ValidationSpec do
       end
     end
   end
+
+  describe ".get_number_type/1" do
+    context "test IT premium" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.it_premium) == PhoneNumberType.premium_rate
+      end
+    end
+
+    context "test GB premium" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.gb_premium) == PhoneNumberType.premium_rate
+      end
+    end
+
+    context "test DE premium" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.de_premium) == PhoneNumberType.premium_rate
+      end
+
+      it "returns true #" do
+        assert get_number_type(PhoneNumberFixture.de_premium2) == PhoneNumberType.premium_rate
+      end
+    end
+
+    context "test Universal Premium Rate" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.universal_premium_rate) == PhoneNumberType.premium_rate
+      end
+    end
+  end
+
 end

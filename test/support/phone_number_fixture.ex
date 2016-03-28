@@ -71,6 +71,20 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def de_premium() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 9001654321
+    }
+  end
+
+  def de_premium2() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 90091234567
+    }
+  end
+
   def gb_mobile() do
     %PhoneNumber{
       country_code: 44,
@@ -82,6 +96,13 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 44,
       national_number: 2070313000
+    }
+  end
+
+  def gb_premium() do
+    %PhoneNumber{
+      country_code: 44,
+      national_number: 9187654321
     }
   end
 
@@ -97,6 +118,13 @@ defmodule PhoneNumberFixture do
       country_code: 39,
       national_number: 236618300,
       italian_leading_zero: true,
+    }
+  end
+
+  def it_premium() do
+    %PhoneNumber{
+      country_code: 39,
+      national_number: 892123
     }
   end
 
