@@ -296,6 +296,35 @@ defmodule ExPhoneNumber.ValidationSpec do
       end
     end
 
+    context "test DE mobile" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.de_mobile) == PhoneNumberType.mobile
+      end
+    end
+
+    context "test BS number" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.bs_number) == PhoneNumberType.fixed_line
+      end
+    end
+
+    context "test IT number" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.it_number) == PhoneNumberType.fixed_line
+      end
+    end
+
+    context "test GB number" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.gb_number) == PhoneNumberType.fixed_line
+      end
+    end
+
+    context "test DE number" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.de_number) == PhoneNumberType.fixed_line
+      end
+    end
   end
 
 end
