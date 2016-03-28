@@ -29,6 +29,13 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def ar_number2() do
+    %PhoneNumber{
+      country_code: 54,
+      national_number: 1987654321
+    }
+  end
+
   def au_number() do
     %PhoneNumber{
       country_code: 61,
@@ -124,6 +131,27 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 44,
       national_number: 8012345678
+    }
+  end
+
+  def gb_shard_cost() do
+    %PhoneNumber{
+      country_code: 44,
+      national_number: 8431231234
+    }
+  end
+
+  def gb_voip() do
+    %PhoneNumber{
+      country_code: 44,
+      national_number: 5631231234
+    }
+  end
+
+  def gb_personal_number() do
+    %PhoneNumber{
+      country_code: 44,
+      national_number: 7031231234
     }
   end
 

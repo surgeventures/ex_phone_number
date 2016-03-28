@@ -105,7 +105,7 @@ defmodule ExPhoneNumber.ValidationSpec do
     end
 
     context "test invalid BS number" do
-      it "returns true" do
+      it "returns false" do
         refute is_valid_number?(PhoneNumberFixture.bs_number_invalid)
       end
     end
@@ -323,6 +323,42 @@ defmodule ExPhoneNumber.ValidationSpec do
     context "test DE number" do
       it "returns true" do
         assert get_number_type(PhoneNumberFixture.de_number) == PhoneNumberType.fixed_line
+      end
+    end
+
+    context "test US number" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.us_number) == PhoneNumberType.fixed_line_or_mobile
+      end
+    end
+
+    context "test AR number 2" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.ar_number2) == PhoneNumberType.fixed_line_or_mobile
+      end
+    end
+
+    context "test GB shared cost" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.gb_shard_cost) == PhoneNumberType.shared_cost
+      end
+    end
+
+    context "test GB voip" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.gb_voip) == PhoneNumberType.voip
+      end
+    end
+
+    context "test GB personal number" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.gb_personal_number) == PhoneNumberType.personal_number
+      end
+    end
+
+    context "test US local number" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.us_local_number) == PhoneNumberType.unknown
       end
     end
   end
