@@ -241,6 +241,37 @@ defmodule ExPhoneNumber.ValidationSpec do
         assert get_number_type(PhoneNumberFixture.universal_premium_rate) == PhoneNumberType.premium_rate
       end
     end
+
+    context "test US toll free" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.us_tollfree2) == PhoneNumberType.toll_free
+      end
+    end
+
+    context "test IT toll free" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.it_toll_free) == PhoneNumberType.toll_free
+      end
+    end
+
+    context "test GB toll free" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.gb_toll_free) == PhoneNumberType.toll_free
+      end
+    end
+
+    context "test DE toll free" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.de_toll_free) == PhoneNumberType.toll_free
+      end
+    end
+
+    context "test International Toll Free" do
+      it "returns true" do
+        assert get_number_type(PhoneNumberFixture.international_toll_free) == PhoneNumberType.toll_free
+      end
+    end
+
   end
 
 end

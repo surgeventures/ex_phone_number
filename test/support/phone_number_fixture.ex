@@ -85,6 +85,13 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def de_toll_free() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 8001234567
+    }
+  end
+
   def gb_mobile() do
     %PhoneNumber{
       country_code: 44,
@@ -103,6 +110,13 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 44,
       national_number: 9187654321
+    }
+  end
+
+  def gb_toll_free() do
+    %PhoneNumber{
+      country_code: 44,
+      national_number: 8012345678
     }
   end
 
@@ -125,6 +139,13 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 39,
       national_number: 892123
+    }
+  end
+
+  def it_toll_free() do
+    %PhoneNumber{
+      country_code: 39,
+      national_number: 803123
     }
   end
 
@@ -244,6 +265,13 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 1,
       national_number: 8002530000
+    }
+  end
+
+  def us_tollfree2() do
+    %PhoneNumber{
+      country_code: 1,
+      national_number: 8881234567
     }
   end
 
