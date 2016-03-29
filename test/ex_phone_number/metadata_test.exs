@@ -444,4 +444,60 @@ defmodule ExPhoneNumber.MetadataSpec do
       end
     end
   end
+
+  describe ".get_ndd_prefix_for_region_code/2" do
+    context "US, false" do
+      it "returns the correct value" do
+        assert "1" == get_ndd_prefix_for_region_code(RegionCodeFixture.us, false)
+      end
+    end
+
+    context "BS, false" do
+      it "returns the correct value" do
+        assert "1" == get_ndd_prefix_for_region_code(RegionCodeFixture.bs, false)
+      end
+    end
+
+    context "NZ, false" do
+      it "returns the correct value" do
+        assert "0" == get_ndd_prefix_for_region_code(RegionCodeFixture.nz, false)
+      end
+    end
+
+    context "A0, false" do
+      it "returns the correct value" do
+        assert "0~0" == get_ndd_prefix_for_region_code(RegionCodeFixture.ao, false)
+      end
+    end
+
+    context "A0, true" do
+      it "returns the correct value" do
+        assert "00" == get_ndd_prefix_for_region_code(RegionCodeFixture.ao, true)
+      end
+    end
+
+    context "empty, false" do
+      it "returns the correct value" do
+        refute get_ndd_prefix_for_region_code("", false)
+      end
+    end
+
+    context "ZZ, false" do
+      it "returns the correct value" do
+        refute get_ndd_prefix_for_region_code(RegionCodeFixture.zz, false)
+      end
+    end
+
+    context "UN001, false" do
+      it "returns the correct value" do
+        refute get_ndd_prefix_for_region_code(RegionCodeFixture.un001, false)
+      end
+    end
+
+    context "CS, false" do
+      it "returns the correct value" do
+        refute get_ndd_prefix_for_region_code(RegionCodeFixture.cs, false)
+      end
+    end
+  end
 end

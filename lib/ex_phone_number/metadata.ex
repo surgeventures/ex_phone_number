@@ -183,4 +183,20 @@ defmodule ExPhoneNumber.Metadata do
     metadata = get_for_region_code_or_calling_code(country_code, get_region_code_for_country_code(country_code))
     not is_nil(metadata) and PhoneMetadata.get_leading_zero_possible_or_default(metadata)
   end
+
+  def get_ndd_prefix_for_region_code(region_code, strip_non_digits) when is_binary(region_code) and is_boolean(strip_non_digits) do
+    unless metadata = get_for_region_code(region_code) do
+      nil
+    else
+      unless is_nil(metadata.national_prefix) or String.length(metadata.national_prefix) > 0 do
+        nil
+      else
+        if strip_non_digits do
+          String.replace(metadata.national_prefix, "~", "")
+        else
+          metadata.national_prefix
+        end
+      end
+    end
+  end
 end
