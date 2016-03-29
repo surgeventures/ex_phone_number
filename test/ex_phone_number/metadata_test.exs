@@ -500,4 +500,42 @@ defmodule ExPhoneNumber.MetadataSpec do
       end
     end
   end
+
+  describe ".is_nanpa_country?/1" do
+    context "US" do
+      it "returns true" do
+        assert is_nanpa_country?(RegionCodeFixture.us)
+      end
+    end
+
+    context "BS" do
+      it "returns true" do
+        assert is_nanpa_country?(RegionCodeFixture.bs)
+      end
+    end
+
+    context "DE" do
+      it "returns false" do
+        refute is_nanpa_country?(RegionCodeFixture.de)
+      end
+    end
+
+    context "ZZ" do
+      it "returns false" do
+        refute is_nanpa_country?(RegionCodeFixture.zz)
+      end
+    end
+
+    context "UN001" do
+      it "returns false" do
+        refute is_nanpa_country?(RegionCodeFixture.un001)
+      end
+    end
+
+    context "nil" do
+      it "returns false" do
+        refute is_nanpa_country?(nil)
+      end
+    end
+  end
 end

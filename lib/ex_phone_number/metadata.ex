@@ -199,4 +199,9 @@ defmodule ExPhoneNumber.Metadata do
       end
     end
   end
+
+  def is_nanpa_country?(nil), do: false
+  def is_nanpa_country?(region_code) when is_binary(region_code) do
+    String.upcase(region_code) in country_code_to_region_code_map[Value.nanpa_country_code]
+  end
 end
