@@ -109,6 +109,40 @@ defmodule ExPhoneNumber.ValidationSpec do
         refute is_valid_number?(PhoneNumberFixture.bs_number_invalid)
       end
     end
+
+    context "test IT invalid" do
+      it "returns false" do
+        refute is_valid_number?(PhoneNumberFixture.it_invalid)
+      end
+    end
+
+    context "test GB invalid" do
+      it "returns false" do
+        refute is_valid_number?(PhoneNumberFixture.gb_invalid)
+      end
+    end
+
+    context "test DE invalid" do
+      it "returns false" do
+        refute is_valid_number?(PhoneNumberFixture.de_invalid)
+      end
+    end
+
+    context "test NZ invalid" do
+      it "returns false" do
+        refute is_valid_number?(PhoneNumberFixture.nz_invalid)
+      end
+    end
+
+    context "test country code invalid" do
+      it "returns false" do
+        refute is_valid_number?(PhoneNumberFixture.unknown_country_code)
+      end
+
+      it "returns false #2" do
+        refute is_valid_number?(PhoneNumberFixture.unknown_country_code2)
+      end
+    end
   end
 
   describe ".is_valid_number_for_region?/2" do
@@ -362,5 +396,4 @@ defmodule ExPhoneNumber.ValidationSpec do
       end
     end
   end
-
 end

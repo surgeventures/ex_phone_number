@@ -106,6 +106,13 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def de_invalid() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 1234
+    }
+  end
+
   def gb_mobile() do
     %PhoneNumber{
       country_code: 44,
@@ -155,6 +162,13 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def gb_invalid() do
+    %PhoneNumber{
+      country_code: 44,
+      national_number: 791234567
+    }
+  end
+
   def it_mobile() do
     %PhoneNumber{
       country_code: 39,
@@ -181,6 +195,14 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 39,
       national_number: 803123
+    }
+  end
+
+  def it_invalid() do
+    %PhoneNumber{
+      country_code: 39,
+      national_number: 23661830000,
+      italian_leading_zero: true
     }
   end
 
@@ -230,6 +252,13 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 64,
       national_number: 21387835
+    }
+  end
+
+  def nz_invalid() do
+    %PhoneNumber{
+      country_code: 64,
+      national_number: 3316005
     }
   end
 
@@ -350,6 +379,20 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 979,
       national_number: 123456789
+    }
+  end
+
+  def unknown_country_code() do
+    %PhoneNumber{
+      country_code: 3923,
+      national_number: 2366
+    }
+  end
+
+  def unknown_country_code2() do
+    %PhoneNumber{
+      country_code: 0,
+      national_number: 2366
     }
   end
 
