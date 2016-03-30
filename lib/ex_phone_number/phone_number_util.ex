@@ -5,6 +5,7 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
   alias ExPhoneNumber.Constant.ErrorMessage
   alias ExPhoneNumber.Constant.Pattern
   alias ExPhoneNumber.Constant.Value
+  alias ExPhoneNumber.Constant.ValidationResult
   alias ExPhoneNumber.PhoneNumber
   alias ExPhoneNumber.Metadata
 
@@ -25,13 +26,10 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
             {:error, ErrorMessage.invalid_country_code}
           else
             phone_number = if keep_raw_input, do: %PhoneNumber{raw_input: number_to_parse}, else: %PhoneNumber{}
-            phone_number = Map.merge(phone_number,
-              if extension = maybe_strip_extension(national_number) do
-                %{extension: extension}
-              else
-                %{}
-              end)
-            phone_number
+            {ext, national_number} = maybe_strip_extension(national_number)
+            phone_number = Map.merge(phone_number, if(not is_nil_or_empty?(ext), do: %{extension: ext}, else: %{}))
+            region_metadata = Metadata.get_for_region_code(default_region)
+            {result, country_code, normalized_national_number} = Extraction.maybe_extract_country_code(national_number, region_metadata, keep_raw_input)
           end
         end
     end
@@ -58,5 +56,20 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
 
   defp check_region_for_parsing(number_to_parse, default_region) do
     Metadata.is_valid_region_code?(default_region) or Regex.match?(Pattern.leading_plus_char_pattern, number_to_parse)
+  end
+
+  def is_possible_number?(%PhoneNumber{} = number) do
+    is_possible_number_with_reason?(number)
+  end
+
+  def is_possible_number_with_reason?(%PhoneNumber{} = number) do
+    unless Metadata.is_valid_country_code?(number.country_code) do
+      ValidationResult.invalid_country_code
+    else
+      region_code = Metadata.get_region_code_for_country_code(number.country_code)
+      metadata = Metadata.get_for_region_code_or_calling_code(number.country_code, region_code)
+      national_number = PhoneNumber.get_national_significant_number(number)
+      test_number_length_against_pattern(metadata.general.possible_number_pattern, national_number)
+    end
   end
 end

@@ -84,6 +84,11 @@ defmodule ExPhoneNumber.Metadata do
     Integer.parse(region_code) == :error and not is_nil(region_code_to_metadata_map[String.upcase(region_code)])
   end
 
+  def is_valid_country_code?(nil), do: false
+  def is_valid_country_code?(country_code) when is_number(country_code) do
+    not is_nil(country_code_to_region_code_map[country_code])
+  end
+
   def get_for_region_code(nil), do: nil
   def get_for_region_code(region_code) do
     region_code_to_metadata_map[String.upcase(region_code)]

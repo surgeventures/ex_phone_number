@@ -4,6 +4,7 @@ defmodule ExPhoneNumber.Validation do
   alias ExPhoneNumber.Constant.Pattern
   alias ExPhoneNumber.Constant.Value
   alias ExPhoneNumber.Constant.PhoneNumberType
+  alias ExPhoneNumber.Constant.ValidationResult
   alias ExPhoneNumber.Metadata
   alias ExPhoneNumber.Metadata.PhoneMetadata
   alias ExPhoneNumber.PhoneNumber
@@ -98,6 +99,17 @@ defmodule ExPhoneNumber.Validation do
       type == PhoneNumberType.uan -> metadata.uan
       type == PhoneNumberType.voicemail -> metadata.voicemail
       true -> metadata.general
+    end
+  end
+
+  def test_number_length_against_pattern(pattern, number) do
+    if matches_entirely?(pattern, number) do
+      ValidationResult.is_possible
+    else
+      case Regex.run(pattern, number, return: :index) do
+        [{index, match_length} | tail] -> if index==0, do: ValidationResult.too_long, else: ValidationResult.too_short
+        nil -> ValidationResult.too_short
+      end
     end
   end
 end

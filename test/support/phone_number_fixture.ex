@@ -290,6 +290,13 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def sg_number2() do
+    %PhoneNumber{
+      country_code: 65,
+      national_number: 1234567890
+    }
+  end
+
   def us_long_number() do
     %PhoneNumber{
       country_code: 1,
@@ -379,6 +386,13 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 979,
       national_number: 123456789
+    }
+  end
+
+  def nanpa_short_number() do
+    %PhoneNumber{
+      country_code: 1,
+      national_number: 253000
     }
   end
 
