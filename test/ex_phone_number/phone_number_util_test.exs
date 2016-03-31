@@ -31,9 +31,33 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
         assert is_possible_number?(PhoneNumberFixture.international_toll_free)
       end
     end
+
+    context "NANPA short number" do
+      it "should return false" do
+        refute is_possible_number?(PhoneNumberFixture.nanpa_short_number)
+      end
+    end
+
+    context "US long number" do
+      it "should return false" do
+        refute is_possible_number?(PhoneNumberFixture.us_long_number)
+      end
+    end
+
+    context "GB short number" do
+      it "should return false" do
+        refute is_possible_number?(PhoneNumberFixture.gb_short_number)
+      end
+    end
+
+    context "International Toll Free too long" do
+      it "should return false" do
+        refute is_possible_number?(PhoneNumberFixture.international_toll_free_too_long)
+      end
+    end
   end
 
-  describe ".is_possible_number?/2" do
+  xdescribe ".is_possible_number?/2" do
     context "US region" do
       it "should return true #1" do
         assert is_possible_number?("+1 650 253 0000", RegionCodeFixture.us)
@@ -49,6 +73,22 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
 
       it "should return true #4" do
         assert is_possible_number?("253-0000", RegionCodeFixture.us)
+      end
+
+      it "should return false #1" do
+        refute is_possible_number?("+1 650 253 00000", RegionCodeFixture.us)
+      end
+
+      it "should return false #2" do
+        refute is_possible_number?("(650) 253-00000", RegionCodeFixture.us)
+      end
+
+      it "should return false #3" do
+        refute is_possible_number?("I want a Pizza", RegionCodeFixture.us)
+      end
+
+      it "should return false #4" do
+        refute is_possible_number?("253-000", RegionCodeFixture.us)
       end
     end
 
@@ -68,6 +108,15 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
       it "should return true #4" do
         assert is_possible_number?("7031 3000", RegionCodeFixture.gb)
       end
+
+      it "should return false #1" do
+        refute is_possible_number?("1 3000", RegionCodeFixture.gb)
+      end
+
+      it "should return false #2" do
+        refute is_possible_number?("+44 300", RegionCodeFixture.gb)
+      end
+
     end
 
     context "NZ region" do
@@ -79,6 +128,10 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
     context "UN001 region" do
       it "should return true #1" do
         assert is_possible_number?("+800 1234 5678", RegionCodeFixture.un001)
+      end
+
+      it "should return false #1" do
+        refute is_possible_number?("+800 1234 5678 9", RegionCodeFixture.un001)
       end
     end
   end

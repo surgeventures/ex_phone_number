@@ -59,7 +59,7 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
   end
 
   def is_possible_number?(%PhoneNumber{} = number) do
-    is_possible_number_with_reason?(number)
+    ValidationResult.is_possible == is_possible_number_with_reason?(number)
   end
 
   def is_possible_number_with_reason?(%PhoneNumber{} = number) do
