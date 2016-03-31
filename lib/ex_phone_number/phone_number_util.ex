@@ -72,4 +72,11 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
       test_number_length_against_pattern(metadata.general.possible_number_pattern, national_number)
     end
   end
+
+  def is_possible_number?(number, region_code) when is_binary(number) do
+    case parse(number, region_code) do
+      {:ok, phone_number} -> is_possible_number?(phone_number)
+      {:error, _} -> false
+    end
+  end
 end

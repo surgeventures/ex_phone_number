@@ -33,6 +33,56 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
     end
   end
 
+  describe ".is_possible_number?/2" do
+    context "US region" do
+      it "should return true #1" do
+        assert is_possible_number?("+1 650 253 0000", RegionCodeFixture.us)
+      end
+
+      it "should return true #2" do
+        assert is_possible_number?("+1 650 GOO OGLE", RegionCodeFixture.us)
+      end
+
+      it "should return true #3" do
+        assert is_possible_number?("(650) 253-0000", RegionCodeFixture.us)
+      end
+
+      it "should return true #4" do
+        assert is_possible_number?("253-0000", RegionCodeFixture.us)
+      end
+    end
+
+    context "GB region" do
+      it "should return true #1" do
+        assert is_possible_number?("+1 650 253 0000", RegionCodeFixture.gb)
+      end
+
+      it "should return true #2" do
+        assert is_possible_number?("+44 20 7031 3000", RegionCodeFixture.gb)
+      end
+
+      it "should return true #3" do
+        assert is_possible_number?("(020) 7031 3000", RegionCodeFixture.gb)
+      end
+
+      it "should return true #4" do
+        assert is_possible_number?("7031 3000", RegionCodeFixture.gb)
+      end
+    end
+
+    context "NZ region" do
+      it "should return true #1" do
+        assert is_possible_number?("3331 6005", RegionCodeFixture.nz)
+      end
+    end
+
+    context "UN001 region" do
+      it "should return true #1" do
+        assert is_possible_number?("+800 1234 5678", RegionCodeFixture.un001)
+      end
+    end
+  end
+
   describe ".is_possible_number_with_reason?/1" do
     context "US number" do
       it "should return correct value" do
