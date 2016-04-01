@@ -180,4 +180,96 @@ defmodule ExPhoneNumber.ExtractionSpec do
       end
     end
   end
+
+  xdescribe ".maybe_extract_country_code/3" do
+    context "case 1" do
+      it "should return correct values" do
+        metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
+        {result, country_code, number, phone_number}  = maybe_extract_country_code("011112-3456789", metadata, true)
+        assert result
+        assert 1 == country_code
+        assert "123456789" = number
+        assert CountryCodeSource.from_number_with_idd == phone_number.country_code_source
+      end
+    end
+
+    context "case 2" do
+      it "should return correct values" do
+        metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
+        {result, country_code, _, phone_number}  = maybe_extract_country_code("+6423456789", metadata, true)
+        assert result
+        assert 64 == country_code
+        assert CountryCodeSource.from_number_with_plus_sign == phone_number.country_code_source
+      end
+    end
+
+    context "case 3" do
+      it "should return correct values" do
+        metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
+        {result, country_code, _, phone_number}  = maybe_extract_country_code("+80012345678", metadata, true)
+        assert result
+        assert 800 == country_code
+        assert CountryCodeSource.from_number_with_plus_sign == phone_number.country_code_source
+      end
+    end
+
+    context "case 4" do
+      it "should return correct values" do
+        metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
+        {result, country_code, _, phone_number}  = maybe_extract_country_code("2345-6789", metadata, true)
+        assert result
+        assert 0 == country_code
+        assert CountryCodeSource.from_default_country == phone_number.country_code_source
+      end
+    end
+
+    context "case 5" do
+      it "should return correct values" do
+        metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
+        {result, message}  = maybe_extract_country_code("0119991123456789", metadata, true)
+        refute result
+        assert message == ErrorMessage.invalid_country_code
+      end
+    end
+
+    context "case 6" do
+      it "should return correct values" do
+        metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
+        {result, country_code, _, phone_number} = maybe_extract_country_code("(1 610) 619 4466", metadata, true)
+        assert result
+        assert 1 = country_code
+        assert CountryCodeSource.from_number_without_plus_sign == phone_number.country_code_source
+      end
+    end
+
+    context "case 7" do
+      it "should return correct values" do
+        metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
+        {result, country_code, _, phone_number} = maybe_extract_country_code("(1 610) 619 4466", metadata, false)
+        assert result
+        assert 1 = country_code
+        assert is_nil(phone_number.country_code_source)
+      end
+    end
+
+    context "case 8" do
+      it "should return correct values" do
+        metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
+        {result, country_code, _, phone_number} = maybe_extract_country_code("(1 610) 619 446", metadata, false)
+        assert result
+        assert 0 = country_code
+        assert is_nil(phone_number.country_code_source)
+      end
+    end
+
+    context "case 9" do
+      it "should return correct values" do
+        metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
+        {result, country_code, _, phone_number} = maybe_extract_country_code("(1 610) 619", metadata, false)
+        assert result
+        assert 0 = country_code
+        assert CountryCodeSource.from_default_country == phone_number.country_code_source
+      end
+    end
+  end
 end
