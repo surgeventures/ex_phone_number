@@ -1,6 +1,7 @@
 defmodule ExPhoneNumber.Extraction do
   import ExPhoneNumber.Normalization
   import ExPhoneNumber.Validation
+  import ExPhoneNumber.Util
   alias ExPhoneNumber.Constant.CountryCodeSource
   alias ExPhoneNumber.Constant.Pattern
   alias ExPhoneNumber.Metadata.PhoneMetadata
@@ -56,6 +57,9 @@ defmodule ExPhoneNumber.Extraction do
     country_code_source = maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix)
   end
 
+  @doc ~S"""
+  Returns tuple {CountryCodeSource, number}
+  """
   def maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix) when length(number) == 0, do: {CountryCodeSource.from_default_country, ""}
   def maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix) do
     if Regex.match?(Pattern.leading_plus_char_pattern, number) do
@@ -71,15 +75,42 @@ defmodule ExPhoneNumber.Extraction do
   end
 
   @doc ~S"""
-  Returns tuple {boolean, carrier_code, number}
+  Returns tuple {boolen, carrier_code, number}
   """
-  def maybe_strip_national_prefix_and_carrier_code(number, metadata) do
-    number_length = String.length(number)
-    possible_national_prefix = metadata.national_prefix_for_parsing
-    if String.length(number) == 0 or is_nil(possible_national_prefix) or String.length(possible_national_prefix) == 0 do
-      {false, "", number}
-    else
-      :ok
+  def maybe_strip_national_prefix_and_carrier_code(number, %PhoneMetadata{} = metadata) do
+    maybe_strip_national_prefix_and_carrier_code(number, metadata.national_prefix_for_parsing, metadata.national_prefix_transform_rule, metadata.general.national_number_pattern)
+  end
+  def maybe_strip_national_prefix_and_carrier_code(number, national_prefix_for_parsing, national_prefix_transform_rule, general_national_number_pattern)
+    when is_nil(number) or is_nil(national_prefix_for_parsing), do: {false, "", number}
+  def maybe_strip_national_prefix_and_carrier_code(number, national_prefix_for_parsing, national_prefix_transform_rule, general_national_number_pattern)
+    when is_binary(number) and is_binary(national_prefix_for_parsing) do
+    false_result = {false, "", number}
+    prefix_pattern = ~r/^(?:#{national_prefix_for_parsing})/
+    case Regex.run(prefix_pattern, number) do
+      nil -> false_result
+      matches ->
+        is_viable_original_number = matches_entirely?(general_national_number_pattern, number)
+        number_of_groups = length(matches) - 1
+        no_transform = is_nil(national_prefix_transform_rule) or String.length(national_prefix_transform_rule) == 0
+          or is_nil(Enum.at(matches, number_of_groups)) or String.length(Enum.at(matches, number_of_groups)) == 0
+        number_strip = elem(String.split_at(number, String.length(Enum.at(matches, 0))), 1)
+        if no_transform do
+          if is_viable_original_number and not matches_entirely?(general_national_number_pattern, number_strip) do
+            false_result
+          else
+            carrier_code = if length(matches) > 0 and not is_nil(Enum.at(matches, number_of_groups)), do: Enum.at(matches, 1)
+            {true, carrier_code, number_strip}
+          end
+        else
+          transform_pattern = String.replace(national_prefix_transform_rule, ~r/\$(\d)/, "\\\\g{\\g{1}}")
+          transformed_number = Regex.replace(prefix_pattern, number, transform_pattern)
+          if is_viable_original_number and not matches_entirely?(general_national_number_pattern, transformed_number) do
+            false_result
+          else
+            carrier_code = if length(matches) > 0, do: Enum.at(matches, 1)
+            {true, carrier_code, transformed_number}
+          end
+        end
     end
   end
 end

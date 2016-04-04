@@ -47,7 +47,7 @@ defmodule ExPhoneNumber.ExtractionSpec do
     end
   end
 
-  xdescribe ".maybe_strip_national_prefix_and_carrier_code/2" do
+  describe ".maybe_strip_national_prefix_and_carrier_code/2" do
     context "national prefix" do
       let :metadata do
         %ExPhoneNumber.Metadata.PhoneMetadata{
@@ -65,8 +65,8 @@ defmodule ExPhoneNumber.ExtractionSpec do
       end
 
       it "should strip national prefix only once" do
-        {_, _, _} = maybe_strip_national_prefix_and_carrier_code("34356778", metadata)
-        {result, _, number} = maybe_strip_national_prefix_and_carrier_code("34356778", metadata)
+        {_, _, number} = maybe_strip_national_prefix_and_carrier_code("34356778", metadata)
+        {result, _, number} = maybe_strip_national_prefix_and_carrier_code(number, metadata)
         refute result
         assert "356778" == number
       end
@@ -107,7 +107,7 @@ defmodule ExPhoneNumber.ExtractionSpec do
     context "tranform rule" do
       let :metadata do
         %ExPhoneNumber.Metadata.PhoneMetadata{
-          national_prefix_for_parsing: "0(\d{2})",
+          national_prefix_for_parsing: "0(\\d{2})",
           national_prefix_transform_rule: "5$15",
           general: %ExPhoneNumber.Metadata.PhoneNumberDescription{
             national_number_pattern: ~r/\d{4,8}/

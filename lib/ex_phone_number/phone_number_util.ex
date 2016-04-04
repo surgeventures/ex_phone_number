@@ -29,7 +29,25 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
             {ext, national_number} = maybe_strip_extension(national_number)
             phone_number = Map.merge(phone_number, if(not is_nil_or_empty?(ext), do: %{extension: ext}, else: %{}))
             region_metadata = Metadata.get_for_region_code(default_region)
-            {result, country_code, normalized_national_number} = Extraction.maybe_extract_country_code(national_number, region_metadata, keep_raw_input)
+            case Extraction.maybe_extract_country_code(national_number, region_metadata, keep_raw_input) do
+              {:error, message} ->
+                if message == ErrorMessage.invalid_country_code and Regex.match?(Pattern.leading_plus_chars_pattern, national_number) do
+                  national_number = String.replace(national_number, Pattern.leading_plus_chars_pattern, "")
+                  case Extraction.maybe_extract_country_code(national_number, region_metadata, keep_raw_input) do
+                    {:error, message} -> {:error, message}
+                    {:ok, country_code, normalized_national_number, phone_number_map} ->
+                      if country_code == 0 do
+                        {:error, message}
+                      else
+                        phone_number = Map.merge(phone_number, phone_number_map)
+                      end
+                  end
+                else
+                  {:error, message}
+                end
+              {:ok, country_code, normalized_national_number, phone_number_map} ->
+                :ok
+            end
           end
         end
     end
