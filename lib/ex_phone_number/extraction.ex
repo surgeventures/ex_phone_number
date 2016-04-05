@@ -5,6 +5,7 @@ defmodule ExPhoneNumber.Extraction do
   alias ExPhoneNumber.Constant.CountryCodeSource
   alias ExPhoneNumber.Constant.Pattern
   alias ExPhoneNumber.Metadata.PhoneMetadata
+  alias ExPhoneNumber.Metadata
 
   def extract_possible_number(number_to_parse) do
     case Regex.run(Pattern.valid_start_char_pattern, number_to_parse, return: :index) do
@@ -108,6 +109,33 @@ defmodule ExPhoneNumber.Extraction do
             {true, carrier_code, transformed_number}
           end
         end
+    end
+  end
+
+  @doc ~S"""
+  Returns tuple {country_code, national_number}
+  """
+  def extract_country_code(full_number) when is_binary(full_number) do
+    if String.length(full_number) == 0 or String.at(full_number, 0) == "0" do
+      {0, ""}
+    else
+      extract_country_code(1, full_number)
+    end
+  end
+  def extract_country_code(index, full_number) when is_number(index) and is_binary(full_number) do
+    unless index <= Value.max_length_country_code and index <= String.length(full_number) do
+      {0, ""}
+    else
+      split = String.split_at(full_number, index)
+      case Integer.parse(elem(split, 0)) do
+        {int, bin} ->
+          if Metadata.is_valid_country_code?(int) do
+            {int, elem(split, 1)}
+          else
+            extract_country_code(index+1, full_number)
+          end
+        :error -> {0, ""}
+      end
     end
   end
 end
