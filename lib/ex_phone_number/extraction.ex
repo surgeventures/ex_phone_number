@@ -71,8 +71,25 @@ defmodule ExPhoneNumber.Extraction do
     end
   end
 
+  @doc ~S"""
+  Returns tuple {boolean, number}
+  """
   def parse_prefix_as_idd(pattern, number) do
-    :ok
+    case Regex.run(pattern, number, return: :index) do
+      [{index, match_length} | tail] ->
+        {number_head, number_tail} = String.split_at(index)
+        case Regex.run(Pattern.capturing_digit_pattern, number_tail) do
+          matches ->
+            normalized_group = Normalization.normalize_digits_only(Enum.at(matches, 1))
+            if normalized_group == "0" do
+              {false, number}
+            else
+              {true, number_tail}
+            end
+          nil -> {false, number}
+        end
+      nil -> {false, number}
+    end
   end
 
   @doc ~S"""
