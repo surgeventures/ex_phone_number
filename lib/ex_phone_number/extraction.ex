@@ -3,9 +3,13 @@ defmodule ExPhoneNumber.Extraction do
   import ExPhoneNumber.Validation
   import ExPhoneNumber.Util
   alias ExPhoneNumber.Constant.CountryCodeSource
+  alias ExPhoneNumber.Constant.ErrorMessage
   alias ExPhoneNumber.Constant.Pattern
+  alias ExPhoneNumber.Constant.ValidationResult
+  alias ExPhoneNumber.Constant.Value
   alias ExPhoneNumber.Metadata.PhoneMetadata
   alias ExPhoneNumber.Metadata
+  alias ExPhoneNumber.PhoneNumber
 
   def extract_possible_number(number_to_parse) do
     case Regex.run(Pattern.valid_start_char_pattern, number_to_parse, return: :index) do
@@ -50,13 +54,48 @@ defmodule ExPhoneNumber.Extraction do
     `metadata` - %PhoneMetadata{}. metadata about the region this number may be from.
     `keep_raw_input` - boolean. flag that indicates if country_code_source and preferred_carrier_code should be returned.
 
-  Returns tuple {boolean, carrier_code, number}
+  Returns tuple {boolean, national_number, phone_number}
   """
-  def maybe_extract_country_code(number, metadata, keep_raw_input) when length(number) == 0, do: 0
-  def maybe_extract_country_code(number,%PhoneMetadata{} = metadata, keep_raw_input) when is_binary(number) and is_boolean(keep_raw_input) do
-    possible_country_idd_prefix = unless is_nil(metadata), do: metadata.international_prefix
-    possible_country_idd_prefix = unless is_nil(possible_country_idd_prefix), do: "NonMatch"
-    country_code_source = maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix)
+  def maybe_extract_country_code(number, metadata, keep_raw_input) when length(number) == 0, do: {false, number, %{country_code: 0}}
+  def maybe_extract_country_code(number, metadata, keep_raw_input) when is_binary(number) and is_boolean(keep_raw_input) do
+    possible_country_idd_prefix = if not is_nil(metadata), do: metadata.international_prefix
+    possible_country_idd_prefix = if is_nil(possible_country_idd_prefix), do: "NonMatch", else: possible_country_idd_prefix
+    {country_code_source, full_number} = maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix)
+    phone_number = if keep_raw_input, do: %PhoneNumber{country_code_source: country_code_source}, else: %PhoneNumber{}
+    if country_code_source != CountryCodeSource.from_default_country do
+      if String.length(full_number) <= Value.min_length_for_nsn do
+        {false, ErrorMessage.too_short_after_idd}
+      else
+        {country_code, national_number} = extract_country_code(full_number)
+        if country_code != 0 do
+          {true, national_number, %{phone_number | country_code: country_code}}
+        else
+          {false, ErrorMessage.invalid_country_code}
+        end
+      end
+    else
+      if not is_nil(metadata) do
+        country_code_string = Integer.to_string(metadata.country_code)
+        if String.starts_with?(full_number, country_code_string) do
+          {_, potential_national_number} = String.split_at(full_number, String.length(country_code_string))
+          {result, _, possible_national_number} = maybe_strip_national_prefix_and_carrier_code(potential_national_number, metadata)
+          potential_national_number = if result, do: possible_national_number, else: potential_national_number
+          if (not matches_entirely?(metadata.general.national_number_pattern, full_number) and
+            matches_entirely?(metadata.general.national_number_pattern, potential_national_number))
+            or test_number_length_against_pattern(metadata.general.possible_number_pattern, full_number) == ValidationResult.too_long do
+            phone_number = if keep_raw_input, do: %{phone_number | country_code: metadata.country_code, country_code_source: CountryCodeSource.from_number_without_plus_sign},
+              else: phone_number
+            {true, potential_national_number, %{phone_number | country_code: metadata.country_code}}
+          else
+            {true, full_number, %{phone_number | country_code: 0}}
+          end
+        else
+          {true, full_number, %{phone_number | country_code: 0}}
+        end
+      else
+        {true, full_number, %{phone_number | country_code: 0}}
+      end
+    end
   end
 
   @doc ~S"""
