@@ -46,9 +46,10 @@ defmodule ExPhoneNumber.Extraction do
   Tries to extract a country calling code from a number.
 
   ## Options
-    `number` - String. non-normalized telephone number that we wish to extract a country calling code from - may begin with '+'.
+    `number` - String. Non-normalized telephone number that we wish to extract a country calling code from - may begin with '+'.
     `metadata` - %PhoneMetadata{}. metadata about the region this number may be from.
     `keep_raw_input` - boolean. flag that indicates if country_code_source and preferred_carrier_code should be returned.
+
   Returns tuple {boolean, carrier_code, number}
   """
   def maybe_extract_country_code(number, metadata, keep_raw_input) when length(number) == 0, do: 0
@@ -59,15 +60,30 @@ defmodule ExPhoneNumber.Extraction do
   end
 
   @doc ~S"""
+  Strips any international prefix (such as +, 00, 011) present in the number provided, normalizes the resulting number, and indicates if an international
+  prefix was present.
+
+  ## Options
+    `number` - String. Non-normalized telephone number that we wish to extract a country calling code from.
+    `possible_country_idd_prefix` - String. The International Dialing Prefix from the region we think this number may be dialed in.
+
   Returns tuple {CountryCodeSource, number}
   """
   def maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix) when length(number) == 0, do: {CountryCodeSource.from_default_country, ""}
   def maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix) do
-    if Regex.match?(Pattern.leading_plus_char_pattern, number) do
-      stripped_national_number = Regex.replace(Pattern.leading_plus_char_patterna, "", number)
-      {CountryCodeSource.from_number_without_plus_sign, normalize(stripped_national_number)}
+    if Regex.match?(Pattern.leading_plus_chars_pattern, number) do
+      stripped_plus_sign = Regex.replace(Pattern.leading_plus_chars_pattern, number, "")
+      {CountryCodeSource.from_number_with_plus_sign, normalize(stripped_plus_sign)}
     else
-      :ok
+      case Regex.compile(possible_country_idd_prefix) do
+        {:error, _} -> {CountryCodeSource.from_default_country, ""}
+        {:ok, regex} ->
+          normalized_number = normalize(number)
+          case parse_prefix_as_idd(regex, normalized_number) do
+            {false, _} -> {CountryCodeSource.from_default_country, normalized_number}
+            {true, stripped_idd} -> {CountryCodeSource.from_number_with_idd, stripped_idd}
+          end
+      end
     end
   end
 
@@ -77,16 +93,20 @@ defmodule ExPhoneNumber.Extraction do
   def parse_prefix_as_idd(pattern, number) do
     case Regex.run(pattern, number, return: :index) do
       [{index, match_length} | tail] ->
-        {number_head, number_tail} = String.split_at(index)
-        case Regex.run(Pattern.capturing_digit_pattern, number_tail) do
-          matches ->
-            normalized_group = Normalization.normalize_digits_only(Enum.at(matches, 1))
-            if normalized_group == "0" do
-              {false, number}
-            else
-              {true, number_tail}
-            end
-          nil -> {false, number}
+        if index == 0 do
+          {number_head, number_tail} = String.split_at(number, match_length)
+          case Regex.run(Pattern.capturing_digit_pattern, number_tail) do
+            matches ->
+              normalized_group = normalize_digits_only(Enum.at(matches, 1))
+              if normalized_group == "0" do
+                {false, number}
+              else
+                {true, number_tail}
+              end
+            nil -> {false, number}
+          end
+        else
+          {false, number}
         end
       nil -> {false, number}
     end

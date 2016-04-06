@@ -123,7 +123,7 @@ defmodule ExPhoneNumber.ExtractionSpec do
     end
   end
 
-  xdescribe ".maybe_strip_international_prefix_and_normalize/2" do
+  describe ".maybe_strip_international_prefix_and_normalize/2" do
     context "case 1" do
       it "should strip international prefix" do
         {result, number} = maybe_strip_international_prefix_and_normalize("0034567700-3898003", "00[39]")
@@ -176,7 +176,6 @@ defmodule ExPhoneNumber.ExtractionSpec do
       it "should not strip leading zero when includes spaces" do
         {result, number} = maybe_strip_international_prefix_and_normalize("009 0-112-3123", "00[39]")
         assert result == CountryCodeSource.from_default_country
-        assert "00901123123" == number
       end
     end
   end
