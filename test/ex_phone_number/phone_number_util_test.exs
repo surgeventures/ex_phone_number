@@ -179,4 +179,128 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
       end
     end
   end
+
+  xdescribe ".parse/2" do
+    context "NZ number" do
+      it "should return correct value #1" do
+        assert PhoneNumberFixture.nz_number == parse("033316005", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #2" do
+        assert PhoneNumberFixture.nz_number == parse("33316005", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #3" do
+        assert PhoneNumberFixture.nz_number == parse("03-331 6005", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #4" do
+        assert PhoneNumberFixture.nz_number == parse("03 331 6005", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #5" do
+        assert PhoneNumberFixture.nz_number == parse("tel:03-331-6005;phone-context=+64", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #6" do
+        assert PhoneNumberFixture.nz_number == parse("tel:331-6005;phone-context=+64-3", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #7" do
+        assert PhoneNumberFixture.nz_number == parse("tel:331-6005;phone-context=+64-3", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #8" do
+        assert PhoneNumberFixture.nz_number == parse("My number is tel:03-331-6005;phone-context=+64", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #9" do
+        assert PhoneNumberFixture.nz_number == parse("tel:03-331-6005;phone-context=+64;a=%A1", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #10" do
+        assert PhoneNumberFixture.nz_number == parse("tel:03-331-6005;isub=12345;phone-context=+64", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #11" do
+        assert PhoneNumberFixture.nz_number == parse("tel:+64-3-331-6005;isub=12345", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #12" do
+        assert PhoneNumberFixture.nz_number == parse("03-331-6005;phone-context=+64", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #13" do
+        assert PhoneNumberFixture.nz_number == parse("0064 3 331 6005", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #14" do
+        assert PhoneNumberFixture.nz_number == parse("01164 3 331 6005", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #15" do
+        assert PhoneNumberFixture.nz_number == parse("+64 3 331 6005", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #16" do
+        assert PhoneNumberFixture.nz_number == parse("+01164 3 331 6005", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #17" do
+        assert PhoneNumberFixture.nz_number == parse("+0064 3 331 6005", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #18" do
+        assert PhoneNumberFixture.nz_number == parse("+ 00 64 3 331 6005", RegionCodeFixture.nz)
+      end
+    end
+
+    context "NZ number3" do
+      it "should return correct value" do
+        assert PhoneNumberFixture.nz_number3 == parse("64(0)64123456", RegionCodeFixture.nz)
+      end
+    end
+
+    context "NZ short number" do
+      it "should return correct value" do
+        assert PhoneNumberFixture.nz_short_number == parse("12", RegionCodeFixture.nz)
+      end
+    end
+
+    context "DE number" do
+      it "should return correct value" do
+        assert PhoneNumberFixture.de_number == parse("301/23456", RegionCodeFixture.de)
+      end
+    end
+
+    context "JP star number" do
+      it "should return correct value" do
+        assert PhoneNumberFixture.jp_star_number == parse("+81 *2345", RegionCodeFixture.jp)
+      end
+    end
+
+    context "US number2" do
+      it "should return correct value" do
+        assert PhoneNumberFixture.us_number2 == parse("123-456-7890", RegionCodeFixture.de)
+      end
+    end
+
+    context "US local number" do
+      it "should return correct value #1" do
+        assert PhoneNumberFixture.us_local_number == parse("tel:253-0000;phone-context=www.google.com", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #2" do
+        assert PhoneNumberFixture.us_local_number == parse("tel:253-0000;isub=12345;phone-context=www.google.com", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #3" do
+        assert PhoneNumberFixture.us_local_number == parse("tel:2530000;isub=12345;phone-context=1-650", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #4" do
+        assert PhoneNumberFixture.us_local_number == parse("tel:2530000;isub=12345;phone-context=1234.com", RegionCodeFixture.us)
+      end
+    end
+  end
 end

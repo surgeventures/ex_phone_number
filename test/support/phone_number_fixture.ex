@@ -262,10 +262,24 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def nz_number3() do
+    %PhoneNumber{
+      country_code: 64,
+      national_number: 64123456
+    }
+  end
+
   def nz_invalid() do
     %PhoneNumber{
       country_code: 64,
       national_number: 3316005
+    }
+  end
+
+  def nz_short_number() do
+    %PhoneNumber{
+      country_code: 64,
+      national_number: 12
     }
   end
 
@@ -300,6 +314,13 @@ defmodule PhoneNumberFixture do
   def sg_number2() do
     %PhoneNumber{
       country_code: 65,
+      national_number: 1234567890
+    }
+  end
+
+  def us_number2() do
+    %PhoneNumber{
+      country_code: 1,
       national_number: 1234567890
     }
   end
