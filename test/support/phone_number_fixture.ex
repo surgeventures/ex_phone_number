@@ -283,6 +283,20 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def nz_toll_free() do
+    %PhoneNumber{
+      country_code: 64,
+      national_number: 800332005
+    }
+  end
+
+  def nz_premium() do
+    %PhoneNumber{
+      country_code: 64,
+      national_number: 9003326005
+    }
+  end
+
   def re_number() do
     %PhoneNumber{
       country_code: 262,

@@ -302,5 +302,97 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
         assert PhoneNumberFixture.us_local_number == parse("tel:2530000;isub=12345;phone-context=1234.com", RegionCodeFixture.us)
       end
     end
+
+    context "Number with alpha chars" do
+      it "should return correct value #1" do
+        assert PhoneNumberFixture.nz_toll_free == parse("0800 DDA 005", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #2" do
+        assert PhoneNumberFixture.nz_premium == parse("0900 DDA 6005", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #3" do
+        assert PhoneNumberFixture.nz_premium == parse("0900 332 6005a", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #4" do
+        assert PhoneNumberFixture.nz_premium == parse("0900 332 600a5", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #5" do
+        assert PhoneNumberFixture.nz_premium == parse("0900 332 600A5", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #6" do
+        assert PhoneNumberFixture.nz_premium == parse("0900 a332 600A5", RegionCodeFixture.nz)
+      end
+    end
+
+    context "Number with international prefix" do
+      it "should return correct value #1" do
+        assert PhoneNumberFixture.us_number == parse("+1 (650) 253-0000", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #2" do
+        assert PhoneNumberFixture.international_toll_free == parse("011 800 1234 5678", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #3" do
+        assert PhoneNumberFixture.us_number == parse("1-650-253-0000", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #4" do
+        assert PhoneNumberFixture.us_number == parse("0011-650-253-0000", RegionCodeFixture.sg)
+      end
+
+      it "should return correct value #5" do
+        assert PhoneNumberFixture.us_number == parse("0081-650-253-0000", RegionCodeFixture.sg)
+      end
+
+      it "should return correct value #6" do
+        assert PhoneNumberFixture.us_number == parse("0191-650-253-0000", RegionCodeFixture.sg)
+      end
+
+      it "should return correct value #7" do
+        assert PhoneNumberFixture.us_number == parse("0~01-650-253-0000", RegionCodeFixture.pl)
+      end
+
+      it "should return correct value #8" do
+        assert PhoneNumberFixture.us_number == parse("++1 (650) 253-0000", RegionCodeFixture.pl)
+      end
+    end
+
+    context "Non Ascii" do
+      it "should return correct value #1" do
+        assert PhoneNumberFixture.us_number == parse("\uFF0B1 (650) 253-0000", RegionCodeFixture.sg)
+      end
+
+      it "should return correct value #2" do
+        assert PhoneNumberFixture.us_number == parse("1 (650) 253\u00AD-0000", RegionCodeFixture.us)
+      end
+
+      it "should return correct value #3" do
+        assert PhoneNumberFixture.us_number == parse("\uFF0B\uFF11\u3000\uFF08\uFF16\uFF15\uFF10\uFF09\u3000\uFF12\uFF15\uFF13\uFF0D\uFF10\uFF10\uFF10\uFF10", RegionCodeFixture.sg)
+      end
+
+      it "should return correct value #4" do
+        assert PhoneNumberFixture.us_number == parse("\uFF0B\uFF11\u3000\uFF08\uFF16\uFF15\uFF10\uFF09\u3000\uFF12\uFF15\uFF13\u30FC\uFF10\uFF10\uFF10\uFF10", RegionCodeFixture.sg)
+      end
+    end
+
+    context "With Leading Zero" do
+      it "should return correct value #1" do
+        assert PhoneNumberFixture.it_number == parse("+39 02-36618 300", RegionCodeFixture.nz)
+      end
+
+      it "should return correct value #2" do
+        assert PhoneNumberFixture.it_number == parse("02-36618 300", RegionCodeFixture.it)
+      end
+
+      it "should return correct value #3" do
+        assert PhoneNumberFixture.it_mobile == parse("345 678 901", RegionCodeFixture.it)
+      end
+    end
   end
 end
