@@ -356,6 +356,142 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
       end
     end
 
+    context "AR numbers" do
+      it "should return correct value #1" do
+        {result, phone_number} = parse("+54 9 343 555 1212", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_mobile2 == phone_number
+      end
+
+      it "should return correct value #2" do
+        {result, phone_number} = parse("0343 15 555 1212", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_mobile2 == phone_number
+      end
+
+      it "should return correct value #3" do
+        {result, phone_number} = parse("+54 9 3715 65 4320", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_mobile3 == phone_number
+      end
+
+      it "should return correct value #4" do
+        {result, phone_number} = parse("03715 15 65 4320", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_mobile3 == phone_number
+      end
+
+      it "should return correct value #5" do
+        {result, phone_number} = parse("911 876 54321", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_mobile == phone_number
+      end
+
+      it "should return correct value #6" do
+        {result, phone_number} = parse("+54 11 8765 4321", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number == phone_number
+      end
+
+      it "should return correct value #7" do
+        {result, phone_number} = parse("011 8765 4321", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number == phone_number
+      end
+
+      it "should return correct value #8" do
+        {result, phone_number} = parse("+54 3715 65 4321", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number3 == phone_number
+      end
+
+      it "should return correct value #9" do
+        {result, phone_number} = parse("03715 65 4321", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number3 == phone_number
+      end
+
+      it "should return correct value #10" do
+        {result, phone_number} = parse("023 1234 0000", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number4 == phone_number
+      end
+
+      it "should return correct value #11" do
+        {result, phone_number} = parse("+54 23 1234 0000", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number4 == phone_number
+      end
+
+      it "should return correct value #12" do
+        {result, phone_number} = parse("01187654321", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number == phone_number
+      end
+
+      it "should return correct value #13" do
+        {result, phone_number} = parse("(0) 1187654321", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number == phone_number
+      end
+
+      it "should return correct value #14" do
+        {result, phone_number} = parse("0 1187654321", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number == phone_number
+      end
+
+      it "should return correct value #15" do
+        {result, phone_number} = parse("(0xx) 1187654321", RegionCodeFixture.ar)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number == phone_number
+      end
+
+      it "should return correct value #16" do
+        {result, phone_number} = parse("011xx5481429712", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.ar_number5 == phone_number
+      end
+    end
+
+    context "MX numbers" do
+      it "should return correct value #1" do
+        {result, phone_number} = parse("+52 (449)978-0001", RegionCodeFixture.mx)
+        assert :ok == result
+        assert PhoneNumberFixture.mx_number_3 == phone_number
+      end
+
+      it "should return correct value #2" do
+        {result, phone_number} = parse("01 (449)978-0001", RegionCodeFixture.mx)
+        assert :ok == result
+        assert PhoneNumberFixture.mx_number_3 == phone_number
+      end
+
+      it "should return correct value #3" do
+        {result, phone_number} = parse("(449)978-0001", RegionCodeFixture.mx)
+        assert :ok == result
+        assert PhoneNumberFixture.mx_number_3 == phone_number
+      end
+
+      it "should return correct value #4" do
+        {result, phone_number} = parse("+52 1 33 1234-5678", RegionCodeFixture.mx)
+        assert :ok == result
+        assert PhoneNumberFixture.mx_number4 == phone_number
+      end
+
+      it "should return correct value #5" do
+        {result, phone_number} = parse("044 (33) 1234-5678", RegionCodeFixture.mx)
+        assert :ok == result
+        assert PhoneNumberFixture.mx_number4 == phone_number
+      end
+
+      it "should return correct value #6" do
+        {result, phone_number} = parse("045 33 1234-5678", RegionCodeFixture.mx)
+        assert :ok == result
+        assert PhoneNumberFixture.mx_number4 == phone_number
+      end
+    end
+
     context "Number with alpha chars" do
       it "should return correct value #1" do
         {result, phone_number} = parse("0800 DDA 005", RegionCodeFixture.nz)

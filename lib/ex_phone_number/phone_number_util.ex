@@ -114,17 +114,17 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
     results_tuple
   end
 
-  defp build_national_number_for_parsing(number_to_parse) do
+  def build_national_number_for_parsing(number_to_parse) do
     case String.split(number_to_parse, Value.rfc3966_phone_context, parts: 2) do
       [number_head, number_tail] ->
-        national_number =
-          if String.starts_with?(number_tail, Value.plus_sign) do
-            case String.split(number_tail, ";", parts: 2) do
-              [phone_context_head, _] -> phone_context_head
-              [_] -> number_tail
-            end
+        if String.starts_with?(number_tail, Value.plus_sign) do
+          case String.split(number_tail, ";", parts: 2) do
+            [phone_context_head, _] -> phone_context_head
+            [_] -> number_tail
           end
-        case String.split(number_to_parse, Value.rfc3966_prefix, parts: 2) do
+        end
+        <>
+        case String.split(number_head, Value.rfc3966_prefix, parts: 2) do
           [_, national_number_tail] -> national_number_tail
           [_] -> number_head
         end

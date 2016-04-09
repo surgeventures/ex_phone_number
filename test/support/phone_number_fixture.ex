@@ -22,6 +22,20 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def ar_mobile2() do
+    %PhoneNumber{
+      country_code: 54,
+      national_number: 93435551212
+    }
+  end
+
+  def ar_mobile3() do
+    %PhoneNumber{
+      country_code: 54,
+      national_number: 93715654320
+    }
+  end
+
   def ar_number() do
     %PhoneNumber{
       country_code: 54,
@@ -33,6 +47,27 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 54,
       national_number: 1987654321
+    }
+  end
+
+  def ar_number3() do
+    %PhoneNumber{
+      country_code: 54,
+      national_number: 3715654321
+    }
+  end
+
+  def ar_number4() do
+    %PhoneNumber{
+      country_code: 54,
+      national_number: 2312340000
+    }
+  end
+
+  def ar_number5() do
+    %PhoneNumber{
+      country_code: 54,
+      national_number: 81429712
     }
   end
 
@@ -245,6 +280,20 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 52,
       national_number: 8211234567
+    }
+  end
+
+  def mx_number3() do
+    %PhoneNumber{
+      country_code: 52,
+      national_number: 4499780001
+    }
+  end
+
+  def mx_number4() do
+    %PhoneNumber{
+      country_code: 52,
+      national_number: 13312345678
     }
   end
 
