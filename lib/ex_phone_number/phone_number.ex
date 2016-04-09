@@ -76,4 +76,14 @@ defmodule ExPhoneNumber.PhoneNumber do
       Integer.to_string(national_number)
     end
   end
+
+  def set_italian_leading_zeros(national_number, %PhoneNumber{} = phone_number) do
+    if String.length(national_number) > 1 and String.at(national_number, 0) == "0" do
+      phone_number = %{phone_number | italian_leading_zero: true}
+      number_of_leading_zeros = Enum.reduce_while(String.graphemes(national_number), 0, fn ele, acc -> if ele == "0", do: {:cont, acc+1}, else: {:halt, acc} end)
+      if number_of_leading_zeros > 1, do: %{phone_number | number_of_leading_zeros: number_of_leading_zeros}, else: phone_number
+    else
+      phone_number
+    end
+  end
 end

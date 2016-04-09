@@ -26,6 +26,14 @@ defmodule ExPhoneNumber.Validation do
     end
   end
 
+  def is_viable_phone_number_helper(phone_number) do
+    if is_viable_phone_number?(phone_number) do
+      {:ok, phone_number}
+    else
+      {:error, ErrorMessage.not_a_number}
+    end
+  end
+
   def is_valid_number?(%PhoneNumber{} = number) do
     region_code = Metadata.get_region_code_for_number(number)
     is_valid_number_for_region?(number, region_code)
@@ -111,5 +119,9 @@ defmodule ExPhoneNumber.Validation do
         nil -> ValidationResult.too_short
       end
     end
+  end
+
+  def is_shorter_than_possible_normal_number?(metadata, number) do
+    test_number_length_against_pattern(metadata.general.possible_number_pattern, number) == ValidationResult.too_short
   end
 end
