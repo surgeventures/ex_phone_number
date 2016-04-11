@@ -168,7 +168,7 @@ defmodule ExPhoneNumber.Extraction do
         is_viable_original_number = matches_entirely?(general_national_number_pattern, number)
         number_of_groups = length(matches) - 1
         number_stripped = elem(String.split_at(number, String.length(Enum.at(matches, 0))), 1)
-        if is_nil_or_empty?(national_prefix_transform_rule) or is_nil_or_empty?(Enum.at(matches, number_of_groups)) do
+        if is_nil_or_empty?(national_prefix_transform_rule) or (not is_nil_or_empty?(Enum.at(matches, number_of_groups))) do
           if is_viable_original_number and not matches_entirely?(general_national_number_pattern, number_stripped) do
             {false, "", number}
           else
