@@ -324,7 +324,7 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
 
     context "US number2" do
       it "should return correct value" do
-        {result, phone_number} = parse("123-456-7890", RegionCodeFixture.de)
+        {result, phone_number} = parse("123-456-7890", RegionCodeFixture.us)
         assert :ok == result
         assert PhoneNumberFixture.us_number2 == phone_number
       end
@@ -458,19 +458,19 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
       it "should return correct value #1" do
         {result, phone_number} = parse("+52 (449)978-0001", RegionCodeFixture.mx)
         assert :ok == result
-        assert PhoneNumberFixture.mx_number_3 == phone_number
+        assert PhoneNumberFixture.mx_number3 == phone_number
       end
 
       it "should return correct value #2" do
         {result, phone_number} = parse("01 (449)978-0001", RegionCodeFixture.mx)
         assert :ok == result
-        assert PhoneNumberFixture.mx_number_3 == phone_number
+        assert PhoneNumberFixture.mx_number3 == phone_number
       end
 
       it "should return correct value #3" do
         {result, phone_number} = parse("(449)978-0001", RegionCodeFixture.mx)
         assert :ok == result
-        assert PhoneNumberFixture.mx_number_3 == phone_number
+        assert PhoneNumberFixture.mx_number3 == phone_number
       end
 
       it "should return correct value #4" do

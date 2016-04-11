@@ -55,13 +55,17 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
               phone_number_extract = if keep_raw_input, do: %{phone_number_extract | country_code_source: nil}, else: phone_number_extract
               {:ok, new_normalized_national_number, region_metadata, Map.merge(phone_number, phone_number_extract)}
             end
-          {:error, message} ->
+          {false, message} ->
             if message == ErrorMessage.invalid_country_code and Regex.match?(Pattern.leading_plus_chars_pattern, national_number) do
               national_number_without_plus_sign = String.replace(national_number, Pattern.leading_plus_chars_pattern, "")
-              case maybe_extract_country_code(national_number, region_metadata, keep_raw_input) do
+              case maybe_extract_country_code(national_number_without_plus_sign, region_metadata, keep_raw_input) do
                 {true, normalized_national_number, phone_number_extract} ->
-                  if phone_number_extract.country_code == 0, do: {:error, message}, else: {:ok, normalized_national_number, Map.merge(phone_number, phone_number_extract)}
-                {:error, message} -> {:error, message}
+                  if phone_number_extract.country_code == 0 do
+                    {:error, message}
+                  else
+                    {:ok, normalized_national_number, region_metadata, Map.merge(phone_number, phone_number_extract)}
+                  end
+                {false, message} -> {:error, message}
               end
             else
               {:error, message}
