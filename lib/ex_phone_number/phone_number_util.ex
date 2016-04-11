@@ -126,6 +126,8 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
             [phone_context_head, _] -> phone_context_head
             [_] -> number_tail
           end
+        else
+          ""
         end
         <>
         case String.split(number_head, Value.rfc3966_prefix, parts: 2) do
