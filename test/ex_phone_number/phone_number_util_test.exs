@@ -899,7 +899,7 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
       end
 
       it "should match the phone number #9" do
-        {result, phone_number} = parse("0~0 1800 7493 5247 ~1234", RegionCodeFixture.us)
+        {result, phone_number} = parse("0~0 1800 7493 5247 ~1234", RegionCodeFixture.pl)
         assert :ok == result
         assert PhoneNumberFixture.alpha_numeric_number2 == phone_number
       end
