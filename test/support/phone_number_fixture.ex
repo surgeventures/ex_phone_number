@@ -8,6 +8,14 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def alpha_numeric_number2() do
+    %PhoneNumber{
+      country_code: 1,
+      national_number: 80074935247,
+      extension: "1234"
+    }
+  end
+
   def ae_uan() do
     %PhoneNumber{
       country_code: 971,
@@ -239,6 +247,14 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def gb_number2() do
+    %PhoneNumber{
+      country_code: 44,
+      national_number: 2034567890,
+      extension: "456"
+    }
+  end
+
   def it_mobile() do
     %PhoneNumber{
       country_code: 39,
@@ -273,6 +289,41 @@ defmodule PhoneNumberFixture do
       country_code: 39,
       national_number: 23661830000,
       italian_leading_zero: true
+    }
+  end
+
+  def au_leading_zero() do
+    %PhoneNumber{
+      country_code: 61,
+      national_number: 11,
+      italian_leading_zero: true
+    }
+  end
+
+  def au_leading_zero2() do
+    %PhoneNumber{
+      country_code: 61,
+      national_number: 1,
+      italian_leading_zero: true,
+      number_of_leading_zeros: 2
+    }
+  end
+
+  def au_leading_zero3() do
+    %PhoneNumber{
+      country_code: 61,
+      national_number: 0,
+      italian_leading_zero: true,
+      number_of_leading_zeros: 2
+    }
+  end
+
+  def au_leading_zero4() do
+    %PhoneNumber{
+      country_code: 61,
+      national_number: 0,
+      italian_leading_zero: true,
+      number_of_leading_zeros: 3
     }
   end
 

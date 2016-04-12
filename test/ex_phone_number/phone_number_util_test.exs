@@ -873,6 +873,140 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
         assert :ok == result
         assert PhoneNumberFixture.nz_number4 == phone_number
       end
+
+      it "should match the phone number #5" do
+        {result, phone_number} = parse("1800 six-flags", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.alpha_numeric_number == phone_number
+      end
+
+      it "should match the phone number #6" do
+        {result, phone_number} = parse("1800 SIX FLAGS", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.alpha_numeric_number == phone_number
+      end
+
+      it "should match the phone number #7" do
+        {result, phone_number} = parse("0~0 1800 7493 5247", RegionCodeFixture.pl)
+        assert :ok == result
+        assert PhoneNumberFixture.alpha_numeric_number == phone_number
+      end
+
+      it "should match the phone number #8" do
+        {result, phone_number} = parse("(1800) 7493.5247", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.alpha_numeric_number == phone_number
+      end
+
+      it "should match the phone number #9" do
+        {result, phone_number} = parse("0~0 1800 7493 5247 ~1234", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.alpha_numeric_number2 == phone_number
+      end
+
+      it "should match the phone number #10" do
+        {result, phone_number} = parse("+44 2034567890x456", RegionCodeFixture.nz)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #11" do
+        {result, phone_number} = parse("+44 2034567890x456", RegionCodeFixture.gb)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #12" do
+        {result, phone_number} = parse("+44 2034567890 x456", RegionCodeFixture.gb)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #13" do
+        {result, phone_number} = parse("+44 2034567890 X456", RegionCodeFixture.gb)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #14" do
+        {result, phone_number} = parse("+44 2034567890 X 456", RegionCodeFixture.gb)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #15" do
+        {result, phone_number} = parse("+44 2034567890 X  456", RegionCodeFixture.gb)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #16" do
+        {result, phone_number} = parse("44 2034567890 x 456  ", RegionCodeFixture.gb)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #17" do
+        {result, phone_number} = parse("+44 2034567890  X 456", RegionCodeFixture.gb)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #18" do
+        {result, phone_number} = parse("+44-2034567890;ext=456", RegionCodeFixture.gb)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #19" do
+        {result, phone_number} = parse("tel:2034567890;ext=456;phone-context=+44", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #20" do
+        {result, phone_number} = parse("+442034567890\uFF45\uFF58\uFF54\uFF4E456", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #21" do
+        {result, phone_number} = parse("+442034567890\uFF58\uFF54\uFF4E456", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+
+      it "should match the phone number #22" do
+        {result, phone_number} = parse("+442034567890\uFF58\uFF54456", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.gb_number2 == phone_number
+      end
+    end
+
+    context "Italian leading zero" do
+      it "should match the phone number #1" do
+        {result, phone_number} = parse("011", RegionCodeFixture.au)
+        assert :ok == result
+        assert PhoneNumberFixture.au_leading_zero == phone_number
+      end
+
+      it "should match the phone number #2" do
+        {result, phone_number} = parse("001", RegionCodeFixture.au)
+        assert :ok == result
+        assert PhoneNumberFixture.au_leading_zero2 == phone_number
+      end
+
+      it "should match the phone number #3" do
+        {result, phone_number} = parse("000", RegionCodeFixture.au)
+        assert :ok == result
+        assert PhoneNumberFixture.au_leading_zero3 == phone_number
+      end
+
+      it "should match the phone number #4" do
+        {result, phone_number} = parse("0000", RegionCodeFixture.au)
+        assert :ok == result
+        assert PhoneNumberFixture.au_leading_zero4 == phone_number
+      end
     end
   end
 end

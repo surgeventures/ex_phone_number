@@ -81,6 +81,7 @@ defmodule ExPhoneNumber.PhoneNumber do
     if String.length(national_number) > 1 and String.at(national_number, 0) == "0" do
       phone_number = %{phone_number | italian_leading_zero: true}
       number_of_leading_zeros = Enum.reduce_while(String.graphemes(national_number), 0, fn ele, acc -> if ele == "0", do: {:cont, acc+1}, else: {:halt, acc} end)
+      number_of_leading_zeros = if String.ends_with?(national_number, "0"), do: number_of_leading_zeros - 1, else: number_of_leading_zeros
       if number_of_leading_zeros > 1, do: %{phone_number | number_of_leading_zeros: number_of_leading_zeros}, else: phone_number
     else
       phone_number
