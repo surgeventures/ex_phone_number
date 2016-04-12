@@ -539,6 +539,22 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def us_number_with_extension() do
+    %PhoneNumber{
+      country_code: 1,
+      national_number: 2121231234,
+      extension: "508"
+    }
+  end
+
+  def us_number_with_extension2() do
+    %PhoneNumber{
+      country_code: 1,
+      national_number: 6451231234,
+      extension: "910"
+    }
+  end
+
   def yt_number() do
     %PhoneNumber{
       country_code: 262,

@@ -981,6 +981,36 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
         assert :ok == result
         assert PhoneNumberFixture.gb_number2 == phone_number
       end
+
+      it "should match the phone number #23" do
+        {result, phone_number} = parse("(212)123-1234 x508/x1234", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.us_number_with_extension == phone_number
+      end
+
+      it "should match the phone number #24" do
+        {result, phone_number} = parse("(212)123-1234 x508/ x1234", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.us_number_with_extension == phone_number
+      end
+
+      it "should match the phone number #25" do
+        {result, phone_number} = parse("(212)123-1234 x508\\x1234", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.us_number_with_extension == phone_number
+      end
+
+      it "should match the phone number #26" do
+        {result, phone_number} = parse("+1 (645) 123 1234-910#", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.us_number_with_extension2 == phone_number
+      end
+
+      it "should match the phone number #27" do
+        {result, phone_number} = parse("+1 (645) 123 1234 ext. 910#", RegionCodeFixture.us)
+        assert :ok == result
+        assert PhoneNumberFixture.us_number_with_extension2 == phone_number
+      end
     end
 
     context "Italian leading zero" do
