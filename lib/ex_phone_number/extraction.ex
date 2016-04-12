@@ -39,14 +39,13 @@ defmodule ExPhoneNumber.Extraction do
         if is_viable_phone_number?(phone_number_head) do
           {match_index, match_length} = Enum.find(tail, fn {match_index, match_length} ->
             if match_index > 0 do
-              {match_head, match_tail} = String.split_at(number, match_index)
-              match_head != ""
+              match = Kernel.binary_part(number, match_index, match_length)
+              match != ""
             else
               false
             end
           end)
-          {_, ext_tail} = String.split_at(number, match_index)
-          {ext, _} = String.split_at(ext_tail, match_length)
+          ext = Kernel.binary_part(number, match_index, match_length)
           {ext, phone_number_head}
         else
           {"", number}
