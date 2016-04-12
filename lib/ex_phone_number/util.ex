@@ -2,11 +2,6 @@ defmodule ExPhoneNumber.Util do
   alias ExPhoneNumber.Constant.Value
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
 
-  @doc ~S"""
-  Returns a boolean indicating whether there was a match and
-  is the same size as the `string` parameter.
-  """
-  @spec matches_entirely?(Regex.t, String.t) :: boolean
   def matches_entirely?(nil, string), do: false
   def matches_entirely?(regex, string) do
     regex = ~r/^(?:#{regex.source})$/

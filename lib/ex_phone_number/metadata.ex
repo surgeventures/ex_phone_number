@@ -62,7 +62,8 @@ defmodule ExPhoneNumber.Metadata do
   end
 
   def get_country_code_for_valid_region(region_code) when is_binary(region_code) do
-    if metadata = get_for_region_code(region_code) do
+    metadata = get_for_region_code(region_code)
+    if metadata do
       metadata.country_code
     else
       {:error, "Invalid region code"}
@@ -96,7 +97,7 @@ defmodule ExPhoneNumber.Metadata do
 
   def get_region_code_for_country_code(country_code) when is_number(country_code) do
     region_codes = country_code_to_region_code_map[country_code]
-    unless region_codes do
+   if is_nil(region_codes) do
       Value.unknown_region
     else
       main_country = Enum.find(region_codes, fn(region_code) ->
@@ -148,7 +149,8 @@ defmodule ExPhoneNumber.Metadata do
 
   defp find_matching_region_code([], _), do: nil
   defp find_matching_region_code([head | tail], national_number) do
-    if region_code = find_matching_region_code(head, national_number) do
+    region_code = find_matching_region_code(head, national_number)
+    if region_code do
       region_code
     else
       find_matching_region_code(tail, national_number)
@@ -190,10 +192,10 @@ defmodule ExPhoneNumber.Metadata do
   end
 
   def get_ndd_prefix_for_region_code(region_code, strip_non_digits) when is_binary(region_code) and is_boolean(strip_non_digits) do
-    unless metadata = get_for_region_code(region_code) do
+    if is_nil(metadata = get_for_region_code(region_code)) do
       nil
     else
-      unless is_nil(metadata.national_prefix) or String.length(metadata.national_prefix) > 0 do
+      if not (is_nil(metadata.national_prefix) or String.length(metadata.national_prefix) > 0) do
         nil
       else
         if strip_non_digits do

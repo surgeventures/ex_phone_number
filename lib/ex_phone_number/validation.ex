@@ -18,11 +18,10 @@ defmodule ExPhoneNumber.Validation do
   end
 
   def is_viable_phone_number?(phone_number) do
-    cond do
-      String.length(phone_number) < Value.min_length_for_nsn ->
-        false
-      true ->
-        matches_entirely?(Pattern.valid_phone_number_pattern, phone_number)
+    if String.length(phone_number) < Value.min_length_for_nsn do
+      false
+    else
+      matches_entirely?(Pattern.valid_phone_number_pattern, phone_number)
     end
   end
 
@@ -59,7 +58,7 @@ defmodule ExPhoneNumber.Validation do
   def get_number_type(%PhoneNumber{} = phone_number) do
     region_code = Metadata.get_region_code_for_number(phone_number)
     metadata = Metadata.get_for_region_code_or_calling_code(phone_number.country_code, region_code)
-    unless metadata do
+    if metadata == nil do
       PhoneNumberType.unknown
     else
       national_significant_number = PhoneNumber.get_national_significant_number(phone_number)

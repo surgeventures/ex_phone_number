@@ -22,16 +22,6 @@ defmodule ExPhoneNumber.Extraction do
     end
   end
 
-  @doc ~S"""
-  Strips any extension (as in, the part of the number dialled after the call is connected, usually indicated with extn, ext, x or similar) from the end of the
-  number, and returns it.
-
-  ## Options
-    `number` - String. non-normalized telephone number that we wish to strip the extension from.
-
-  Returns tuple {extension, number}
-  """
-  @spec maybe_strip_extension(String.t) :: tuple
   def maybe_strip_extension(number) do
     case Regex.run(Pattern.extn_pattern, number, return: :index) do
       [{index, _} | tail] ->
@@ -54,16 +44,6 @@ defmodule ExPhoneNumber.Extraction do
     end
   end
 
-  @doc ~S"""
-  Tries to extract a country calling code from a number.
-
-  ## Options
-    `number` - String. Non-normalized telephone number that we wish to extract a country calling code from - may begin with '+'.
-    `metadata` - %PhoneMetadata{}. metadata about the region this number may be from.
-    `keep_raw_input` - boolean. flag that indicates if country_code_source and preferred_carrier_code should be returned.
-
-  Returns tuple {boolean, national_number, phone_number}
-  """
   def maybe_extract_country_code(number, metadata, keep_raw_input) when length(number) == 0, do: {false, number, %{country_code: 0}}
   def maybe_extract_country_code(number, metadata, keep_raw_input) when is_binary(number) and is_boolean(keep_raw_input) do
     possible_country_idd_prefix = if not is_nil(metadata), do: metadata.international_prefix
@@ -106,16 +86,6 @@ defmodule ExPhoneNumber.Extraction do
     end
   end
 
-  @doc ~S"""
-  Strips any international prefix (such as +, 00, 011) present in the number provided, normalizes the resulting number, and indicates if an international
-  prefix was present.
-
-  ## Options
-    `number` - String. Non-normalized telephone number that we wish to extract a country calling code from.
-    `possible_country_idd_prefix` - String. The International Dialing Prefix from the region we think this number may be dialed in.
-
-  Returns tuple {CountryCodeSource, number}
-  """
   def maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix) when length(number) == 0, do: {CountryCodeSource.from_default_country, ""}
   def maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix) do
     if Regex.match?(Pattern.leading_plus_chars_pattern, number) do
@@ -134,9 +104,6 @@ defmodule ExPhoneNumber.Extraction do
     end
   end
 
-  @doc ~S"""
-  Returns tuple {boolean, number}
-  """
   def parse_prefix_as_idd(pattern, number) do
     case Regex.run(pattern, number, return: :index) do
       [{index, match_length} | tail] ->
@@ -161,9 +128,6 @@ defmodule ExPhoneNumber.Extraction do
     end
   end
 
-  @doc ~S"""
-  Returns tuple {boolen, carrier_code, number}
-  """
   def maybe_strip_national_prefix_and_carrier_code(number, %PhoneMetadata{} = metadata) do
     maybe_strip_national_prefix_and_carrier_code(number, metadata.national_prefix_for_parsing, metadata.national_prefix_transform_rule, metadata.general.national_number_pattern)
   end
@@ -202,9 +166,6 @@ defmodule ExPhoneNumber.Extraction do
     end
   end
 
-  @doc ~S"""
-  Returns tuple {country_code, national_number}
-  """
   def extract_country_code(full_number) when is_binary(full_number) do
     if String.length(full_number) == 0 or String.at(full_number, 0) == "0" do
       {0, ""}
@@ -213,7 +174,7 @@ defmodule ExPhoneNumber.Extraction do
     end
   end
   def extract_country_code(index, full_number) when is_number(index) and is_binary(full_number) do
-    unless index <= Value.max_length_country_code and index <= String.length(full_number) do
+    if not(index <= Value.max_length_country_code and index <= String.length(full_number)) do
       {0, ""}
     else
       split = String.split_at(full_number, index)

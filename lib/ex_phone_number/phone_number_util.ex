@@ -21,7 +21,7 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
         {:error, message} -> {:error, message}
         {:ok, number_to_parse} ->
           national_number = build_national_number_for_parsing(number_to_parse)
-          unless is_viable_phone_number?(national_number) do
+          if not is_viable_phone_number?(national_number) do
             {:error, ErrorMessage.not_a_number}
           else
             if check_region and not check_region_for_parsing(national_number, default_region) do
@@ -37,7 +37,7 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
         {_, national_number, region_code} = results_tuple
         phone_number = if keep_raw_input, do: %PhoneNumber{raw_input: number_to_parse}, else: %PhoneNumber{}
         {ext, national_number} = maybe_strip_extension(national_number)
-        phone_number = unless is_nil_or_empty?(ext), do: %{phone_number | extension: ext}, else: phone_number
+        phone_number = if not is_nil_or_empty?(ext), do: %{phone_number | extension: ext}, else: phone_number
         region_metadata = Metadata.get_for_region_code(default_region)
         case maybe_extract_country_code(national_number, region_metadata, keep_raw_input) do
           {true, normalized_national_number, phone_number_extract} ->
@@ -119,7 +119,9 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
   end
 
   def build_national_number_for_parsing(number_to_parse) do
-    case String.split(number_to_parse, Value.rfc3966_phone_context, parts: 2) do
+    number_to_parse
+    |> String.split(Value.rfc3966_phone_context, parts: 2)
+    |> case do
       [number_head, number_tail] ->
         if String.starts_with?(number_tail, Value.plus_sign) do
           case String.split(number_tail, ";", parts: 2) do
@@ -155,7 +157,7 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
   end
 
   def is_possible_number_with_reason?(%PhoneNumber{} = number) do
-    unless Metadata.is_valid_country_code?(number.country_code) do
+    if not Metadata.is_valid_country_code?(number.country_code) do
       ValidationResult.invalid_country_code
     else
       region_code = Metadata.get_region_code_for_country_code(number.country_code)
@@ -173,9 +175,6 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
   end
 
   defp update_if_nil(_k, v1, v2) do
-    cond do
-      is_nil(v2) -> v1
-      true -> v2
-    end
+    if is_nil(v2), do: v1, else: v2
   end
 end

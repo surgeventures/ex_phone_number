@@ -1,5 +1,5 @@
 defmodule ExPhoneNumber.NormalizationSpec do
-  use Pavlov.Case
+  use Pavlov.Case, async: true
 
   doctest ExPhoneNumber.Normalization
   import ExPhoneNumber.Normalization

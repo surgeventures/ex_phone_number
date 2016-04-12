@@ -50,8 +50,11 @@ defmodule ExPhoneNumber.Normalization do
   end
 
   def normalize_helper(number, normalization_replacements, remove_non_matches) when is_binary(number) and is_map(normalization_replacements) and is_boolean(remove_non_matches) do
-    Enum.reduce(String.codepoints(number), [], fn(char, list) ->
-      if new_char = Map.get(normalization_replacements, String.upcase(char)) do
+    number
+    |> String.codepoints()
+    |> Enum.reduce([], fn(char, list) ->
+      new_char = Map.get(normalization_replacements, String.upcase(char))
+      if new_char do
         list ++ [new_char]
       else
         if remove_non_matches do
