@@ -766,5 +766,61 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
         assert ErrorMessage.invalid_country_code == message
       end
     end
+
+    context "With plus sign with no region" do
+      it "should match the phone number #1" do
+        {result, phone_number} = parse("+64 3 331 6005", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number == phone_number
+      end
+
+      it "should match the phone number #2" do
+        {result, phone_number} = parse("\uFF0B64 3 331 6005", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number == phone_number
+      end
+
+      it "should match the phone number #3" do
+        {result, phone_number} = parse("Tel: +64 3 331 6005", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number == phone_number
+      end
+
+      it "should match the phone number #4" do
+        {result, phone_number} = parse("+64 3 331 6005", nil)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number == phone_number
+      end
+
+      it "should match the phone number #5" do
+        {result, phone_number} = parse("+800 1234 5678", nil)
+        assert :ok == result
+        assert PhoneNumberFixture.international_toll_free == phone_number
+      end
+
+      it "should match the phone number #6" do
+        {result, phone_number} = parse("+979 123 456 789", nil)
+        assert :ok == result
+        assert PhoneNumberFixture.universal_premium_rate == phone_number
+      end
+
+      it "should match the phone number #7" do
+        {result, phone_number} = parse("tel:03-331-6005;phone-context=+64", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number == phone_number
+      end
+
+      it "should match the phone number #8" do
+        {result, phone_number} = parse("  tel:03-331-6005;phone-context=+64", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number == phone_number
+      end
+
+      it "should match the phone number #9" do
+        {result, phone_number} = parse("tel:03-331-6005;isub=12345;phone-context=+64", RegionCodeFixture.zz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number == phone_number
+      end
+    end
   end
 end
