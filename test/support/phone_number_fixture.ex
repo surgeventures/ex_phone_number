@@ -99,6 +99,34 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def by_number() do
+    %PhoneNumber{
+      country_code: 375,
+      national_number: 8123
+    }
+  end
+
+  def by_number2() do
+    %PhoneNumber{
+      country_code: 375,
+      national_number: 81234
+    }
+  end
+
+  def by_number3() do
+    %PhoneNumber{
+      country_code: 375,
+      national_number: 812345
+    }
+  end
+
+  def by_number4() do
+    %PhoneNumber{
+      country_code: 375,
+      national_number: 123456
+    }
+  end
+
   def de_number() do
     %PhoneNumber{
       country_code: 49,

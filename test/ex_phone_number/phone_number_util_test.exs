@@ -822,5 +822,31 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
         assert PhoneNumberFixture.nz_number == phone_number
       end
     end
+
+    context "too short if national prefix stripped" do
+      it "should match the phone number #1" do
+        {result, phone_number} = parse("8123", RegionCodeFixture.by)
+        assert :ok == result
+        assert PhoneNumberFixture.by_number == phone_number
+      end
+
+      it "should match the phone number #2" do
+        {result, phone_number} = parse("81234", RegionCodeFixture.by)
+        assert :ok == result
+        assert PhoneNumberFixture.by_number2 == phone_number
+      end
+
+      it "should match the phone number #3" do
+        {result, phone_number} = parse("812345", RegionCodeFixture.by)
+        assert :ok == result
+        assert PhoneNumberFixture.by_number3 == phone_number
+      end
+
+      it "should match the phone number #4" do
+        {result, phone_number} = parse("8123456", RegionCodeFixture.by)
+        assert :ok == result
+        assert PhoneNumberFixture.by_number4 == phone_number
+      end
+    end
   end
 end
