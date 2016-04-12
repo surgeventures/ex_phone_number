@@ -33,12 +33,21 @@ defmodule ExPhoneNumber.Extraction do
   """
   @spec maybe_strip_extension(String.t) :: tuple
   def maybe_strip_extension(number) do
-    case Regex.run(Pattern.extn_pattern, number) do
-      [{index, match_length} | tail] ->
+    case Regex.run(Pattern.extn_pattern, number, return: :index) do
+      [{index, _} | tail] ->
         {phone_number_head, phone_number_tail} = String.split_at(number, index)
         if is_viable_phone_number?(phone_number_head) do
-          {ext_head, ext_tail} = String.split_at(phone_number_tail, match_length)
-          {ext_head, phone_number_head}
+          {match_index, match_length} = Enum.find(tail, fn {match_index, match_length} ->
+            if match_index > 0 do
+              {match_head, match_tail} = String.split_at(number, match_index)
+              match_head != ""
+            else
+              false
+            end
+          end)
+          {_, ext_tail} = String.split_at(number, match_index)
+          {ext, _} = String.split_at(ext_tail, match_length)
+          {ext, phone_number_head}
         else
           {"", number}
         end

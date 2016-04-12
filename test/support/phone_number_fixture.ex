@@ -374,6 +374,14 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def nz_number4() do
+    %PhoneNumber{
+      country_code: 64,
+      national_number: 33316005,
+      extension: "3456"
+    }
+  end
+
   def re_number() do
     %PhoneNumber{
       country_code: 262,

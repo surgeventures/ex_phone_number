@@ -48,12 +48,12 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
                 else
                   region_metadata
                 end
-              {:ok, normalized_national_number, phone_number_region_metadata, Map.merge(phone_number, phone_number_extract)}
+              {:ok, normalized_national_number, phone_number_region_metadata, Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
             else
               new_normalized_national_number = normalize(national_number)
               phone_number_extract = %{phone_number_extract | country_code: region_metadata.country_code}
               phone_number_extract = if keep_raw_input, do: %{phone_number_extract | country_code_source: nil}, else: phone_number_extract
-              {:ok, new_normalized_national_number, region_metadata, Map.merge(phone_number, phone_number_extract)}
+              {:ok, new_normalized_national_number, region_metadata, Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
             end
           {false, message} ->
             if message == ErrorMessage.invalid_country_code and Regex.match?(Pattern.leading_plus_chars_pattern, national_number) do
@@ -63,7 +63,7 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
                   if phone_number_extract.country_code == 0 do
                     {:error, message}
                   else
-                    {:ok, normalized_national_number, region_metadata, Map.merge(phone_number, phone_number_extract)}
+                    {:ok, normalized_national_number, region_metadata, Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
                   end
                 {false, message} -> {:error, message}
               end
@@ -169,6 +169,13 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
     case parse(number, region_code) do
       {:ok, phone_number} -> is_possible_number?(phone_number)
       {:error, _} -> false
+    end
+  end
+
+  defp update_if_nil(_k, v1, v2) do
+    cond do
+      is_nil(v2) -> v1
+      true -> v2
     end
   end
 end

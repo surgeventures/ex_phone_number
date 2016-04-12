@@ -823,7 +823,7 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
       end
     end
 
-    context "too short if national prefix stripped" do
+    context "Too short if national prefix stripped" do
       it "should match the phone number #1" do
         {result, phone_number} = parse("8123", RegionCodeFixture.by)
         assert :ok == result
@@ -846,6 +846,32 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
         {result, phone_number} = parse("8123456", RegionCodeFixture.by)
         assert :ok == result
         assert PhoneNumberFixture.by_number4 == phone_number
+      end
+    end
+
+    context "Number with extension" do
+      it "should match the phone number #1" do
+        {result, phone_number} = parse("03 331 6005 ext 3456", RegionCodeFixture.nz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number4 == phone_number
+      end
+
+      it "should match the phone number #2" do
+        {result, phone_number} = parse("03-3316005x3456", RegionCodeFixture.nz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number4 == phone_number
+      end
+
+      it "should match the phone number #3" do
+        {result, phone_number} = parse("03-3316005 int.3456", RegionCodeFixture.nz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number4 == phone_number
+      end
+
+      it "should match the phone number #4" do
+        {result, phone_number} = parse("03 3316005 #3456", RegionCodeFixture.nz)
+        assert :ok == result
+        assert PhoneNumberFixture.nz_number4 == phone_number
       end
     end
   end
