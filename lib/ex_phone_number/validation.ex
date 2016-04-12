@@ -115,7 +115,7 @@ defmodule ExPhoneNumber.Validation do
       ValidationResult.is_possible
     else
       case Regex.run(pattern, number, return: :index) do
-        [{index, match_length} | tail] -> if index==0, do: ValidationResult.too_long, else: ValidationResult.too_short
+        [{index, match_length} | tail] -> if index == 0, do: ValidationResult.too_long, else: ValidationResult.too_short
         nil -> ValidationResult.too_short
       end
     end

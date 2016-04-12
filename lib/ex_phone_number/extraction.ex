@@ -222,7 +222,7 @@ defmodule ExPhoneNumber.Extraction do
           if Metadata.is_valid_country_code?(int) do
             {int, elem(split, 1)}
           else
-            extract_country_code(index+1, full_number)
+            extract_country_code(index + 1, full_number)
           end
         :error -> {0, ""}
       end
