@@ -166,9 +166,13 @@ defmodule ExPhoneNumber.Extraction do
       nil -> {false, "", number}
       matches ->
         is_viable_original_number = matches_entirely?(general_national_number_pattern, number)
-        number_of_groups = length(matches) - 1
+        number_of_groups = if length(matches) == 1, do: 1, else: length(matches) - 1
+        match = Enum.at(matches, number_of_groups)
         number_stripped = elem(String.split_at(number, String.length(Enum.at(matches, 0))), 1)
-        if is_nil_or_empty?(national_prefix_transform_rule) or (not is_nil_or_empty?(Enum.at(matches, number_of_groups))) do
+        is_nil_transform_rule = is_nil_or_empty?(national_prefix_transform_rule)
+        is_nil_match = is_nil_or_empty?(match)
+        no_transform = is_nil_transform_rule or is_nil_match
+        if no_transform do
           if is_viable_original_number and not matches_entirely?(general_national_number_pattern, number_stripped) do
             {false, "", number}
           else
