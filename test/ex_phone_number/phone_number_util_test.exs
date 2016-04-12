@@ -4,6 +4,7 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
   doctest ExPhoneNumber.PhoneNumberUtil
   import ExPhoneNumber.PhoneNumberUtil
   alias PhoneNumberFixture
+  alias ExPhoneNumber.Constant.ErrorMessage
   alias ExPhoneNumber.Constant.ValidationResult
 
   describe ".is_possible_number?/1" do
@@ -623,6 +624,146 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
         {result, phone_number} = parse("345 678 901", RegionCodeFixture.it)
         assert :ok == result
         assert PhoneNumberFixture.it_mobile == phone_number
+      end
+    end
+
+    context "Invalid numbers" do
+      it "should match the error message #1" do
+        {result, message} = parse("This is not a phone number", RegionCodeFixture.nz)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #2" do
+        {result, message} = parse("1 Still not a number", RegionCodeFixture.nz)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #3" do
+        {result, message} = parse("1 MICROSOFT", RegionCodeFixture.nz)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #4" do
+        {result, message} = parse("12 MICROSOFT", RegionCodeFixture.nz)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #5" do
+        {result, message} = parse("01495 72553301873 810104", RegionCodeFixture.gb)
+        assert :error == result
+        assert ErrorMessage.too_long == message
+      end
+
+      it "should match the error message #6" do
+        {result, message} = parse("+---", RegionCodeFixture.de)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #7" do
+        {result, message} = parse("+***", RegionCodeFixture.de)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #8" do
+        {result, message} = parse("+*******91", RegionCodeFixture.de)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #9" do
+        {result, message} = parse("+49 0", RegionCodeFixture.de)
+        assert :error == result
+        assert ErrorMessage.too_short_nsn == message
+      end
+
+      it "should match the error message #10" do
+        {result, message} = parse("+210 3456 56789", RegionCodeFixture.nz)
+        assert :error == result
+        assert ErrorMessage.invalid_country_code == message
+      end
+
+      it "should match the error message #11" do
+        {result, message} = parse("+ 00 210 3 331 6005", RegionCodeFixture.nz)
+        assert :error == result
+        assert ErrorMessage.invalid_country_code == message
+      end
+
+      it "should match the error message #12" do
+        {result, message} = parse("123 456 7890", RegionCodeFixture.zz)
+        assert :error == result
+        assert ErrorMessage.invalid_country_code == message
+      end
+
+      it "should match the error message #13" do
+        {result, message} = parse("123 456 7890", RegionCodeFixture.cs)
+        assert :error == result
+        assert ErrorMessage.invalid_country_code == message
+      end
+
+      it "should match the error message #14" do
+        {result, message} = parse("123 456 7890", nil)
+        assert :error == result
+        assert ErrorMessage.invalid_country_code == message
+      end
+
+      it "should match the error message #15" do
+        {result, message} = parse("0044------", RegionCodeFixture.gb)
+        assert :error == result
+        assert ErrorMessage.too_short_after_idd == message
+      end
+
+      it "should match the error message #16" do
+        {result, message} = parse("0044", RegionCodeFixture.gb)
+        assert :error == result
+        assert ErrorMessage.too_short_after_idd == message
+      end
+
+      it "should match the error message #17" do
+        {result, message} = parse("011", RegionCodeFixture.us)
+        assert :error == result
+        assert ErrorMessage.too_short_after_idd == message
+      end
+
+      it "should match the error message #18" do
+        {result, message} = parse("0119", RegionCodeFixture.us)
+        assert :error == result
+        assert ErrorMessage.too_short_after_idd == message
+      end
+
+      it "should match the error message #19" do
+        {result, message} = parse("", RegionCodeFixture.zz)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #20" do
+        {result, message} = parse(nil, RegionCodeFixture.zz)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #21" do
+        {result, message} = parse(nil, RegionCodeFixture.us)
+        assert :error == result
+        assert ErrorMessage.not_a_number == message
+      end
+
+      it "should match the error message #22" do
+        {result, message} = parse("tel:555-1234;phone-context=www.google.com", RegionCodeFixture.zz)
+        assert :error == result
+        assert ErrorMessage.invalid_country_code == message
+      end
+
+      it "should match the error message #23" do
+        {result, message} = parse("tel:555-1234;phone-context=1-331", RegionCodeFixture.zz)
+        assert :error == result
+        assert ErrorMessage.invalid_country_code == message
       end
     end
   end

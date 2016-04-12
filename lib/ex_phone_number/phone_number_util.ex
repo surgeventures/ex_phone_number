@@ -14,7 +14,7 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
   end
 
   def parse_helper(number_to_parse, _default_region, _keep_raw_input, _check_region) when is_nil(number_to_parse), do: {:error, ErrorMessage.not_a_number}
-  def parse_helper(number_to_parse, default_region, keep_raw_input, check_region) when is_binary(number_to_parse) and is_binary(default_region) and is_boolean(keep_raw_input) and is_boolean(check_region) do
+  def parse_helper(number_to_parse, default_region, keep_raw_input, check_region) when is_binary(number_to_parse) and is_boolean(keep_raw_input) and is_boolean(check_region) do
 
     results_tuple =
       case validate_length(number_to_parse) do

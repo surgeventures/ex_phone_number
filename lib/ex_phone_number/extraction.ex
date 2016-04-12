@@ -136,7 +136,9 @@ defmodule ExPhoneNumber.Extraction do
           {number_head, number_tail} = String.split_at(number, match_length)
           case Regex.run(Pattern.capturing_digit_pattern, number_tail) do
             matches ->
-              normalized_group = normalize_digits_only(Enum.at(matches, 1))
+              match_is_nil = is_nil(matches)
+              capture = if match_is_nil, do: "", else: Enum.at(matches, 1)
+              normalized_group = normalize_digits_only(capture)
               if normalized_group == "0" do
                 {false, number}
               else

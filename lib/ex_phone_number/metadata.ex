@@ -79,7 +79,7 @@ defmodule ExPhoneNumber.Metadata do
   end
   def is_supported_global_network_calling_code?(_), do: false
 
-  def is_valid_region_code?(nil), do: nil
+  def is_valid_region_code?(nil), do: false
   def is_valid_region_code?(region_code) when is_binary(region_code) do
     Integer.parse(region_code) == :error and not is_nil(region_code_to_metadata_map[String.upcase(region_code)])
   end
