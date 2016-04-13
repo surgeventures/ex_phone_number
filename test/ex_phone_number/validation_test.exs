@@ -3,22 +3,101 @@ defmodule ExPhoneNumber.ValidationSpec do
 
   doctest ExPhoneNumber.Validation
   import ExPhoneNumber.Validation
-  alias ExPhoneNumber.Constant.PhoneNumberType
+  alias ExPhoneNumber.Constants.PhoneNumberTypes
+  alias ExPhoneNumber.Constants.ValidationResults
   alias PhoneNumberFixture
   alias RegionCodeFixture
 
-  describe ".validate_length" do
-    context "length less or equal to Constant.Value.max_input_string_length" do
-      subject do: "1234567890"
-      it "returns {:ok, number}" do
-        assert {:ok, _} = validate_length(subject)
+  describe ".is_possible_number?/1" do
+    context "US number" do
+      it "should return true" do
+        assert is_possible_number?(PhoneNumberFixture.us_number)
       end
     end
 
-    context "length larger than Constant.Value.max_input_string_length" do
-      subject do: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890x"
-      it "returns {:error, message}" do
-        assert {:error, _} = validate_length(subject)
+    context "US local number" do
+      it "should return true" do
+        assert is_possible_number?(PhoneNumberFixture.us_local_number)
+      end
+    end
+
+    context "GB number" do
+      it "should return true" do
+        assert is_possible_number?(PhoneNumberFixture.gb_number)
+      end
+    end
+
+    context "International Toll Free" do
+      it "should return true" do
+        assert is_possible_number?(PhoneNumberFixture.international_toll_free)
+      end
+    end
+
+    context "NANPA short number" do
+      it "should return false" do
+        refute is_possible_number?(PhoneNumberFixture.nanpa_short_number)
+      end
+    end
+
+    context "US long number" do
+      it "should return false" do
+        refute is_possible_number?(PhoneNumberFixture.us_long_number)
+      end
+    end
+
+    context "GB short number" do
+      it "should return false" do
+        refute is_possible_number?(PhoneNumberFixture.gb_short_number)
+      end
+    end
+
+    context "International Toll Free too long" do
+      it "should return false" do
+        refute is_possible_number?(PhoneNumberFixture.international_toll_free_too_long)
+      end
+    end
+  end
+
+  describe ".is_possible_number_with_reason?/1" do
+    context "US number" do
+      it "should return correct value" do
+        assert ValidationResults.is_possible == is_possible_number_with_reason?(PhoneNumberFixture.us_number)
+      end
+    end
+
+    context "US local number" do
+      it "should return correct value" do
+        assert ValidationResults.is_possible == is_possible_number_with_reason?(PhoneNumberFixture.us_number)
+      end
+    end
+
+    context "US long number" do
+      it "should return correct value" do
+        assert ValidationResults.too_long == is_possible_number_with_reason?(PhoneNumberFixture.us_long_number)
+      end
+    end
+
+    context "Invalid country code" do
+      it "should return correct value" do
+        assert ValidationResults.invalid_country_code == is_possible_number_with_reason?(PhoneNumberFixture.unknown_country_code2)
+      end
+    end
+
+    context "US short number" do
+      it "should return correct value" do
+        assert ValidationResults.too_short == is_possible_number_with_reason?(PhoneNumberFixture.nanpa_short_number)
+      end
+    end
+
+    context "SG number 2" do
+      it "should return correct value" do
+        assert ValidationResults.is_possible == is_possible_number_with_reason?(PhoneNumberFixture.sg_number2)
+      end
+    end
+
+    context "International Toll Free long number" do
+      it "should return correct value" do
+        assert ValidationResults.too_long == is_possible_number_with_reason?(PhoneNumberFixture.international_toll_free_too_long)
       end
     end
   end
@@ -250,149 +329,165 @@ defmodule ExPhoneNumber.ValidationSpec do
   describe ".get_number_type/1" do
     context "test IT premium" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.it_premium) == PhoneNumberType.premium_rate
+        assert get_number_type(PhoneNumberFixture.it_premium) == PhoneNumberTypes.premium_rate
       end
     end
 
     context "test GB premium" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.gb_premium) == PhoneNumberType.premium_rate
+        assert get_number_type(PhoneNumberFixture.gb_premium) == PhoneNumberTypes.premium_rate
       end
     end
 
     context "test DE premium" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.de_premium) == PhoneNumberType.premium_rate
+        assert get_number_type(PhoneNumberFixture.de_premium) == PhoneNumberTypes.premium_rate
       end
 
       it "returns true #" do
-        assert get_number_type(PhoneNumberFixture.de_premium2) == PhoneNumberType.premium_rate
+        assert get_number_type(PhoneNumberFixture.de_premium2) == PhoneNumberTypes.premium_rate
       end
     end
 
     context "test Universal Premium Rate" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.universal_premium_rate) == PhoneNumberType.premium_rate
+        assert get_number_type(PhoneNumberFixture.universal_premium_rate) == PhoneNumberTypes.premium_rate
       end
     end
 
     context "test US toll free" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.us_tollfree2) == PhoneNumberType.toll_free
+        assert get_number_type(PhoneNumberFixture.us_tollfree2) == PhoneNumberTypes.toll_free
       end
     end
 
     context "test IT toll free" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.it_toll_free) == PhoneNumberType.toll_free
+        assert get_number_type(PhoneNumberFixture.it_toll_free) == PhoneNumberTypes.toll_free
       end
     end
 
     context "test GB toll free" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.gb_toll_free) == PhoneNumberType.toll_free
+        assert get_number_type(PhoneNumberFixture.gb_toll_free) == PhoneNumberTypes.toll_free
       end
     end
 
     context "test DE toll free" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.de_toll_free) == PhoneNumberType.toll_free
+        assert get_number_type(PhoneNumberFixture.de_toll_free) == PhoneNumberTypes.toll_free
       end
     end
 
     context "test International Toll Free" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.international_toll_free) == PhoneNumberType.toll_free
+        assert get_number_type(PhoneNumberFixture.international_toll_free) == PhoneNumberTypes.toll_free
       end
     end
 
     context "test BS mobile" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.bs_mobile) == PhoneNumberType.mobile
+        assert get_number_type(PhoneNumberFixture.bs_mobile) == PhoneNumberTypes.mobile
       end
     end
 
     context "test GB mobile" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.gb_mobile) == PhoneNumberType.mobile
+        assert get_number_type(PhoneNumberFixture.gb_mobile) == PhoneNumberTypes.mobile
       end
     end
 
     context "test IT mobile" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.it_mobile) == PhoneNumberType.mobile
+        assert get_number_type(PhoneNumberFixture.it_mobile) == PhoneNumberTypes.mobile
       end
     end
 
     context "test AR mobile" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.ar_mobile) == PhoneNumberType.mobile
+        assert get_number_type(PhoneNumberFixture.ar_mobile) == PhoneNumberTypes.mobile
       end
     end
 
     context "test DE mobile" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.de_mobile) == PhoneNumberType.mobile
+        assert get_number_type(PhoneNumberFixture.de_mobile) == PhoneNumberTypes.mobile
       end
     end
 
     context "test BS number" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.bs_number) == PhoneNumberType.fixed_line
+        assert get_number_type(PhoneNumberFixture.bs_number) == PhoneNumberTypes.fixed_line
       end
     end
 
     context "test IT number" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.it_number) == PhoneNumberType.fixed_line
+        assert get_number_type(PhoneNumberFixture.it_number) == PhoneNumberTypes.fixed_line
       end
     end
 
     context "test GB number" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.gb_number) == PhoneNumberType.fixed_line
+        assert get_number_type(PhoneNumberFixture.gb_number) == PhoneNumberTypes.fixed_line
       end
     end
 
     context "test DE number" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.de_number) == PhoneNumberType.fixed_line
+        assert get_number_type(PhoneNumberFixture.de_number) == PhoneNumberTypes.fixed_line
       end
     end
 
     context "test US number" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.us_number) == PhoneNumberType.fixed_line_or_mobile
+        assert get_number_type(PhoneNumberFixture.us_number) == PhoneNumberTypes.fixed_line_or_mobile
       end
     end
 
     context "test AR number 2" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.ar_number2) == PhoneNumberType.fixed_line_or_mobile
+        assert get_number_type(PhoneNumberFixture.ar_number2) == PhoneNumberTypes.fixed_line_or_mobile
       end
     end
 
     context "test GB shared cost" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.gb_shard_cost) == PhoneNumberType.shared_cost
+        assert get_number_type(PhoneNumberFixture.gb_shard_cost) == PhoneNumberTypes.shared_cost
       end
     end
 
     context "test GB voip" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.gb_voip) == PhoneNumberType.voip
+        assert get_number_type(PhoneNumberFixture.gb_voip) == PhoneNumberTypes.voip
       end
     end
 
     context "test GB personal number" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.gb_personal_number) == PhoneNumberType.personal_number
+        assert get_number_type(PhoneNumberFixture.gb_personal_number) == PhoneNumberTypes.personal_number
       end
     end
 
     context "test US local number" do
       it "returns true" do
-        assert get_number_type(PhoneNumberFixture.us_local_number) == PhoneNumberType.unknown
+        assert get_number_type(PhoneNumberFixture.us_local_number) == PhoneNumberTypes.unknown
+      end
+    end
+  end
+
+  describe ".validate_length" do
+    context "length less or equal to Constants.Value.max_input_string_length" do
+      subject do: "1234567890"
+      it "returns {:ok, number}" do
+        assert {:ok, _} = validate_length(subject)
+      end
+    end
+
+    context "length larger than Constants.Value.max_input_string_length" do
+      subject do: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890x"
+      it "returns {:error, message}" do
+        assert {:error, _} = validate_length(subject)
       end
     end
   end

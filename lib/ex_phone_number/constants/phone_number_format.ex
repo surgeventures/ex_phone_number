@@ -1,4 +1,4 @@
-defmodule ExPhoneNumber.Constant.PhoneNumberFormat do
+defmodule ExPhoneNumber.Constants.PhoneNumberFormats do
   def e164(), do: :e164
 
   def international(), do: :international

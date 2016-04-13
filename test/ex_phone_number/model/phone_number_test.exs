@@ -1,8 +1,8 @@
-defmodule ExPhoneNumber.PhoneNumberSpec do
+defmodule ExPhoneNumber.Model.PhoneNumberSpec do
   use Pavlov.Case, async: true
 
-  doctest ExPhoneNumber.PhoneNumber
-  import ExPhoneNumber.PhoneNumber
+  doctest ExPhoneNumber.Model.PhoneNumber
+  import ExPhoneNumber.Model.PhoneNumber
   import PhoneNumberFixture
 
   describe ".get_national_significant_number/1" do

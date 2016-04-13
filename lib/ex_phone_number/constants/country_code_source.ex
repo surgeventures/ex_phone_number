@@ -1,4 +1,4 @@
-defmodule ExPhoneNumber.Constant.CountryCodeSource do
+defmodule ExPhoneNumber.Constants.CountryCodeSource do
   def from_number_with_plus_sign(), do: :from_number_with_plus_sign
 
   def from_number_with_idd(), do: :from_number_with_idd

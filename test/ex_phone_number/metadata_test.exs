@@ -3,7 +3,7 @@ defmodule ExPhoneNumber.MetadataSpec do
 
   doctest ExPhoneNumber.Metadata
   import ExPhoneNumber.Metadata
-  alias ExPhoneNumber.Constant.Value
+  alias ExPhoneNumber.Constants.Values
   alias ExPhoneNumber.Metadata.PhoneMetadata
   alias PhoneNumberFixture
   alias RegionCodeFixture
@@ -64,11 +64,11 @@ defmodule ExPhoneNumber.MetadataSpec do
       end
 
       it "returns valid shared_cost.national_number_pattern" do
-        assert Value.description_default_pattern == metadata.shared_cost.national_number_pattern
+        assert Values.description_default_pattern == metadata.shared_cost.national_number_pattern
       end
 
       it "returns valid shared_cost.possible_number_pattern" do
-        assert Value.description_default_pattern == metadata.shared_cost.possible_number_pattern
+        assert Values.description_default_pattern == metadata.shared_cost.possible_number_pattern
       end
     end
 

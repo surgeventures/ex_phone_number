@@ -1,5 +1,5 @@
-defmodule ExPhoneNumber.Constant.Pattern do
-  alias ExPhoneNumber.Constant.Value
+defmodule ExPhoneNumber.Constants.Patterns do
+  alias ExPhoneNumber.Constants.Values
 
   @unique_international_prefix "[\d]+(?:[~\u2053\u223C\uFF5E][\d]+)?"
   @unique_international_prefix_regex Regex.compile(@unique_international_prefix)
@@ -34,15 +34,15 @@ defmodule ExPhoneNumber.Constant.Pattern do
 
   def valid_alpha_phone_pattern(), do: ~r/(?:.*?[A-Za-z]){3}.*/u
 
-  def min_length_phone_number_pattern(), do: "[" <> valid_digits <> "]{" <> Integer.to_string(Value.min_length_for_nsn) <> "}"
+  def min_length_phone_number_pattern(), do: "[" <> valid_digits <> "]{" <> Integer.to_string(Values.min_length_for_nsn) <> "}"
 
   def valid_phone_number() do
     "[" <> plus_chars <> "]*(?:[" <>
       valid_punctuation <>
-      Value.star_sign <> "]*[" <>
+      Values.star_sign <> "]*[" <>
       valid_digits <> "]){3,}[" <>
       valid_punctuation <>
-      Value.star_sign <>
+      Values.star_sign <>
       valid_alpha <>
       valid_digits <> "]*"
   end
@@ -52,7 +52,7 @@ defmodule ExPhoneNumber.Constant.Pattern do
   def capturing_extn_digits(), do: "([" <> valid_digits <> "]{1,7})"
 
   def extn_patterns_for_parsing() do
-    Value.rfc3966_extn_prefix <>
+    Values.rfc3966_extn_prefix <>
     capturing_extn_digits <> "|" <>
     "[ \u00A0\\t,]*" <>
     "(?:e?xt(?:ensi(?:o\u0301?|\u00F3))?n?|\uFF45?\uFF58\uFF54\uFF4E?|" <>

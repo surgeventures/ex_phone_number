@@ -33,11 +33,11 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
   require Logger
   import SweetXml
-  import ExPhoneNumber.Normalization
-  alias ExPhoneNumber.Constant.Value
+  import ExPhoneNumber.Utilities
+  alias ExPhoneNumber.Constants.Values
+  alias ExPhoneNumber.Metadata.NumberFormat
   alias ExPhoneNumber.Metadata.PhoneMetadata
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
-  alias ExPhoneNumber.Metadata.NumberFormat
 
   def from_xpath_node(xpath_node) do
     kwlist =
@@ -270,7 +270,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         Map.merge(%NumberFormat{}, number_format)
       else
         intl_number_format = %NumberFormat{pattern: number_format.pattern, leading_digits_pattern: number_format.leading_digits_pattern}
-        unless number_format.intl_format == Value.description_default_pattern do
+        unless number_format.intl_format == Values.description_default_pattern do
           intl_number_format = Map.merge(intl_number_format, %{format: number_format.intl_format})
         end
         intl_number_format
@@ -320,7 +320,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
   defp process_other_phone_number_description(description, %PhoneMetadata{general: general}) do
     if is_nil(description) do
-      %PhoneNumberDescription{national_number_pattern: Value.description_default_pattern, possible_number_pattern: Value.description_default_pattern}
+      %PhoneNumberDescription{national_number_pattern: Values.description_default_pattern, possible_number_pattern: Values.description_default_pattern}
     else
       process_phone_number_description(description, general)
     end

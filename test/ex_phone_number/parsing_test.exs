@@ -1,61 +1,10 @@
-defmodule ExPhoneNumber.PhoneNumberUtilSpec do
+defmodule ExPhoneNumber.ParsingSpec do
   use Pavlov.Case, async: true
 
-  doctest ExPhoneNumber.PhoneNumberUtil
-  import ExPhoneNumber.PhoneNumberUtil
+  doctest ExPhoneNumber.Parsing
+  import ExPhoneNumber.Parsing
   alias PhoneNumberFixture
-  alias ExPhoneNumber.Constant.ErrorMessage
-  alias ExPhoneNumber.Constant.ValidationResult
-
-  describe ".is_possible_number?/1" do
-    context "US number" do
-      it "should return true" do
-        assert is_possible_number?(PhoneNumberFixture.us_number)
-      end
-    end
-
-    context "US local number" do
-      it "should return true" do
-        assert is_possible_number?(PhoneNumberFixture.us_local_number)
-      end
-    end
-
-    context "GB number" do
-      it "should return true" do
-        assert is_possible_number?(PhoneNumberFixture.gb_number)
-      end
-    end
-
-    context "International Toll Free" do
-      it "should return true" do
-        assert is_possible_number?(PhoneNumberFixture.international_toll_free)
-      end
-    end
-
-    context "NANPA short number" do
-      it "should return false" do
-        refute is_possible_number?(PhoneNumberFixture.nanpa_short_number)
-      end
-    end
-
-    context "US long number" do
-      it "should return false" do
-        refute is_possible_number?(PhoneNumberFixture.us_long_number)
-      end
-    end
-
-    context "GB short number" do
-      it "should return false" do
-        refute is_possible_number?(PhoneNumberFixture.gb_short_number)
-      end
-    end
-
-    context "International Toll Free too long" do
-      it "should return false" do
-        refute is_possible_number?(PhoneNumberFixture.international_toll_free_too_long)
-      end
-    end
-  end
+  alias ExPhoneNumber.Constants.ErrorMessages
 
   describe ".is_possible_number?/2" do
     context "US region" do
@@ -132,50 +81,6 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
 
       it "should return false #1" do
         refute is_possible_number?("+800 1234 5678 9", RegionCodeFixture.un001)
-      end
-    end
-  end
-
-  describe ".is_possible_number_with_reason?/1" do
-    context "US number" do
-      it "should return correct value" do
-        assert ValidationResult.is_possible == is_possible_number_with_reason?(PhoneNumberFixture.us_number)
-      end
-    end
-
-    context "US local number" do
-      it "should return correct value" do
-        assert ValidationResult.is_possible == is_possible_number_with_reason?(PhoneNumberFixture.us_number)
-      end
-    end
-
-    context "US long number" do
-      it "should return correct value" do
-        assert ValidationResult.too_long == is_possible_number_with_reason?(PhoneNumberFixture.us_long_number)
-      end
-    end
-
-    context "Invalid country code" do
-      it "should return correct value" do
-        assert ValidationResult.invalid_country_code == is_possible_number_with_reason?(PhoneNumberFixture.unknown_country_code2)
-      end
-    end
-
-    context "US short number" do
-      it "should return correct value" do
-        assert ValidationResult.too_short == is_possible_number_with_reason?(PhoneNumberFixture.nanpa_short_number)
-      end
-    end
-
-    context "SG number 2" do
-      it "should return correct value" do
-        assert ValidationResult.is_possible == is_possible_number_with_reason?(PhoneNumberFixture.sg_number2)
-      end
-    end
-
-    context "International Toll Free long number" do
-      it "should return correct value" do
-        assert ValidationResult.too_long == is_possible_number_with_reason?(PhoneNumberFixture.international_toll_free_too_long)
       end
     end
   end
@@ -631,139 +536,139 @@ defmodule ExPhoneNumber.PhoneNumberUtilSpec do
       it "should match the error message #1" do
         {result, message} = parse("This is not a phone number", RegionCodeFixture.nz)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #2" do
         {result, message} = parse("1 Still not a number", RegionCodeFixture.nz)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #3" do
         {result, message} = parse("1 MICROSOFT", RegionCodeFixture.nz)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #4" do
         {result, message} = parse("12 MICROSOFT", RegionCodeFixture.nz)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #5" do
         {result, message} = parse("01495 72553301873 810104", RegionCodeFixture.gb)
         assert :error == result
-        assert ErrorMessage.too_long == message
+        assert ErrorMessages.too_long == message
       end
 
       it "should match the error message #6" do
         {result, message} = parse("+---", RegionCodeFixture.de)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #7" do
         {result, message} = parse("+***", RegionCodeFixture.de)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #8" do
         {result, message} = parse("+*******91", RegionCodeFixture.de)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #9" do
         {result, message} = parse("+49 0", RegionCodeFixture.de)
         assert :error == result
-        assert ErrorMessage.too_short_nsn == message
+        assert ErrorMessages.too_short_nsn == message
       end
 
       it "should match the error message #10" do
         {result, message} = parse("+210 3456 56789", RegionCodeFixture.nz)
         assert :error == result
-        assert ErrorMessage.invalid_country_code == message
+        assert ErrorMessages.invalid_country_code == message
       end
 
       it "should match the error message #11" do
         {result, message} = parse("+ 00 210 3 331 6005", RegionCodeFixture.nz)
         assert :error == result
-        assert ErrorMessage.invalid_country_code == message
+        assert ErrorMessages.invalid_country_code == message
       end
 
       it "should match the error message #12" do
         {result, message} = parse("123 456 7890", RegionCodeFixture.zz)
         assert :error == result
-        assert ErrorMessage.invalid_country_code == message
+        assert ErrorMessages.invalid_country_code == message
       end
 
       it "should match the error message #13" do
         {result, message} = parse("123 456 7890", RegionCodeFixture.cs)
         assert :error == result
-        assert ErrorMessage.invalid_country_code == message
+        assert ErrorMessages.invalid_country_code == message
       end
 
       it "should match the error message #14" do
         {result, message} = parse("123 456 7890", nil)
         assert :error == result
-        assert ErrorMessage.invalid_country_code == message
+        assert ErrorMessages.invalid_country_code == message
       end
 
       it "should match the error message #15" do
         {result, message} = parse("0044------", RegionCodeFixture.gb)
         assert :error == result
-        assert ErrorMessage.too_short_after_idd == message
+        assert ErrorMessages.too_short_after_idd == message
       end
 
       it "should match the error message #16" do
         {result, message} = parse("0044", RegionCodeFixture.gb)
         assert :error == result
-        assert ErrorMessage.too_short_after_idd == message
+        assert ErrorMessages.too_short_after_idd == message
       end
 
       it "should match the error message #17" do
         {result, message} = parse("011", RegionCodeFixture.us)
         assert :error == result
-        assert ErrorMessage.too_short_after_idd == message
+        assert ErrorMessages.too_short_after_idd == message
       end
 
       it "should match the error message #18" do
         {result, message} = parse("0119", RegionCodeFixture.us)
         assert :error == result
-        assert ErrorMessage.too_short_after_idd == message
+        assert ErrorMessages.too_short_after_idd == message
       end
 
       it "should match the error message #19" do
         {result, message} = parse("", RegionCodeFixture.zz)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #20" do
         {result, message} = parse(nil, RegionCodeFixture.zz)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #21" do
         {result, message} = parse(nil, RegionCodeFixture.us)
         assert :error == result
-        assert ErrorMessage.not_a_number == message
+        assert ErrorMessages.not_a_number == message
       end
 
       it "should match the error message #22" do
         {result, message} = parse("tel:555-1234;phone-context=www.google.com", RegionCodeFixture.zz)
         assert :error == result
-        assert ErrorMessage.invalid_country_code == message
+        assert ErrorMessages.invalid_country_code == message
       end
 
       it "should match the error message #23" do
         {result, message} = parse("tel:555-1234;phone-context=1-331", RegionCodeFixture.zz)
         assert :error == result
-        assert ErrorMessage.invalid_country_code == message
+        assert ErrorMessages.invalid_country_code == message
       end
     end
 

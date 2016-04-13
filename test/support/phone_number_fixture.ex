@@ -1,5 +1,5 @@
 defmodule PhoneNumberFixture do
-  alias ExPhoneNumber.PhoneNumber
+  alias ExPhoneNumber.Model.PhoneNumber
 
   def alpha_numeric_number() do
     %PhoneNumber{

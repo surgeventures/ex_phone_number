@@ -2,10 +2,10 @@ defmodule ExPhoneNumber.Metadata do
   import SweetXml
   import ExPhoneNumber.Normalization
   import ExPhoneNumber.Validation
-  alias ExPhoneNumber.Constant.PhoneNumberType
-  alias ExPhoneNumber.Constant.Value
+  alias ExPhoneNumber.Constants.PhoneNumberTypes
+  alias ExPhoneNumber.Constants.Values
   alias ExPhoneNumber.Metadata.PhoneMetadata
-  alias ExPhoneNumber.PhoneNumber
+  alias ExPhoneNumber.Model.PhoneNumber
 
   @resources_dir "./resources"
   @xml_file Application.fetch_env!(:ex_phone_number, :metadata_file)
@@ -70,24 +70,9 @@ defmodule ExPhoneNumber.Metadata do
     end
   end
 
-  def is_supported_region?(region_code) when is_binary(region_code) do
-    not is_nil(region_code_to_metadata_map[String.upcase(region_code)])
-  end
-  def is_supported_region?(_), do: false
-
-  def is_supported_global_network_calling_code?(calling_code) when is_number(calling_code) do
-    not is_nil(region_code_to_metadata_map[Integer.to_string(calling_code)])
-  end
-  def is_supported_global_network_calling_code?(_), do: false
-
-  def is_valid_region_code?(nil), do: false
-  def is_valid_region_code?(region_code) when is_binary(region_code) do
-    Integer.parse(region_code) == :error and not is_nil(region_code_to_metadata_map[String.upcase(region_code)])
-  end
-
-  def is_valid_country_code?(nil), do: false
-  def is_valid_country_code?(country_code) when is_number(country_code) do
-    not is_nil(country_code_to_region_code_map[country_code])
+  def get_for_non_geographical_region(calling_code) when is_number(calling_code), do: get_for_non_geographical_region(Integer.to_string(calling_code))
+  def get_for_non_geographical_region(region_code) when is_binary(region_code) do
+    get_for_region_code(region_code)
   end
 
   def get_for_region_code(nil), do: nil
@@ -95,10 +80,34 @@ defmodule ExPhoneNumber.Metadata do
     region_code_to_metadata_map[String.upcase(region_code)]
   end
 
+  def get_for_region_code_or_calling_code(calling_code, region_code) do
+    if region_code == Values.region_code_for_non_geo_entity do
+      get_for_non_geographical_region(calling_code)
+    else
+      get_for_region_code(region_code)
+    end
+  end
+
+  def get_ndd_prefix_for_region_code(region_code, strip_non_digits) when is_binary(region_code) and is_boolean(strip_non_digits) do
+    if is_nil(metadata = get_for_region_code(region_code)) do
+      nil
+    else
+      if not (is_nil(metadata.national_prefix) or String.length(metadata.national_prefix) > 0) do
+        nil
+      else
+        if strip_non_digits do
+          String.replace(metadata.national_prefix, "~", "")
+        else
+          metadata.national_prefix
+        end
+      end
+    end
+  end
+
   def get_region_code_for_country_code(country_code) when is_number(country_code) do
     region_codes = country_code_to_region_code_map[country_code]
    if is_nil(region_codes) do
-      Value.unknown_region
+      Values.unknown_region
     else
       main_country = Enum.find(region_codes, fn(region_code) ->
         metadata = region_code_to_metadata_map[region_code]
@@ -113,18 +122,6 @@ defmodule ExPhoneNumber.Metadata do
       else
         main_country
       end
-    end
-  end
-
-  def get_region_codes_for_country_code(country_code) when is_number(country_code) do
-    List.wrap(country_code_to_region_code_map[country_code])
-  end
-
-  def get_for_region_code_or_calling_code(calling_code, region_code) do
-    if region_code == Value.region_code_for_non_geo_entity do
-      get_for_non_geographical_region(calling_code)
-    else
-      get_for_region_code(region_code)
     end
   end
 
@@ -147,31 +144,8 @@ defmodule ExPhoneNumber.Metadata do
     find_matching_region_code(region_codes, national_number)
   end
 
-  defp find_matching_region_code([], _), do: nil
-  defp find_matching_region_code([head | tail], national_number) do
-    region_code = find_matching_region_code(head, national_number)
-    if region_code do
-      region_code
-    else
-      find_matching_region_code(tail, national_number)
-    end
-  end
-  defp find_matching_region_code(region_code, national_number) when is_binary(region_code) and is_binary(national_number) do
-    metadata = get_for_region_code(region_code)
-    if PhoneMetadata.has_leading_digits(metadata) do
-      if match_at_start?(national_number, metadata.leading_digits) do
-        region_code
-      end
-    else
-      if get_number_type_helper(national_number, metadata) != PhoneNumberType.unknown do
-        region_code
-      end
-    end
-  end
-
-  def get_for_non_geographical_region(calling_code) when is_number(calling_code), do: get_for_non_geographical_region(Integer.to_string(calling_code))
-  def get_for_non_geographical_region(region_code) when is_binary(region_code) do
-    get_for_region_code(region_code)
+  def get_region_codes_for_country_code(country_code) when is_number(country_code) do
+    List.wrap(country_code_to_region_code_map[country_code])
   end
 
   def get_supported_regions() do
@@ -191,24 +165,50 @@ defmodule ExPhoneNumber.Metadata do
     not is_nil(metadata) and PhoneMetadata.get_leading_zero_possible_or_default(metadata)
   end
 
-  def get_ndd_prefix_for_region_code(region_code, strip_non_digits) when is_binary(region_code) and is_boolean(strip_non_digits) do
-    if is_nil(metadata = get_for_region_code(region_code)) do
-      nil
-    else
-      if not (is_nil(metadata.national_prefix) or String.length(metadata.national_prefix) > 0) do
-        nil
-      else
-        if strip_non_digits do
-          String.replace(metadata.national_prefix, "~", "")
-        else
-          metadata.national_prefix
-        end
-      end
-    end
-  end
-
   def is_nanpa_country?(nil), do: false
   def is_nanpa_country?(region_code) when is_binary(region_code) do
-    String.upcase(region_code) in country_code_to_region_code_map[Value.nanpa_country_code]
+    String.upcase(region_code) in country_code_to_region_code_map[Values.nanpa_country_code]
+  end
+
+  def is_supported_global_network_calling_code?(calling_code) when is_number(calling_code) do
+    not is_nil(region_code_to_metadata_map[Integer.to_string(calling_code)])
+  end
+  def is_supported_global_network_calling_code?(_), do: false
+
+  def is_supported_region?(region_code) when is_binary(region_code) do
+    not is_nil(region_code_to_metadata_map[String.upcase(region_code)])
+  end
+  def is_supported_region?(_), do: false
+
+  def is_valid_country_code?(nil), do: false
+  def is_valid_country_code?(country_code) when is_number(country_code) do
+    not is_nil(country_code_to_region_code_map[country_code])
+  end
+
+  def is_valid_region_code?(nil), do: false
+  def is_valid_region_code?(region_code) when is_binary(region_code) do
+    Integer.parse(region_code) == :error and not is_nil(region_code_to_metadata_map[String.upcase(region_code)])
+  end
+
+  defp find_matching_region_code([], _), do: nil
+  defp find_matching_region_code([head | tail], national_number) do
+    region_code = find_matching_region_code(head, national_number)
+    if region_code do
+      region_code
+    else
+      find_matching_region_code(tail, national_number)
+    end
+  end
+  defp find_matching_region_code(region_code, national_number) when is_binary(region_code) and is_binary(national_number) do
+    metadata = get_for_region_code(region_code)
+    if PhoneMetadata.has_leading_digits(metadata) do
+      if match_at_start?(national_number, metadata.leading_digits) do
+        region_code
+      end
+    else
+      if get_number_type_helper(national_number, metadata) != PhoneNumberTypes.unknown do
+        region_code
+      end
+    end
   end
 end

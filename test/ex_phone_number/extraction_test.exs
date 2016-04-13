@@ -4,8 +4,8 @@ defmodule ExPhoneNumber.ExtractionSpec do
   doctest ExPhoneNumber.Extraction
   import ExPhoneNumber.Extraction
   alias ExPhoneNumber.Metadata
-  alias ExPhoneNumber.Constant.CountryCodeSource
-  alias ExPhoneNumber.Constant.ErrorMessage
+  alias ExPhoneNumber.Constants.CountryCodeSource
+  alias ExPhoneNumber.Constants.ErrorMessages
 
   describe ".extract_possible_number/1" do
     context "removes preceding funky punctuation and letters" do
@@ -229,7 +229,7 @@ defmodule ExPhoneNumber.ExtractionSpec do
         metadata = Metadata.get_for_region_code(RegionCodeFixture.us)
         {result, message}  = maybe_extract_country_code("0119991123456789", metadata, true)
         refute result
-        assert message == ErrorMessage.invalid_country_code
+        assert message == ErrorMessages.invalid_country_code
       end
     end
 

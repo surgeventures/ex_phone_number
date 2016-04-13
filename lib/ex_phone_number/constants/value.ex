@@ -1,5 +1,4 @@
-defmodule ExPhoneNumber.Constant.Value do
-
+defmodule ExPhoneNumber.Constants.Values do
   def nanpa_country_code(), do: 1
 
   def min_length_for_nsn(), do: 2

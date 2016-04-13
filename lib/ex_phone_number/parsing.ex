@@ -1,31 +1,64 @@
-defmodule ExPhoneNumber.PhoneNumberUtil do
+defmodule ExPhoneNumber.Parsing do
   import ExPhoneNumber.Extraction
   import ExPhoneNumber.Normalization
   import ExPhoneNumber.Validation
-  alias ExPhoneNumber.Constant.ErrorMessage
-  alias ExPhoneNumber.Constant.Pattern
-  alias ExPhoneNumber.Constant.Value
-  alias ExPhoneNumber.Constant.ValidationResult
-  alias ExPhoneNumber.PhoneNumber
+  import ExPhoneNumber.Utilities
+  alias ExPhoneNumber.Constants.ErrorMessages
+  alias ExPhoneNumber.Constants.Patterns
+  alias ExPhoneNumber.Constants.Values
   alias ExPhoneNumber.Metadata
+  alias ExPhoneNumber.Model.PhoneNumber
+
+  def build_national_number_for_parsing(number_to_parse) do
+    number_to_parse
+    |> String.split(Values.rfc3966_phone_context, parts: 2)
+    |> case do
+      [number_head, number_tail] ->
+        if String.starts_with?(number_tail, Values.plus_sign) do
+          case String.split(number_tail, ";", parts: 2) do
+            [phone_context_head, _] -> phone_context_head
+            [_] -> number_tail
+          end
+        else
+          ""
+        end
+        <>
+        case String.split(number_head, Values.rfc3966_prefix, parts: 2) do
+          [_, national_number_tail] -> national_number_tail
+          [_] -> number_head
+        end
+      [_] -> extract_possible_number(number_to_parse)
+    end
+    |> split_at_match_and_return_head(Values.rfc3966_isdn_subaddress)
+  end
+
+  def check_region_for_parsing(number_to_parse, default_region) do
+    Metadata.is_valid_region_code?(default_region) or Regex.match?(Patterns.leading_plus_chars_pattern, number_to_parse)
+  end
+
+  def is_possible_number?(number, region_code) when is_binary(number) do
+    case parse(number, region_code) do
+      {:ok, phone_number} -> is_possible_number?(phone_number)
+      {:error, _} -> false
+    end
+  end
 
   def parse(number_to_parse, default_region) do
     parse_helper(number_to_parse, default_region, false, true)
   end
 
-  def parse_helper(number_to_parse, _default_region, _keep_raw_input, _check_region) when is_nil(number_to_parse), do: {:error, ErrorMessage.not_a_number}
+  def parse_helper(number_to_parse, _default_region, _keep_raw_input, _check_region) when is_nil(number_to_parse), do: {:error, ErrorMessages.not_a_number}
   def parse_helper(number_to_parse, default_region, keep_raw_input, check_region) when is_binary(number_to_parse) and is_boolean(keep_raw_input) and is_boolean(check_region) do
-
     results_tuple =
       case validate_length(number_to_parse) do
         {:error, message} -> {:error, message}
         {:ok, number_to_parse} ->
           national_number = build_national_number_for_parsing(number_to_parse)
           if not is_viable_phone_number?(national_number) do
-            {:error, ErrorMessage.not_a_number}
+            {:error, ErrorMessages.not_a_number}
           else
             if check_region and not check_region_for_parsing(national_number, default_region) do
-              {:error, ErrorMessage.invalid_country_code}
+              {:error, ErrorMessages.invalid_country_code}
             else
               {:ok, national_number, default_region}
             end
@@ -56,8 +89,8 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
               {:ok, new_normalized_national_number, region_metadata, Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
             end
           {false, message} ->
-            if message == ErrorMessage.invalid_country_code and Regex.match?(Pattern.leading_plus_chars_pattern, national_number) do
-              national_number_without_plus_sign = String.replace(national_number, Pattern.leading_plus_chars_pattern, "")
+            if message == ErrorMessages.invalid_country_code and Regex.match?(Patterns.leading_plus_chars_pattern, national_number) do
+              national_number_without_plus_sign = String.replace(national_number, Patterns.leading_plus_chars_pattern, "")
               case maybe_extract_country_code(national_number_without_plus_sign, region_metadata, keep_raw_input) do
                 {true, normalized_national_number, phone_number_extract} ->
                   if phone_number_extract.country_code == 0 do
@@ -98,10 +131,10 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
       if :ok == elem(results_tuple, 0) do
         {_, normalized_national_number, phone_number} = results_tuple
         cond do
-          String.length(normalized_national_number) < Value.min_length_for_nsn ->
-            {:error, ErrorMessage.too_short_nsn}
-          String.length(normalized_national_number) > Value.max_length_for_nsn ->
-            {:error, ErrorMessage.too_long}
+          String.length(normalized_national_number) < Values.min_length_for_nsn ->
+            {:error, ErrorMessages.too_short_nsn}
+          String.length(normalized_national_number) > Values.max_length_for_nsn ->
+            {:error, ErrorMessages.too_long}
           true ->
             phone_number_add = PhoneNumber.set_italian_leading_zeros(normalized_national_number, phone_number)
             case Integer.parse(normalized_national_number) do
@@ -116,62 +149,6 @@ defmodule ExPhoneNumber.PhoneNumberUtil do
       end
 
     results_tuple
-  end
-
-  def build_national_number_for_parsing(number_to_parse) do
-    number_to_parse
-    |> String.split(Value.rfc3966_phone_context, parts: 2)
-    |> case do
-      [number_head, number_tail] ->
-        if String.starts_with?(number_tail, Value.plus_sign) do
-          case String.split(number_tail, ";", parts: 2) do
-            [phone_context_head, _] -> phone_context_head
-            [_] -> number_tail
-          end
-        else
-          ""
-        end
-        <>
-        case String.split(number_head, Value.rfc3966_prefix, parts: 2) do
-          [_, national_number_tail] -> national_number_tail
-          [_] -> number_head
-        end
-      [_] -> extract_possible_number(number_to_parse)
-    end
-    |> split_at_match_and_return_head(Value.rfc3966_isdn_subaddress)
-  end
-
-  def check_region_for_parsing_helper(number_to_parse, default_region, check_region) when is_binary(number_to_parse) and is_binary(default_region) and is_boolean(check_region) do
-    if check_region and not check_region_for_parsing(number_to_parse, default_region) do
-      {:error, ErrorMessage.invalid_country_code}
-    else
-      {:ok, number_to_parse, default_region}
-    end
-  end
-  defp check_region_for_parsing(number_to_parse, default_region) do
-    Metadata.is_valid_region_code?(default_region) or Regex.match?(Pattern.leading_plus_chars_pattern, number_to_parse)
-  end
-
-  def is_possible_number?(%PhoneNumber{} = number) do
-    ValidationResult.is_possible == is_possible_number_with_reason?(number)
-  end
-
-  def is_possible_number_with_reason?(%PhoneNumber{} = number) do
-    if not Metadata.is_valid_country_code?(number.country_code) do
-      ValidationResult.invalid_country_code
-    else
-      region_code = Metadata.get_region_code_for_country_code(number.country_code)
-      metadata = Metadata.get_for_region_code_or_calling_code(number.country_code, region_code)
-      national_number = PhoneNumber.get_national_significant_number(number)
-      test_number_length_against_pattern(metadata.general.possible_number_pattern, national_number)
-    end
-  end
-
-  def is_possible_number?(number, region_code) when is_binary(number) do
-    case parse(number, region_code) do
-      {:ok, phone_number} -> is_possible_number?(phone_number)
-      {:error, _} -> false
-    end
   end
 
   defp update_if_nil(_k, v1, v2) do

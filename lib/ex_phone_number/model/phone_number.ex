@@ -1,4 +1,4 @@
-defmodule ExPhoneNumber.PhoneNumber do
+defmodule ExPhoneNumber.Model.PhoneNumber do
   defstruct country_code: nil,                   # number
             national_number: nil,                # number
             extension: nil,                      # string
@@ -8,8 +8,8 @@ defmodule ExPhoneNumber.PhoneNumber do
             country_code_source: nil,            # atom
             preferred_domestic_carrier_code: nil # string
 
-  alias ExPhoneNumber.PhoneNumber
-  alias ExPhoneNumber.Constant.CountryCodeSource
+  alias ExPhoneNumber.Model.PhoneNumber
+  alias ExPhoneNumber.Constants.CountryCodeSource
 
   def has_country_code?(phone_number = %PhoneNumber{}) do
     not is_nil(phone_number.country_code)
@@ -70,7 +70,7 @@ defmodule ExPhoneNumber.PhoneNumber do
 
     if has_italian_leading_zero?(phone_number) and phone_number.italian_leading_zero do
       upper_bound = get_number_of_leading_zeros_or_default(phone_number)
-      prefix = for x <- 1..upper_bound, do: "0"
+      prefix = for _x <- 1..upper_bound, do: "0"
       List.to_string(prefix) <> Integer.to_string(national_number)
     else
       Integer.to_string(national_number)
