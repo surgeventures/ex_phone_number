@@ -258,5 +258,33 @@ defmodule ExPhoneNumber.FormattingSpec do
         assert "+528211234567" == format(PhoneNumberFixture.mx_number2, PhoneNumberFormats.e164)
       end
     end
+
+    context "E164 numbers" do
+      it "should return correct value #0" do
+        assert "+16502530000" == format(PhoneNumberFixture.us_number, PhoneNumberFormats.e164)
+      end
+
+      it "should return correct value #1" do
+        assert "+4930123456" == format(PhoneNumberFixture.de_number, PhoneNumberFormats.e164)
+      end
+
+      it "should return correct value #2" do
+        assert "+80012345678" == format(PhoneNumberFixture.international_toll_free, PhoneNumberFormats.e164)
+      end
+    end
+
+    context "Numbers with extensions" do
+      it "should return correct value #0" do
+        assert "03-331 6005 ext. 1234" == format(%{PhoneNumberFixture.nz_number | extension: "1234"}, PhoneNumberFormats.national)
+      end
+
+      it "should return correct value #1" do
+        assert "tel:+64-3-331-6005;ext=1234" == format(%{PhoneNumberFixture.nz_number | extension: "1234"}, PhoneNumberFormats.rfc3966)
+      end
+
+      it "should return correct value #2" do
+        assert "650 253 0000 extn. 4567" == format(%{PhoneNumberFixture.us_number | extension: "4567"}, PhoneNumberFormats.national)
+      end
+    end
   end
 end

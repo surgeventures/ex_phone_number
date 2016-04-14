@@ -90,7 +90,7 @@ defmodule ExPhoneNumber.Formatting do
       if PhoneNumberFormats.rfc3966 == phone_number_format do
         Values.rfc3966_extn_prefix <> phone_number.extension
       else
-        if PhoneMetadata.has_preferred_ext_prefix?(metadata) do
+        if PhoneMetadata.has_preferred_extn_prefix?(metadata) do
           metadata.preferred_extn_prefix <> phone_number.extension
         else
           Values.default_extn_prefix <> phone_number.extension

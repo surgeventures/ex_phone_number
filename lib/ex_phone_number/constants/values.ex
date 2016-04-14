@@ -28,4 +28,6 @@ defmodule ExPhoneNumber.Constants.Values do
   def region_code_for_non_geo_entity(), do: "001"
 
   def description_default_pattern(), do: "NA"
+
+  def default_extn_prefix(), do: " ext. "
 end
