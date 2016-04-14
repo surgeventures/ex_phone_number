@@ -86,6 +86,13 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def au_number2() do
+    %PhoneNumber{
+      country_code: 61,
+      national_number: 1800123456
+    }
+  end
+
   def bs_mobile() do
     %PhoneNumber{
       country_code: 1,
@@ -139,6 +146,48 @@ defmodule PhoneNumberFixture do
     %PhoneNumber{
       country_code: 49,
       national_number: 30123456
+    }
+  end
+
+  def de_number2() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 301234
+    }
+  end
+
+  def de_number3() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 291123
+    }
+  end
+
+  def de_number4() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 29112345678
+    }
+  end
+
+  def de_number5() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 912312345
+    }
+  end
+
+  def de_number6() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 80212345
+    }
+  end
+
+  def de_number7() do
+    %PhoneNumber{
+      country_code: 49,
+      national_number: 41341234
     }
   end
 

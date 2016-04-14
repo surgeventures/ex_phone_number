@@ -22,7 +22,7 @@ defmodule ExPhoneNumber.Constants.Patterns do
 
   def leading_plus_chars_pattern(), do: ~r/^[#{plus_chars}]+/u
 
-  def separator_pattern(), do: "[" <> valid_punctuation <> "]+"
+  def separator_pattern(), do: ~r/[#{valid_punctuation}]+/u
 
   def capturing_digit_pattern(), do: ~r/([#{valid_digits}])/u
 
@@ -70,7 +70,7 @@ defmodule ExPhoneNumber.Constants.Patterns do
 
   def non_digits_pattern(), do: ~r/\D+/u
 
-  def first_group_pattern(), do: ~r/(\$\d)/u
+  def first_group_pattern(), do: ~r/(\\g{\d})/u
 
   def np_pattern(), do: ~r/\$NP/u
 

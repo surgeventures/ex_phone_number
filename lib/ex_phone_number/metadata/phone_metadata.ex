@@ -226,15 +226,15 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   def get_national_prefix_formatting_rule(%PhoneMetadata{national_prefix: prefix, national_prefix_formatting_rule: rule}), do: get_national_prefix_formatting_rule(prefix, rule)
   def get_national_prefix_formatting_rule(%NumberFormat{national_prefix_formatting_rule: rule}, prefix), do: get_national_prefix_formatting_rule(prefix, rule)
   def get_national_prefix_formatting_rule(prefix, rule) do
-    rule = String.replace(rule, "\\$NP", prefix, global: false)
-    String.replace(rule, "\\$FG", "\\$1", global: false)
+    rule = Regex.replace(~r/\$NP/, rule, prefix, global: false)
+    Regex.replace(~r/\$FG/, rule, "\\\\g{1}", global: false)
   end
 
   def get_domestic_carrier_code_formatting_rule(%PhoneMetadata{national_prefix: prefix, carrier_code_formatting_rule: rule}), do: get_domestic_carrier_code_formatting_rule(prefix, rule)
   def get_domestic_carrier_code_formatting_rule(%NumberFormat{domestic_carrier_code_formatting_rule: rule}, prefix), do: get_domestic_carrier_code_formatting_rule(prefix, rule)
   def get_domestic_carrier_code_formatting_rule(prefix, rule) do
-    rule = String.replace(rule, "\\$FG", "\\$1", global: false)
-    String.replace(rule, "\\$NP", prefix, global: false)
+    rule = Regex.replace(~r/\$FG/, rule, "\\\\g{1}", global: false)
+    Regex.replace(~r/\$NP/, rule, prefix, global: false)
   end
 
   def get_number_format(%PhoneMetadata{} = phone_metadata), do: get_number_format(phone_metadata.available_formats, phone_metadata)
