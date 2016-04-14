@@ -110,7 +110,7 @@ defmodule ExPhoneNumber.ExtractionSpec do
       let :metadata do
         %ExPhoneNumber.Metadata.PhoneMetadata{
           national_prefix_for_parsing: "0(\\d{2})",
-          national_prefix_transform_rule: "5$15",
+          national_prefix_transform_rule: "5\\g{1}5",
           general: %ExPhoneNumber.Metadata.PhoneNumberDescription{
             national_number_pattern: ~r/\d{4,8}/
           }

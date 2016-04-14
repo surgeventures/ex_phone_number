@@ -40,7 +40,7 @@ defmodule ExPhoneNumber.MetadataSpec do
       end
 
       it "returns valid number_format(1).format" do
-        assert "$1 $2 $3" == Enum.at(metadata.number_format, 1).format
+        assert "\\g{1} \\g{2} \\g{3}" == Enum.at(metadata.number_format, 1).format
       end
 
       it "returns valid general.national_number_pattern" do
@@ -111,7 +111,7 @@ defmodule ExPhoneNumber.MetadataSpec do
       end
 
       it "returns valid number_format(5).format" do
-        assert "$1 $2 $3" ==  Enum.at(metadata.number_format, 5).format
+        assert "\\g{1} \\g{2} \\g{3}" ==  Enum.at(metadata.number_format, 5).format
       end
 
       it "returns valid fixed_line.national_number_pattern" do
@@ -162,11 +162,11 @@ defmodule ExPhoneNumber.MetadataSpec do
       end
 
       it "returns valid national_prefix_transform_rule" do
-        assert "9$1" == metadata.national_prefix_transform_rule
+        assert "9\\g{1}" == metadata.national_prefix_transform_rule
       end
 
       it "returns valid number_format(2).format" do
-        assert "$2 15 $3-$4" == Enum.at(metadata.number_format, 2).format
+        assert "\\g{2} 15 \\g{3}-\\g{4}" == Enum.at(metadata.number_format, 2).format
       end
 
       it "returns valid number_format(3).pattern" do
@@ -178,7 +178,7 @@ defmodule ExPhoneNumber.MetadataSpec do
       end
 
       it "returns valid intl_number_format(3).format" do
-        assert "$1 $2 $3 $4" == Enum.at(metadata.intl_number_format, 3).format
+        assert "\\g{1} \\g{2} \\g{3} \\g{4}" == Enum.at(metadata.intl_number_format, 3).format
       end
     end
   end
@@ -199,7 +199,7 @@ defmodule ExPhoneNumber.MetadataSpec do
       end
 
       it "returns valid number_format(0).format" do
-        assert "$1 $2" == Enum.at(metadata.number_format, 0).format
+        assert "\\g{1} \\g{2}" == Enum.at(metadata.number_format, 0).format
       end
 
       it "returns valid number_format(0).pattern" do

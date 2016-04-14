@@ -154,8 +154,7 @@ defmodule ExPhoneNumber.Extraction do
             {true, carrier_code, number_stripped}
           end
         else
-          transform_pattern = String.replace(national_prefix_transform_rule, ~r/\$(\d)/, "\\\\g{\\g{1}}")
-          transformed_number = Regex.replace(prefix_pattern, number, transform_pattern)
+          transformed_number = Regex.replace(prefix_pattern, number, national_prefix_transform_rule)
           if is_viable_original_number and not matches_entirely?(general_national_number_pattern, transformed_number) do
             {false, "", number}
           else
