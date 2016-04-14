@@ -205,6 +205,12 @@ defmodule ExPhoneNumber.ValidationSpec do
       it "returns false" do
         refute is_valid_number?(PhoneNumberFixture.de_invalid)
       end
+
+      it "returns false #2" do
+        {result, phone_number} = ExPhoneNumber.parse("+494915778961257", "DE")
+        assert :ok == result
+        refute is_valid_number?(phone_number)
+      end
     end
 
     context "test NZ invalid" do
