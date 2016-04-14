@@ -1,13 +1,13 @@
 defmodule ExPhoneNumber do
-  defdelegate format(phone_number, phone_number_format), to: ExPhoneNumber.Formatting
+  def format(%ExPhoneNumber.Model.PhoneNumber{} = phone_number, phone_number_format) when is_atom(phone_number_format), do: ExPhoneNumber.Formatting.format(phone_number, phone_number_format)
 
-  defdelegate get_number_type(phone_number), to: ExPhoneNumber.Validation
+  def get_number_type(%ExPhoneNumber.Model.PhoneNumber{} = phone_number), do: ExPhoneNumber.Validation.get_number_type(phone_number)
 
-  defdelegate is_possible_number?(number), to: ExPhoneNumber.Validation
+  def is_possible_number?(%ExPhoneNumber.Model.PhoneNumber{} = phone_number), do: ExPhoneNumber.Validation.is_possible_number?(phone_number)
 
-  defdelegate is_possible_number?(number, region_code), to: ExPhoneNumber.Parsing
+  def is_possible_number?(number, region_code) when is_binary(number), do: ExPhoneNumber.Parsing.is_possible_number?(number, region_code)
 
-  defdelegate is_valid_number?(number), to: ExPhoneNumber.Validation
+  def is_valid_number?(%ExPhoneNumber.Model.PhoneNumber{} = phone_number), do: ExPhoneNumber.Validation.is_valid_number?(phone_number)
 
-  defdelegate parse(number_to_parse, default_region), to: ExPhoneNumber.Parsing
+  def parse(number_to_parse, default_region), do: ExPhoneNumber.Parsing.parse(number_to_parse, default_region)
 end

@@ -25,7 +25,7 @@ defmodule ExPhoneNumber.Formatting do
     end)
   end
 
-  def format(%PhoneNumber{} = phone_number, phone_number_format) do
+  def format(%PhoneNumber{} = phone_number, phone_number_format) when is_atom(phone_number_format) do
     if phone_number.national_number == 0 and not is_nil_or_empty?(phone_number.raw_input) do
       phone_number.raw_input
     else
