@@ -8,7 +8,7 @@ defmodule ExPhoneNumber.Metadata do
   alias ExPhoneNumber.Model.PhoneNumber
 
   @resources_dir "./resources"
-  @xml_file Application.fetch_env!(:ex_phone_number, :metadata_file)
+  @xml_file if Mix.env == :test, do: "PhoneNumberMetadataForTesting.xml", else: "PhoneNumberMetadata.xml"
   @document_path Path.join([@resources_dir, @xml_file])
   @external_resource @document_path
 
