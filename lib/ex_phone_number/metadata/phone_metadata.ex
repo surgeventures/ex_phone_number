@@ -31,13 +31,15 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
             number_format: [],                             # [%NumberFormat{}]
             intl_number_format: []                         # [%NumberFormat{}]
 
-  require Logger
   import SweetXml
   import ExPhoneNumber.Utilities
   alias ExPhoneNumber.Constants.Values
   alias ExPhoneNumber.Metadata.NumberFormat
   alias ExPhoneNumber.Metadata.PhoneMetadata
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
+
+  require Logger
+  Logger.configure(level: Application.get_env(:ex_phone_number, :log_level, :warn))
 
   def from_xpath_node(xpath_node) do
     kwlist =

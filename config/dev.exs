@@ -1,4 +1,4 @@
 use Mix.Config
 
-config :logger,
-  level: :info
+config :ex_phone_number,
+  log_level: :debug
