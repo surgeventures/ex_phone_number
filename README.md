@@ -5,10 +5,18 @@ Based on Google's [libphonenumber](https://github.com/googlei18n/libphonenumber)
 
 ## Installation
 
-  1. Add ExPhoneNumber to your list of dependencies in `mix.exs`:
+  1. Add `:ex_phone_number` to your list of dependencies in `mix.exs`:
 ```ex
 def deps do
-  [{:ex_phone_number, git: "https://github.com/socialpaymentsbv/ex_phone_number.git"}]
+  [{:ex_phone_number, git: "https://github.com/socialpaymentsbv/ex_phone_number.git", branch: "develop"}]
+end
+```
+
+  2. Add `:ex_phone_number` to the list of applications in `mix.exs`:
+```ex
+def application do
+  [mod: {MyApp, []},
+   applications: [..., :ex_phone_number]]
 end
 ```
 
