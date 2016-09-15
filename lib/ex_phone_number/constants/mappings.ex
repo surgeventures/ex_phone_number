@@ -1,5 +1,5 @@
 defmodule ExPhoneNumber.Constants.Mappings do
-  alias ExPhoneNumber.Constants.Patterns
+  alias ExPhoneNumber.Constants.Values
 
   def digit_mappings() do
     %{
@@ -58,7 +58,7 @@ defmodule ExPhoneNumber.Constants.Mappings do
       "7" => "7",
       "8" => "8",
       "9" => "9",
-      "+" => Patterns.plus_sign,
+      "+" => Values.plus_sign,
       "*" => "*"
     };
   end
