@@ -177,16 +177,20 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     Logger.debug "#{inspect(phone_metadata)}"
     Logger.debug "region_code: #{inspect(phone_metadata.id)}"
 
-    if has_national_prefix?(phone_metadata) do
-      Logger.debug "has national_prefix"
-      if not has_national_prefix_for_parsing?(phone_metadata) do
-        Logger.debug "has not national_prefix_for_parsing"
-        phone_metadata = %{phone_metadata | national_prefix_for_parsing: phone_metadata.national_prefix}
-        Logger.debug "national_prefix_for_parsing: #{inspect(phone_metadata.national_prefix_for_parsing)}"
+    phone_metadata =
+      if has_national_prefix?(phone_metadata) do
+        Logger.debug "has national_prefix"
+        if not has_national_prefix_for_parsing?(phone_metadata) do
+          Logger.debug "has not national_prefix_for_parsing"
+          Logger.debug "national_prefix_for_parsing: #{inspect(phone_metadata.national_prefix)}"
+          %{phone_metadata | national_prefix_for_parsing: phone_metadata.national_prefix}
+        else
+          phone_metadata
+        end
+      else
+        Logger.debug "has not national_prefix"
+        phone_metadata
       end
-    else
-      Logger.debug "has not national_prefix"
-    end
 
     phone_metadata = %{phone_metadata | national_prefix_formatting_rule: get_national_prefix_formatting_rule(phone_metadata)}
     Logger.debug "national_prefix_formatting_rule: #{inspect(phone_metadata.national_prefix_formatting_rule)}"
@@ -287,10 +291,12 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         Map.merge(%NumberFormat{}, number_format)
       else
         intl_number_format = %NumberFormat{pattern: number_format.pattern, leading_digits_pattern: number_format.leading_digits_pattern}
-        unless number_format.intl_format == Values.description_default_pattern do
-          intl_number_format = Map.merge(intl_number_format, %{format: number_format.intl_format})
-        end
-        intl_number_format
+        intl_number_format =
+          if number_format.intl_format == Values.description_default_pattern do
+            intl_number_format
+          else
+            Map.merge(intl_number_format, %{format: number_format.intl_format})
+          end
       end
 
     unless is_nil_or_empty?(intl_number_format.format) do
