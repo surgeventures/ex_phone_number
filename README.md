@@ -1,5 +1,7 @@
 # ExPhoneNumber
 
+[![Build Status](https://travis-ci.org/socialpaymentsbv/ex_phone_number.svg?branch=develop)](https://travis-ci.org/socialpaymentsbv/ex_phone_number)
+
 It's a library for parsing, formatting, and validating international phone numbers.
 Based on Google's [libphonenumber](https://github.com/googlei18n/libphonenumber).
 
