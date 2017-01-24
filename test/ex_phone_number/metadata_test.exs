@@ -51,7 +51,8 @@ defmodule ExPhoneNumber.MetadataTest do
       end
 
       it "returns valid fixed_line", state do
-        assert state[:us_metadata].general == state[:us_metadata].fixed_line
+        general = state[:us_metadata].general |> Map.put(:example_number, "1234567890")
+        assert general == state[:us_metadata].fixed_line
       end
 
       it "returns valid toll_free.possible_number_pattern", state do
@@ -113,7 +114,7 @@ defmodule ExPhoneNumber.MetadataTest do
       end
 
       it "returns valid fixed_line.national_number_pattern", state do
-        assert ~r/(?:[24-6]\d{2}|3[03-9]\d|[789](?:[1-9]\d|0[2-9]))\d{1,8}/ == state[:de_metadata].fixed_line.national_number_pattern
+        assert ~r/(?:[24-6]\d{2}|3[03-9]\d|[789](?:0[2-9]|[1-9]\d))\d{1,8}/ == state[:de_metadata].fixed_line.national_number_pattern
       end
 
       it "returns valid fixed_line.possible_number_pattern", state do
@@ -203,7 +204,7 @@ defmodule ExPhoneNumber.MetadataTest do
       end
 
       it "returns valid general.example_number", state do
-        assert "12345678" == state[:un001_metadata].general.example_number
+        assert nil == state[:un001_metadata].general.example_number
       end
 
       it "returns valid toll_free.example_number", state do
