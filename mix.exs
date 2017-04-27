@@ -14,6 +14,7 @@ defmodule ExPhoneNumber.Mixfile do
      deps: deps(),
      package: package(),
      description: description(),
+     name: "ExPhoneNumber",
      source_url: "https://github.com/socialpaymentsbv/ex_phone_number",
      homepage_url: "https://github.com/socialpaymentsbv/ex_phone_number"]
   end
@@ -40,6 +41,6 @@ defmodule ExPhoneNumber.Mixfile do
      licenses: ["MIT"],
      links: %{"GitHub" => "https://github.com/socialpaymentsbv/ex_phone_number"},
      maintainers: ["Jose Miguel Rivero Bruno (@josemrb)"],
-     name: "ExPhoneNumber"]
+     name: :ex_phone_number]
   end
 end
