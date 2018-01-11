@@ -8,6 +8,7 @@ defmodule ExPhoneNumber.Parsing do
   alias ExPhoneNumber.Constants.Values
   alias ExPhoneNumber.Metadata
   alias ExPhoneNumber.Model.PhoneNumber
+  alias ExPhoneNumber.Constants.ValidationResults
 
   def build_national_number_for_parsing(number_to_parse) do
     number_to_parse
@@ -114,7 +115,13 @@ defmodule ExPhoneNumber.Parsing do
         if not is_nil(metadata) do
           case maybe_strip_national_prefix_and_carrier_code(normalized_national_number, metadata) do
             {true, carrier_code, potential_national_number} ->
-              national_number = if not is_shorter_than_possible_normal_number?(metadata, potential_national_number), do: potential_national_number, else: normalized_national_number
+              validation_result = test_number_length(potential_national_number, metadata)
+
+              national_number = if not validation_result in [ValidationResults.too_short, ValidationResults.is_possible_local_only, ValidationResults.invalid_length] do
+                                  potential_national_number
+                                else
+                                  normalized_national_number
+                                end
               phone_number = if keep_raw_input, do: %{phone_number | preferred_domestic_carrier_code: carrier_code}, else: phone_number
               {:ok, national_number, phone_number}
             {false, _, _} ->

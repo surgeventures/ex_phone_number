@@ -333,10 +333,15 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
       else
         description.example_number
       end
+    possible_lengths = description.possible_lengths || []
+    possible_lengths_local_only = description.possible_lengths_local_only || []
+
     %PhoneNumberDescription{
       national_number_pattern: national_number_pattern,
       possible_number_pattern: possible_number_pattern,
-      example_number: example_number
+      example_number: example_number,
+      possible_lengths: possible_lengths,
+      possible_lengths_local_only: possible_lengths_local_only,
     }
   end
 

@@ -1,5 +1,6 @@
 defmodule ExPhoneNumber.Validation do
   import ExPhoneNumber.Utilities
+  use ExPhoneNumber.Constants.PhoneNumberTypes
   alias ExPhoneNumber.Constants.ErrorMessages
   alias ExPhoneNumber.Constants.Patterns
   alias ExPhoneNumber.Constants.PhoneNumberTypes
@@ -121,6 +122,90 @@ defmodule ExPhoneNumber.Validation do
         nil -> ValidationResults.too_short
       end
     end
+  end
+
+  def test_number_length(national_number, metadata, phone_number_type \\ :unknown) do
+    type_description = get_number_description_by_type(metadata, phone_number_type)
+
+    {possible_lengths, local_lengths} = type_description
+                                        |> get_lengths_for_type(metadata)
+                                        |> maybe_merge_mobile_possible_lengths(phone_number_type, national_number, metadata)
+
+    actual_length = String.length(national_number)
+    minimum_length = List.first(possible_lengths)
+
+    cond do
+      is_nil(type_description)                    -> ValidationResults.sinvalid_length
+      # This is safe because there is never an overlap beween the possible lengths and the local-only
+      # lengths; this is checked at build time.
+      actual_length in local_lengths              -> ValidationResults.is_possible_local_only
+      minimum_length == actual_length             -> ValidationResults.is_possible
+      minimum_length > actual_length              -> ValidationResults.too_short
+      List.last(possible_lengths) < actual_length -> ValidationResults.too_long
+      actual_length in possible_lengths           -> ValidationResults.is_possible
+      true                                        -> ValidationResults.invalid_length
+    end
+  end
+
+  defp maybe_merge_mobile_possible_lengths({possible_lengths, local_lengths}, @fixed_line_or_mobile, national_number, metadata) do
+    type_description = get_number_description_by_type(metadata, @fixed_line)
+
+    if not description_has_possible_number_data?(type_description) do
+      # The rare case has been encountered where no fixedLine data is available (true for some
+      # non-geographical entities), so we just check mobile.
+      test_number_length(national_number, metadata, @mobile)
+    else
+      mobile_description = get_number_description_by_type(metadata, @mobile)
+
+      if description_has_possible_number_data?(mobile_description) do
+        # Merge the mobile data in if there was any. We have to make a copy to do this.
+        # Note that when adding the possible lengths from mobile, we have to again check they
+        # aren't empty since if they are this indicates they are the same as the general desc and
+        # should be obtained from there.
+        possible_lengths = if length(mobile_description.possible_lengths) == 0 do
+                             metadata.general.possible_lengths ++ possible_lengths
+                           else
+                             mobile_description.possible_lengths ++ possible_lengths
+                           end
+
+        # The current list is sorted; we need to merge in the new list and re-sort (duplicates
+        # are okay). Sorting isn't so expensive because the lists are very small.
+        possible_lengths = Enum.sort(possible_lengths)
+
+        local_lengths = if length(local_lengths) == 0 do
+                          mobile_description.possible_length_local_only
+                        else
+                          Enum.sort(mobile_description.possible_lengths_local_only ++ local_lengths)
+                        end
+
+        {possible_lengths, local_lengths}
+      else
+        {possible_lengths, local_lengths}
+      end
+    end
+  end
+  defp maybe_merge_mobile_possible_lengths({possible_lengths, local_lengths}, _phone_number_type, _national_number, _metadata) do
+    {possible_lengths, local_lengths}
+  end
+
+  defp description_has_possible_number_data?(%{possible_lengths: possible_lengths}) do
+    length(possible_lengths) != 1 or List.first(possible_lengths) != -1
+  end
+  defp description_has_possible_number_data?(_description), do: false
+
+  defp get_lengths_for_type(nil, metadata) do
+    {metadata.general.possible_lengths, []}
+  end
+  defp get_lengths_for_type(type_description, metadata) do
+    # There should always be "possible_lengths" set for every element. This is declared in the XML
+    # schema which is verified by PhoneNumberMetadataSchemaTest.
+    # For size efficiency, where a sub-description (e.g. fixed-line) has the same possibleLengths
+    # as the parent, this is missing, so we fall back to the general desc (where no numbers of the
+    # type exist at all, there is one possible length (-1) which is guaranteed not to match the
+    # length of any real phone number).
+    possible_lengths = if length(type_description.possible_lengths) == 0, do: metadata.general.possible_lengths, else: type_description.possible_lengths
+
+    {possible_lengths, type_description.possible_lengths_local_only}
   end
 
   def validate_length(number_to_parse) do
