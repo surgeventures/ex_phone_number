@@ -15,7 +15,7 @@ defmodule ExPhoneNumber.Normalization do
   end
 
   def normalize(number) do
-    if matches_entirely?(Patterns.valid_alpha_phone_pattern, number) do
+    if matches_entirely?(number, Patterns.valid_alpha_phone_pattern, false) do
       normalize_helper(number, Mappings.all_normalization_mappings, true)
     else
       normalize_digits_only(number)

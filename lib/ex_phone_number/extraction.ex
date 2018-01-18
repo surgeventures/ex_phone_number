@@ -70,9 +70,9 @@ defmodule ExPhoneNumber.Extraction do
           {_, potential_national_number} = String.split_at(full_number, String.length(country_code_string))
           {result, _, possible_national_number} = maybe_strip_national_prefix_and_carrier_code(potential_national_number, metadata)
           potential_national_number = if result, do: possible_national_number, else: potential_national_number
-          if (not matches_entirely?(metadata.general.national_number_pattern, full_number) and
-            matches_entirely?(metadata.general.national_number_pattern, potential_national_number))
-            or test_number_length_against_pattern(metadata.general.possible_number_pattern, full_number) == ValidationResults.too_long do
+          if (not matches_national_number?(full_number, metadata.general, false) and
+            matches_national_number?(potential_national_number, metadata.general, false))
+            or test_number_length(full_number, metadata) == ValidationResults.too_long do
             phone_number = if keep_raw_input, do: %{phone_number | country_code: metadata.country_code, country_code_source: CountryCodeSource.from_number_without_plus_sign},
               else: phone_number
             {true, potential_national_number, %{phone_number | country_code: metadata.country_code}}
@@ -139,7 +139,7 @@ defmodule ExPhoneNumber.Extraction do
     case Regex.run(prefix_pattern, number) do
       nil -> {false, "", number}
       matches ->
-        is_viable_original_number = matches_entirely?(general_national_number_pattern, number)
+        is_viable_original_number = matches_entirely?(number, general_national_number_pattern, false)
         number_of_groups = if length(matches) == 1, do: 1, else: length(matches) - 1
         match = Enum.at(matches, number_of_groups)
         number_stripped = elem(String.split_at(number, String.length(Enum.at(matches, 0))), 1)
@@ -147,7 +147,7 @@ defmodule ExPhoneNumber.Extraction do
         is_nil_match = is_nil_or_empty?(match)
         no_transform = is_nil_transform_rule or is_nil_match
         if no_transform do
-          if is_viable_original_number and not matches_entirely?(general_national_number_pattern, number_stripped) do
+          if is_viable_original_number and not matches_entirely?(number_stripped, general_national_number_pattern, false) do
             {false, "", number}
           else
             carrier_code = if length(matches) > 0 and not is_nil(Enum.at(matches, number_of_groups)), do: Enum.at(matches, 1)
@@ -155,7 +155,7 @@ defmodule ExPhoneNumber.Extraction do
           end
         else
           transformed_number = Regex.replace(prefix_pattern, number, national_prefix_transform_rule)
-          if is_viable_original_number and not matches_entirely?(general_national_number_pattern, transformed_number) do
+          if is_viable_original_number and not matches_entirely?(transformed_number, general_national_number_pattern, false) do
             {false, "", number}
           else
             carrier_code = if length(matches) > 0, do: Enum.at(matches, 1)

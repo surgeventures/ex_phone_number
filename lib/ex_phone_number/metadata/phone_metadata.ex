@@ -134,15 +134,6 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     end
   end
 
-  @leading_zero_possible_default false
-  def get_leading_zero_possible_or_default(%PhoneMetadata{} = phone_metadata) do
-    if is_nil(phone_metadata.leading_zero_possible) do
-      @leading_zero_possible_default
-    else
-      phone_metadata.leading_zero_possible
-    end
-  end
-
   @mobile_number_portable_region_default false
   def get_mobile_number_portable_region_or_default(phone_metadata = %PhoneMetadata{}) do
     if is_nil(phone_metadata.mobile_number_portable_region) do
@@ -210,6 +201,9 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
       if is_nil(ele), do: acc, else: acc ++ [ele]
     end)
     Logger.debug "intl_number_format count: #{inspect(length(intl_number_format))}"
+
+    phone_metadata = set_general_possible_lengths(phone_metadata)
+
     phone_metadata = %{phone_metadata | number_format: number_format, intl_number_format: intl_number_format}
     phone_metadata = %{phone_metadata | general: process_phone_number_description(phone_metadata.general, phone_metadata)}
     phone_metadata = %{phone_metadata | fixed_line: process_phone_number_description(phone_metadata.fixed_line, phone_metadata)}
@@ -315,39 +309,62 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   def process_phone_number_description(%PhoneNumberDescription{} = description, nil), do: process_phone_number_description(description, %PhoneNumberDescription{})
   def process_phone_number_description(%PhoneNumberDescription{} = description, %PhoneMetadata{general: general}), do: process_phone_number_description(description, general)
   def process_phone_number_description(%PhoneNumberDescription{} = description, %PhoneNumberDescription{} = general) do
-    national_number_pattern =
-      if is_nil_or_empty?(description.national_number_pattern) do
-        general.national_number_pattern
-      else
-        description.national_number_pattern
-      end
-    possible_number_pattern =
-      if is_nil_or_empty?(description.possible_number_pattern) do
-        general.possible_number_pattern
-      else
-        description.possible_number_pattern
-      end
-    example_number =
-      if is_nil_or_empty?(description.example_number) do
-        general.example_number
-      else
-        description.example_number
-      end
-    possible_lengths = description.possible_lengths || []
-    possible_lengths_local_only = description.possible_lengths_local_only || []
+    description
+    |> populate_national_number_pattern(general)
+    |> populate_example_number(general)
+  end
 
-    %PhoneNumberDescription{
-      national_number_pattern: national_number_pattern,
-      possible_number_pattern: possible_number_pattern,
-      example_number: example_number,
-      possible_lengths: possible_lengths,
-      possible_lengths_local_only: possible_lengths_local_only,
-    }
+  defp populate_national_number_pattern(%PhoneNumberDescription{national_number_pattern: pattern} = description, %PhoneNumberDescription{} = general) when is_nil(pattern) or pattern == "" do
+    %{description | national_number_pattern: general.national_number_pattern}
+  end
+  defp populate_national_number_pattern(%PhoneNumberDescription{} = description, %PhoneNumberDescription{}), do: description
+
+  defp populate_example_number(%PhoneNumberDescription{example_number: example_number} = description, %PhoneNumberDescription{} = general) when is_nil(example_number) or example_number == "" do
+    %{description | example_number: general.example_number}
+  end
+  defp populate_example_number(%PhoneNumberDescription{} = description, %PhoneNumberDescription{}), do: description
+
+  # Sets possible lengths in the general description, derived from certain child elements
+  #
+  # The general description node should *always* be present if metadata for other types is
+  # present, aside from in some unit tests.
+  # (However, for e.g. formatting metadata in PhoneNumberAlternateFormats, no PhoneNumberDesc
+  # elements are present).
+  defp set_general_possible_lengths(phone_metadata) do
+    # For short number metadata, we want to copy the lengths from the "short code" section only.
+    # This is because it's the more detailed validation pattern, it's not a sub-type of short
+    # codes. The other lengths will be checked later to see that they are a sub-set of these
+    # possible lengths.
+
+    possible_lengths = aggregate_lengths(phone_metadata, :possible_lengths)
+    possible_lengths_local_only = aggregate_lengths(phone_metadata, :possible_lengths_local_only)
+
+    general_description = %{phone_metadata.general | possible_lengths: possible_lengths, possible_lengths_local_only: possible_lengths_local_only}
+
+    %{phone_metadata | general: general_description}
+  end
+
+  defp aggregate_lengths(nil, _length_type), do: []
+  defp aggregate_lengths(phone_metadata, length_type) do
+    types =  ~w(fixed_line mobile toll_free premium_rate shared_cost voip personal_number pager uan voicemail)a
+
+    Enum.reduce(types, [], fn type, acc ->
+      with type_description when is_map(type_description) <- Map.get(phone_metadata, type),
+           lengths when is_list(lengths) <- Map.get(type_description, length_type)
+      do
+        [lengths | acc]
+      else
+        _ -> acc
+      end
+    end)
+    |> List.flatten
+    |> Enum.uniq
+    |> Enum.sort
   end
 
   def process_other_phone_number_description(description, %PhoneMetadata{general: general}) do
     if is_nil(description) do
-      %PhoneNumberDescription{national_number_pattern: Values.description_default_pattern, possible_number_pattern: Values.description_default_pattern}
+      %PhoneNumberDescription{national_number_pattern: Values.description_default_pattern}
     else
       process_phone_number_description(description, general)
     end

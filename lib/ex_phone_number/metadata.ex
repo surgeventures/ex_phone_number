@@ -30,14 +30,25 @@ defmodule ExPhoneNumber.Metadata do
 
     country_code = Map.get(phone_metadata, :country_code)
     country_code_atom = String.to_atom(Integer.to_string(country_code))
-    Module.put_attribute(__MODULE__, :list_country_code_to_region_code, {country_code_atom, phone_metadata.id})
+    Module.put_attribute(__MODULE__, :list_country_code_to_region_code, {country_code_atom, {phone_metadata.id, phone_metadata.main_country_for_code}})
   end
 
   list_cctrc = Module.get_attribute(__MODULE__, :list_country_code_to_region_code)
   uniq_keys_cctrc = Enum.uniq(Keyword.keys(list_cctrc))
+
+  order_country_codes = fn
+    {_cc1, true}, {_cc2, false} -> true
+    {_cc1, false}, {_cc2, true} -> false
+    {cc1, false}, {cc2, false} -> cc1 <= cc2
+  end
+
   map_cctrc = Enum.reduce(uniq_keys_cctrc, %{}, fn(key, acc) ->
     {new_key, _} = Integer.parse(Atom.to_string(key))
-    Map.put(acc, new_key, Keyword.get_values(list_cctrc, key))
+    country_codes = list_cctrc
+                    |> Keyword.get_values(key)
+                    |> Enum.sort(order_country_codes)
+                    |> Enum.map(&(elem(&1, 0)))
+    Map.put(acc, new_key, country_codes)
   end)
   defp country_code_to_region_code_map() do
     unquote(Macro.escape(map_cctrc))
@@ -106,7 +117,7 @@ defmodule ExPhoneNumber.Metadata do
 
   def get_region_code_for_country_code(country_code) when is_number(country_code) do
     region_codes = country_code_to_region_code_map()[country_code]
-   if is_nil(region_codes) do
+    if is_nil(region_codes) do
       Values.unknown_region
     else
       main_country = Enum.find(region_codes, fn(region_code) ->
@@ -118,7 +129,7 @@ defmodule ExPhoneNumber.Metadata do
         end
       end)
       if is_nil(main_country) do
-        Enum.at(Enum.reverse(region_codes), 0)
+        List.first(region_codes)
       else
         main_country
       end
@@ -128,14 +139,10 @@ defmodule ExPhoneNumber.Metadata do
   def get_region_code_for_number(nil), do: nil
   def get_region_code_for_number(%PhoneNumber{} = phone_number) do
     regions = country_code_to_region_code_map()[phone_number.country_code]
-    if is_nil(regions) do
-      nil
-    else
-      if length(regions) == 1 do
-        Enum.at(regions, 0)
-      else
-        get_region_code_for_number_from_region_list(phone_number, regions)
-      end
+    case regions do
+      nil -> nil
+      [region] -> region
+      regions -> get_region_code_for_number_from_region_list(phone_number, regions)
     end
   end
 
@@ -158,11 +165,6 @@ defmodule ExPhoneNumber.Metadata do
       {number, _} = Integer.parse(calling_code)
       number
     end)
-  end
-
-  def is_leading_zero_possible?(country_code) when is_number(country_code) do
-    metadata = get_for_region_code_or_calling_code(country_code, get_region_code_for_country_code(country_code))
-    not is_nil(metadata) and PhoneMetadata.get_leading_zero_possible_or_default(metadata)
   end
 
   def is_nanpa_country?(nil), do: false

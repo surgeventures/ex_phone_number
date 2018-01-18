@@ -70,17 +70,90 @@ defmodule ExPhoneNumber.Validation do
   end
 
   def is_possible_number?(%PhoneNumber{} = number) do
-    ValidationResults.is_possible == is_possible_number_with_reason?(number)
+    result = is_possible_number_with_reason(number)
+    result == ValidationResults.is_possible || result == ValidationResults.is_possible_local_only
   end
 
-  def is_possible_number_with_reason?(%PhoneNumber{} = number) do
-    if not Metadata.is_valid_country_code?(number.country_code) do
+  # def is_possible_number_with_reason(%PhoneNumber{} = number) do
+  #   if not Metadata.is_valid_country_code?(number.country_code) do
+  #     ValidationResults.invalid_country_code
+  #   else
+  #     region_code = Metadata.get_region_code_for_country_code(number.country_code)
+  #     metadata = Metadata.get_for_region_code_or_calling_code(number.country_code, region_code)
+  #     national_number = PhoneNumber.get_national_significant_number(number)
+  #     test_number_length_against_pattern(metadata.general.possible_number_pattern, national_number)
+  #   end
+  # end
+
+  #  Check whether a phone number is a possible number. It provides a more lenient check than
+  #  is_valid_number? in the following sense:
+  #
+  #    It only checks the length of phone numbers. In particular, it doesn't check starting
+  #    digits of the number.
+  #
+  #    It doesn't attempt to figure out the type of the number, but uses general rules which
+  #    applies to all types of phone numbers in a region. Therefore, it is much faster than
+  #    isValidNumber.
+  #
+  #    For some numbers (particularly fixed-line), many regions have the concept of area code,
+  #    which together with subscriber number constitute the national significant number. It is
+  #    sometimes okay to dial only the subscriber number when dialing in the same area. This
+  #    function will return IS_POSSIBLE_LOCAL_ONLY if the subscriber-number-only version is
+  #    passed in. On the other hand, because isValidNumber validates using information on both
+  #    starting digits (for fixed line numbers, that would most likely be area codes) and
+  #    length (obviously includes the length of area codes for fixed line numbers), it will
+  #    return false for the subscriber-number-only version.
+  #
+  # `number`  the number that needs to be checked
+  # return    a validation result that indicates whether the number is possible
+  def is_possible_number_with_reason(%PhoneNumber{} = number) do
+    is_possible_number_for_type_with_reason(number, PhoneNumberTypes.unknown())
+  end
+
+  # Convenience wrapper around is_possible_number_for_type_with_reason. Instead of returning the
+  # reason for failure, this method returns true if the number is either a possible fully-qualified
+  # number (containing the area code and country code), or if the number could be a possible local
+  # number (with a country code, but missing an area code). Local numbers are considered possible
+  # if they could be possibly dialled in this format: if the area code is needed for a call to
+  # connect, the number is not considered possible without it.
+  #
+  # `number`  the number that needs to be checked
+  # `type`    the type we are interested in
+  #
+  # `return`  true if the number is possible for this particular type
+  defp is_possible_number_for_type(%PhoneNumber{} = number, type) do
+    result = is_possible_number_for_type_with_reason(number, type)
+
+    result == ValidationResults.is_possible || result == ValidationResults.is_possible_local_only
+  end
+
+  defp is_possible_number_for_type_with_reason(%PhoneNumber{} = number, type) do
+    national_number = PhoneNumber.get_national_significant_number(number)
+    country_code = number.country_code
+
+    # Note: For regions that share a country calling code, like NANPA numbers, we just use the
+    # rules from the default region (US in this case) since the getRegionCodeForNumber will not
+    # work if the number is possible but not valid. There is in fact one country calling code (290)
+    # where the possible number pattern differs between various regions (Saint Helena and Tristan
+    # da Cuñha), but this is handled by putting all possible lengths for any country with this
+    # country calling code in the metadata for the default region in this case.
+    if !has_valid_country_code?(country_code) do
       ValidationResults.invalid_country_code
     else
-      region_code = Metadata.get_region_code_for_country_code(number.country_code)
-      metadata = Metadata.get_for_region_code_or_calling_code(number.country_code, region_code)
-      national_number = PhoneNumber.get_national_significant_number(number)
-      test_number_length_against_pattern(metadata.general.possible_number_pattern, national_number)
+      region_code = Metadata.get_region_code_for_country_code(country_code)
+      # Metadata cannot be null because the country calling code is valid.
+      metadata = Metadata.get_for_region_code_or_calling_code(country_code, region_code)
+      test_number_length(national_number, metadata, type)
+    end
+  end
+
+  defp has_valid_country_code?(country_code) do
+    unknown_region_code = Values.unknown_region
+
+    case Metadata.get_region_code_for_country_code(country_code) do
+      ^unknown_region_code -> false
+      false                -> false
+      _                    -> true
     end
   end
 
@@ -109,12 +182,12 @@ defmodule ExPhoneNumber.Validation do
     if String.length(phone_number) < Values.min_length_for_nsn do
       false
     else
-      matches_entirely?(Patterns.valid_phone_number_pattern, phone_number)
+      matches_entirely?(phone_number, Patterns.valid_phone_number_pattern, false)
     end
   end
 
   def test_number_length_against_pattern(pattern, number) do
-    if matches_entirely?(pattern, number) do
+    if matches_entirely?(number, pattern, false) do
       ValidationResults.is_possible
     else
       case Regex.run(pattern, number, return: :index) do
@@ -135,7 +208,7 @@ defmodule ExPhoneNumber.Validation do
     minimum_length = List.first(possible_lengths)
 
     cond do
-      is_nil(type_description)                    -> ValidationResults.sinvalid_length
+      is_nil(type_description)                    -> ValidationResults.invalid_length
       # This is safe because there is never an overlap beween the possible lengths and the local-only
       # lengths; this is checked at build time.
       actual_length in local_lengths              -> ValidationResults.is_possible_local_only

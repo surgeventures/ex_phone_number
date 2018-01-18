@@ -1,6 +1,5 @@
 defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
   defstruct national_number_pattern: nil,   # string
-            possible_number_pattern: nil,   # string
             example_number: nil,            # string
 
             # These represent the lengths a phone number from this region can be. They
@@ -11,7 +10,7 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
             # This could be used to highlight tokens in a text that may be a phone
             # number, or to quickly prune numbers that could not possibly be a phone
             # number for this locale.
-            possible_lengths: nil,
+            possible_lengths: [],
 
             # These represent the lengths that only local phone numbers (without an area
             # code) from this region can be. They will be sorted from smallest to
@@ -24,7 +23,7 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
             # and mobile numbers, so this field should only be set for those types of
             # numbers (and the general description) - however there are exceptions for
             # NANPA countries.
-            possible_lengths_local_only: nil
+            possible_lengths_local_only: []
 
   import SweetXml
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
@@ -34,7 +33,6 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
     kwlist =
       xpath_node |> xmap(
         national_number_pattern: ~x"./nationalNumberPattern/text()"o |> transform_by(&normalize_pattern/1),
-        possible_number_pattern: ~x"./possibleNumberPattern/text()"o |> transform_by(&normalize_pattern/1),
         example_number: ~x"./exampleNumber/text()"o |> transform_by(&normalize_string/1),
         possible_lengths: ~x"string(./possibleLengths/@national)"o |> transform_by(&extract_lengths/1),
         possible_lengths_local_only: ~x"string(./possibleLengths/@localOnly)"o |> transform_by(&extract_lengths/1)

@@ -9,19 +9,19 @@ defmodule ExPhoneNumber.Formatting do
 
   def choose_formatting_pattern_for_number(available_formats, national_number) do
     Enum.find(available_formats, fn(number_format) ->
-        leading_digits_pattern_size = length(number_format.leading_digits_pattern)
-        match_index = if not (leading_digits_pattern_size == 0) do
-          last_leading_digits_pattern = List.last(number_format.leading_digits_pattern)
-          case Regex.run(last_leading_digits_pattern, national_number, return: :index) do
-            nil -> - 1
-            [{match_index, _match_length} | _tail] -> match_index
-          end
-        else
-          - 1
+      leading_digits_pattern_size = length(number_format.leading_digits_pattern)
+      match_index = if not (leading_digits_pattern_size == 0) do
+        last_leading_digits_pattern = List.last(number_format.leading_digits_pattern)
+        case Regex.run(last_leading_digits_pattern, national_number, return: :index) do
+          nil -> - 1
+          [{match_index, _match_length} | _tail] -> match_index
         end
-        if leading_digits_pattern_size == 0 or match_index == 0 do
-          matches_entirely?(number_format.pattern, national_number)
-        end
+      else
+        - 1
+      end
+      if leading_digits_pattern_size == 0 or match_index == 0 do
+        matches_entirely?(national_number, number_format.pattern, false)
+      end
     end)
   end
 
