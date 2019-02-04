@@ -139,9 +139,18 @@ defmodule ExPhoneNumber.Metadata do
     end
   end
 
-  def get_region_code_for_number_from_region_list(%PhoneNumber{} = phone_number, region_codes) when is_list(region_codes) do
+  defp get_region_code_for_number_from_region_list(%PhoneNumber{} = phone_number, region_codes) when is_list(region_codes) do
+    region_codes = if_gb_regions_ensure_gb_first(region_codes)
     national_number = PhoneNumber.get_national_significant_number(phone_number)
     find_matching_region_code(region_codes, national_number)
+  end
+
+  # Ensure `GB` is first when checking numbers that match `country_code: 44`. In the Javascript official library it's the case.
+  defp if_gb_regions_ensure_gb_first(regions) do
+    case Enum.member?(regions, "GB") do
+      false -> regions
+      true -> Enum.sort(regions)
+    end
   end
 
   def get_region_codes_for_country_code(country_code) when is_number(country_code) do
@@ -158,11 +167,6 @@ defmodule ExPhoneNumber.Metadata do
       {number, _} = Integer.parse(calling_code)
       number
     end)
-  end
-
-  def is_leading_zero_possible?(country_code) when is_number(country_code) do
-    metadata = get_for_region_code_or_calling_code(country_code, get_region_code_for_country_code(country_code))
-    not is_nil(metadata) and PhoneMetadata.get_leading_zero_possible_or_default(metadata)
   end
 
   def is_nanpa_country?(nil), do: false

@@ -9,23 +9,6 @@ defmodule ExPhoneNumber.Validation do
   alias ExPhoneNumber.Metadata.PhoneMetadata
   alias ExPhoneNumber.Model.PhoneNumber
 
-  def get_number_description_by_type(%PhoneMetadata{} = metadata, type) do
-    cond do
-      type == PhoneNumberTypes.premium_rate -> metadata.premium_rate
-      type == PhoneNumberTypes.toll_free -> metadata.toll_free
-      type == PhoneNumberTypes.mobile -> metadata.mobile
-      type == PhoneNumberTypes.fixed_line -> metadata.fixed_line
-      type == PhoneNumberTypes.fixed_line_or_mobile -> metadata.fixed_line
-      type == PhoneNumberTypes.shared_cost -> metadata.shared_cost
-      type == PhoneNumberTypes.voip -> metadata.voip
-      type == PhoneNumberTypes.personal_number -> metadata.personal_number
-      type == PhoneNumberTypes.pager -> metadata.pager
-      type == PhoneNumberTypes.uan -> metadata.uan
-      type == PhoneNumberTypes.voicemail -> metadata.voicemail
-      true -> metadata.general
-    end
-  end
-
   def get_number_type(%PhoneNumber{} = phone_number) do
     region_code = Metadata.get_region_code_for_number(phone_number)
     metadata = Metadata.get_for_region_code_or_calling_code(phone_number.country_code, region_code)
@@ -79,12 +62,12 @@ defmodule ExPhoneNumber.Validation do
       region_code = Metadata.get_region_code_for_country_code(number.country_code)
       metadata = Metadata.get_for_region_code_or_calling_code(number.country_code, region_code)
       national_number = PhoneNumber.get_national_significant_number(number)
-      test_number_length_against_pattern(metadata.general.possible_number_pattern, national_number)
+      test_number_length(national_number, metadata)
     end
   end
 
   def is_shorter_than_possible_normal_number?(metadata, number) do
-    test_number_length_against_pattern(metadata.general.possible_number_pattern, number) == ValidationResults.too_short
+    test_number_length(number, metadata) == ValidationResults.too_short
   end
 
   def is_valid_number?(%PhoneNumber{} = number) do
@@ -112,15 +95,8 @@ defmodule ExPhoneNumber.Validation do
     end
   end
 
-  def test_number_length_against_pattern(pattern, number) do
-    if matches_entirely?(pattern, number) do
-      ValidationResults.is_possible
-    else
-      case Regex.run(pattern, number, return: :index) do
-        [{index, _match_length} | _tail] -> if index == 0, do: ValidationResults.too_long, else: ValidationResults.too_short
-        nil -> ValidationResults.too_short
-      end
-    end
+  def test_number_length(number, metadata) do
+    test_number_length_for_type(number, metadata, PhoneNumberTypes.unknown)
   end
 
   def validate_length(number_to_parse) do
@@ -128,6 +104,62 @@ defmodule ExPhoneNumber.Validation do
       {:error, ErrorMessages.too_long()}
     else
       {:ok, number_to_parse}
+    end
+  end
+
+  defp test_number_length_for_type(number, metadata, type) do
+    possible_lengths =
+      if type == PhoneNumberTypes.fixed_line_or_mobile() do
+        possible_lengths_by_type(metadata, PhoneNumberTypes.fixed_line())
+        ++ possible_lengths_by_type(metadata, PhoneNumberTypes.mobile())
+        |> Enum.uniq
+      else
+        possible_lengths_by_type(metadata, type)
+      end
+
+    min_length = Enum.min(possible_lengths)
+    max_length = Enum.max(possible_lengths)
+
+    if(min_length == -1) do
+      ValidationResults.invalid_length
+    else
+      case String.length(number) do
+        actual_length when (actual_length < min_length) -> ValidationResults.too_short
+        actual_length when (actual_length > max_length) -> ValidationResults.too_long
+        actual_length ->
+          if Enum.member?(possible_lengths, actual_length) do
+            ValidationResults.is_possible
+          else
+            ValidationResults.invalid_length
+          end
+      end
+    end
+  end
+
+  defp possible_lengths_by_type(metadata, type) do
+    desc_for_type = get_number_description_by_type(metadata, type)
+    desc_general = get_number_description_by_type(metadata, :general)
+
+    if Enum.empty?(desc_for_type.possible_lengths) do
+      desc_general.possible_lengths
+    else
+      desc_for_type.possible_lengths
+    end
+  end
+
+  defp get_number_description_by_type(%PhoneMetadata{} = metadata, type) do
+    cond do
+      type == PhoneNumberTypes.premium_rate -> metadata.premium_rate
+      type == PhoneNumberTypes.toll_free -> metadata.toll_free
+      type == PhoneNumberTypes.mobile -> metadata.mobile
+      type == PhoneNumberTypes.fixed_line -> metadata.fixed_line
+      type == PhoneNumberTypes.shared_cost -> metadata.shared_cost
+      type == PhoneNumberTypes.voip -> metadata.voip
+      type == PhoneNumberTypes.personal_number -> metadata.personal_number
+      type == PhoneNumberTypes.pager -> metadata.pager
+      type == PhoneNumberTypes.uan -> metadata.uan
+      type == PhoneNumberTypes.voicemail -> metadata.voicemail
+      true -> metadata.general
     end
   end
 end
