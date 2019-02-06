@@ -1,7 +1,7 @@
 defmodule ExPhoneNumber.Mixfile do
   use Mix.Project
 
-  @version "0.1.1"
+  @version "0.1.2"
 
   def project do
     [app: :ex_phone_number,
@@ -40,7 +40,7 @@ defmodule ExPhoneNumber.Mixfile do
     [files: ["lib", "config", "resources", "LICENSE*", "README*", "mix.exs"],
      licenses: ["MIT"],
      links: %{"GitHub" => "https://github.com/socialpaymentsbv/ex_phone_number"},
-     maintainers: ["Jose Miguel Rivero Bruno (@josemrb)"],
+     maintainers: ["ClubCollect (@socialpaymentsbv)",  "Jose Miguel Rivero Bruno (@josemrb)"],
      name: :ex_phone_number]
   end
 end
