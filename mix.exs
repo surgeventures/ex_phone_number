@@ -1,7 +1,7 @@
 defmodule ExPhoneNumber.Mixfile do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.2.1"
 
   def project do
     [
@@ -35,16 +35,18 @@ defmodule ExPhoneNumber.Mixfile do
     ]
   end
 
-  defp description do
-    "A library for parsing, formatting, and validating international phone numbers. " <>
-      "Based on Google's libphonenumber."
+  defp description do """
+  A library for parsing, formatting, and validating international phone numbers. Based on Google's libphonenumber.
+  """
   end
 
   defp package do
-    [files: ["lib", "config", "resources", "LICENSE*", "README*", "mix.exs"],
-     licenses: ["MIT"],
-     links: %{"GitHub" => "https://github.com/socialpaymentsbv/ex_phone_number"},
-     maintainers: ["ClubCollect (@socialpaymentsbv)",  "Jose Miguel Rivero Bruno (@josemrb)"],
-     name: :ex_phone_number]
+    [
+      files: ["lib", "config", "resources", "LICENSE*", "README*", "mix.exs"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/socialpaymentsbv/ex_phone_number"},
+      maintainers: ["ClubCollect (@socialpaymentsbv)", "Jose Miguel Rivero Bruno (@josemrb)"],
+      name: :ex_phone_number
+    ]
   end
 end
