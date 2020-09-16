@@ -10,7 +10,7 @@ Based on Google's [libphonenumber](https://github.com/googlei18n/libphonenumber)
   1. Add `:ex_phone_number` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
-  [{:ex_phone_number, "~> 0.2.1"}]
+  [{:ex_phone_number, git: "https://github.com/surgeventures/ex_phone_number.git", tag: "v0.2.2"}]
 end
 ```
 
