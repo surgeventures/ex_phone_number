@@ -16,6 +16,7 @@ defmodule RegionCodeFixture do
   def cs(), do: "CS"
   def cx(), do: "CX"
   def de(), do: "DE"
+  def eg(), do: "EG"
   def gb(), do: "GB"
   def hu(), do: "HU"
   def it(), do: "IT"

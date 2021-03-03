@@ -7206,12 +7206,12 @@
       </availableFormats>
       <generalDesc>
         <nationalNumberPattern>
-          1\d{4,9}|
+          1\d{4,10}|
           [2456]\d{8}|
           3\d{7}|
           [89]\d{8,9}
         </nationalNumberPattern>
-        <possibleNumberPattern>\d{5,10}</possibleNumberPattern>
+        <possibleNumberPattern>\d{5,11}</possibleNumberPattern>
       </generalDesc>
       <fixedLine>
         <!-- Short numbers used for businesses (starting with 16 or 19) are covered here. Note also
@@ -7269,11 +7269,11 @@
           1(?:
             0[0-269]|
             1[0-245]|
-            2[0-278]
-          )\d{7}
+            2[0-27-9]
+          )\d{7,8}
         </nationalNumberPattern>
-        <possibleNumberPattern>\d{10}</possibleNumberPattern>
-        <possibleLengths national="10"/>
+        <possibleNumberPattern>\d{10,11}</possibleNumberPattern>
+        <possibleLengths national="10,11"/>
         <exampleNumber>1001234567</exampleNumber>
       </mobile>
       <tollFree>

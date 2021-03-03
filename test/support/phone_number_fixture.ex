@@ -233,6 +233,13 @@ defmodule PhoneNumberFixture do
     }
   end
 
+  def eg_mobile() do
+    %PhoneNumber{
+      country_code: 20,
+      national_number: 12912345678
+    }
+  end
+
   def gb_mobile() do
     %PhoneNumber{
       country_code: 44,

@@ -165,6 +165,12 @@ defmodule ExPhoneNumber.ValidationTest do
       end
     end
 
+    context "test EG mobile" do
+      it "returns true" do
+        assert is_valid_number?(PhoneNumberFixture.eg_mobile)
+      end
+    end
+
     context "test International Toll Free" do
       it "returns true" do
         assert is_valid_number?(PhoneNumberFixture.international_toll_free)

@@ -220,6 +220,14 @@ defmodule ExPhoneNumber.ParsingTest do
       end
     end
 
+    context "EG number" do
+      it "should return correct value" do
+        {result, phone_number} = parse("+2012912345678", RegionCodeFixture.eg)
+        assert :ok == result
+        assert PhoneNumberFixture.eg_mobile == phone_number
+      end
+    end
+
     context "JP star number" do
       it "should return correct value" do
         {result, phone_number} = parse("+81 *2345", RegionCodeFixture.jp)

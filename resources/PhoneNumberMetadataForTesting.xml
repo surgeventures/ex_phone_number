@@ -471,6 +471,63 @@
       </premiumRate>
     </territory>
 
+    <!-- Egypt -->
+    <territory id="EG" countryCode="20" internationalPrefix="00"
+               nationalPrefix="0" nationalPrefixFormattingRule="$NP$FG"
+               mobileNumberPortableRegion="true">
+      <references>
+        <sourceUrl>http://www.itu.int/oth/T020200003E/en</sourceUrl>
+      </references>
+      <availableFormats>
+        <!-- Note that no explicit formatting rule is here for 5-digit numbers starting with a 16
+             or 19. These are formatted without national prefix, as a block, so do not need to be
+             listed here. -->
+        <numberFormat pattern="(\d)(\d{7,8})">
+          <leadingDigits>[23]</leadingDigits>
+          <format>$1 $2</format>
+        </numberFormat>
+        <numberFormat pattern="(\d{3})(\d{3})(\d{4})">
+          <leadingDigits>
+            1[012]|
+            [89]00
+          </leadingDigits>
+          <format>$1 $2 $3</format>
+        </numberFormat>
+        <numberFormat pattern="(\d{2})(\d{6,7})">
+          <leadingDigits>
+            1[35]|
+            [4-6]|
+            [89][2-9]
+          </leadingDigits>
+          <format>$1 $2</format>
+        </numberFormat>
+      </availableFormats>
+      <generalDesc>
+        <nationalNumberPattern>
+          1\d{4,10}|
+          [2456]\d{8}|
+          3\d{7}|
+          [89]\d{8,9}
+        </nationalNumberPattern>
+        <possibleNumberPattern>\d{5,11}</possibleNumberPattern>
+      </generalDesc>
+      <mobile>
+        <!-- Adding the extra prefixes 102 and 121 from user reports that Vodafone and Mobinil have
+             started allocating numbers beginning with these prefixes, along with 115 from numbers
+             found online. Etisalat is using 110. -->
+        <nationalNumberPattern>
+          1(?:
+            0[0-269]|
+            1[0-245]|
+            2[0-27-9]
+          )\d{7,8}
+        </nationalNumberPattern>
+        <possibleNumberPattern>\d{10,11}</possibleNumberPattern>
+        <possibleLengths national="10,11"/>
+        <exampleNumber>1001234567</exampleNumber>
+      </mobile>
+    </territory>
+
     <!-- France -->
     <territory id="FR" countryCode="33" nationalPrefix="0" nationalPrefixFormattingRule="$NP$FG"
                internationalPrefix="00">
