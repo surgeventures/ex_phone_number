@@ -9112,7 +9112,7 @@
       </availableFormats>
       <generalDesc>
         <nationalNumberPattern>
-          [189]\d{8,9}|
+          [189]\d{8,10}|
           [24-6]\d{8}|
           [135]\d{7}
         </nationalNumberPattern>
@@ -9141,9 +9141,9 @@
         </nationalNumberPattern>
       </fixedLine>
       <mobile>
-        <possibleLengths national="10"/>
+        <possibleLengths national="10,11"/>
         <exampleNumber>1001234567</exampleNumber>
-        <nationalNumberPattern>1[0-25]\d{8}</nationalNumberPattern>
+        <nationalNumberPattern>1[0-25]\d{8,9}</nationalNumberPattern>
       </mobile>
       <tollFree>
         <possibleLengths national="10"/>
