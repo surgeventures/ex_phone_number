@@ -9,7 +9,9 @@ defmodule ExPhoneNumber.Mixfile do
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: ExCoveralls],
      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test],
-     deps: deps()]
+     deps: deps(),
+     description: description(),
+     package: package()]
   end
 
   def application do
@@ -20,8 +22,24 @@ defmodule ExPhoneNumber.Mixfile do
     [
       {:sweet_xml, "~> 0.6.1"},
       {:ex_spec, "~> 2.0", only: :test},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.5.6", only: :test},
       {:credo, "~> 0.4.11", only: [:dev, :test]}
     ]
+  end
+
+  defp package do
+    [
+      files: ["lib", "resources", "mix.exs", "README*"],
+      licenses: [],
+      links: %{"GitHub" => "https://github.com/surgeventures/ex_phone_number"},
+      organization: "fresha"
+    ]
+  end
+
+  defp description do
+    """
+    It's a library for parsing, formatting, and validating international phone numbers.
+    """
   end
 end
