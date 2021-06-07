@@ -1,20 +1,20 @@
 version: 2.1
 
 orbs:
-  elixir-orb: fresha/elixir-orb@0.0
+  elixir-orb: fresha/elixir-orb@0.1
 
 workflows:
   version: 2
   ci:
     jobs:
-      - elixir-orb/test
+#      - elixir-orb/test
 #      - elixir-orb/static-check:
 #          dialyzer: true
 #          context: Hex
       - hold-for-dev-publish:
           type: approval
-          requires:
-            - elixir-orb/test
+#          requires:
+#            - elixir-orb/test
 #            - elixir-orb/static-check
           filters:
             branches:
@@ -26,8 +26,8 @@ workflows:
             - hold-for-dev-publish
       - elixir-orb/deploy:
           context: Hex
-          requires:
-            - elixir-orb/test
+#          requires:
+#            - elixir-orb/test
 #            - elixir-orb/static-check
           filters:
             branches:
