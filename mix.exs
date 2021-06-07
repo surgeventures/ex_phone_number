@@ -3,7 +3,7 @@ defmodule ExPhoneNumber.Mixfile do
 
   def project do
     [
-      app: :ex_phone_number,
+      app: :ex_phone_number_fresha,
       version: "0.2.3",
       elixir: "~> 1.4",
       build_embedded: Mix.env() == :prod,
@@ -41,8 +41,7 @@ defmodule ExPhoneNumber.Mixfile do
       files: ["lib", "config", "resources", "LICENSE*", "README*", "mix.exs"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/surgeventures/ex_phone_number"},
-      maintainers: ["ClubCollect (@socialpaymentsbv)", "Jose Miguel Rivero Bruno (@josemrb)"],
-      name: :ex_phone_number_fresha
+      maintainers: ["ClubCollect (@socialpaymentsbv)", "Jose Miguel Rivero Bruno (@josemrb)"]
     ]
   end
 end
