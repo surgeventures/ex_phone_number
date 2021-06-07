@@ -2,44 +2,48 @@ defmodule ExPhoneNumber.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :ex_phone_number,
-     version: "0.0.2",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test],
-     deps: deps(),
-     description: description(),
-     package: package()]
+    [
+      app: :ex_phone_number,
+      version: "0.2.3",
+      elixir: "~> 1.4",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      package: package(),
+      description: description(),
+      name: "ExPhoneNumber",
+      source_url: "https://github.com/surgeventures/ex_phone_number",
+      homepage_url: "https://github.com/surgeventures/ex_phone_number"
+    ]
   end
 
   def application do
-    [applications: [:logger]]
+    [extra_applications: [:logger]]
   end
 
   defp deps do
     [
-      {:sweet_xml, "~> 0.6.1"},
+      {:sweet_xml, "~> 0.6.5"},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:ex_spec, "~> 2.0", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.5.6", only: :test},
-      {:credo, "~> 0.4.11", only: [:dev, :test]}
-    ]
-  end
-
-  defp package do
-    [
-      files: ["lib", "resources", "mix.exs", "README*"],
-      licenses: [],
-      links: %{"GitHub" => "https://github.com/surgeventures/ex_phone_number"},
-      organization: "fresha"
+      {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false}
     ]
   end
 
   defp description do
     """
-    It's a library for parsing, formatting, and validating international phone numbers.
+    A library for parsing, formatting, and validating international phone numbers. Based on Google's libphonenumber.
     """
+  end
+
+  defp package do
+    [
+      files: ["lib", "config", "resources", "LICENSE*", "README*", "mix.exs"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/surgeventures/ex_phone_number"},
+      maintainers: ["ClubCollect (@socialpaymentsbv)", "Jose Miguel Rivero Bruno (@josemrb)"],
+      name: :ex_phone_number,
+      organization: "fresha"
+    ]
   end
 end
