@@ -31,14 +31,14 @@ defmodule ExPhoneNumber.Mixfile do
     [
       files: ["lib", "mix.exs", "README*"],
       licenses: [],
-      links: %{"GitHub" => "https://github.com/surgeventures/heartbeats"},
+      links: %{"GitHub" => "https://github.com/surgeventures/ex_phone_number"},
       organization: "fresha"
     ]
   end
 
   defp description do
     """
-    A universal solution for health checking elixir apps.
+    It's a library for parsing, formatting, and validating international phone numbers.
     """
   end
 end
