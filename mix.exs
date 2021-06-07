@@ -42,8 +42,7 @@ defmodule ExPhoneNumber.Mixfile do
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/surgeventures/ex_phone_number"},
       maintainers: ["ClubCollect (@socialpaymentsbv)", "Jose Miguel Rivero Bruno (@josemrb)"],
-      name: :ex_phone_number,
-      organization: "fresha"
+      name: :ex_phone_number_fresha,
     ]
   end
 end
