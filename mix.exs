@@ -9,7 +9,9 @@ defmodule ExPhoneNumber.Mixfile do
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: ExCoveralls],
      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test],
-     deps: deps()]
+     deps: deps(),
+     description: description(),
+     package: package()]
   end
 
   def application do
@@ -23,5 +25,20 @@ defmodule ExPhoneNumber.Mixfile do
       {:excoveralls, "~> 0.5.6", only: :test},
       {:credo, "~> 0.4.11", only: [:dev, :test]}
     ]
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README*"],
+      licenses: [],
+      links: %{"GitHub" => "https://github.com/surgeventures/heartbeats"},
+      organization: "fresha"
+    ]
+  end
+
+  defp description do
+    """
+    A universal solution for health checking elixir apps.
+    """
   end
 end

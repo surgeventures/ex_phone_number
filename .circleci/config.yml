@@ -8,14 +8,14 @@ workflows:
   ci:
     jobs:
       - elixir-orb/test
-      - elixir-orb/static-check:
-          dialyzer: true
-          context: Hex
+#      - elixir-orb/static-check:
+#          dialyzer: true
+#          context: Hex
       - hold-for-dev-publish:
           type: approval
           requires:
             - elixir-orb/test
-            - elixir-orb/static-check
+#            - elixir-orb/static-check
           filters:
             branches:
               ignore:
@@ -28,7 +28,7 @@ workflows:
           context: Hex
           requires:
             - elixir-orb/test
-            - elixir-orb/static-check
+#            - elixir-orb/static-check
           filters:
             branches:
               only:
