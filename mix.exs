@@ -30,7 +30,7 @@ defmodule ExPhoneNumber.Mixfile do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "README*"],
+      files: ["lib", "resources", "mix.exs", "README*"],
       licenses: [],
       links: %{"GitHub" => "https://github.com/surgeventures/ex_phone_number"},
       organization: "fresha"
