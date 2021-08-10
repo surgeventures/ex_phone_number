@@ -13,9 +13,9 @@ workflows:
           context: Hex
       - hold-for-dev-publish:
           type: approval
-#          requires:
-#            - elixir-orb/test
-#            - elixir-orb/static-check
+          requires:
+            - elixir-orb/test
+            - elixir-orb/static-check
           filters:
             branches:
               ignore:
@@ -26,9 +26,9 @@ workflows:
             - hold-for-dev-publish
       - elixir-orb/deploy:
           context: Hex
-#          requires:
-#            - elixir-orb/test
-#            - elixir-orb/static-check
+          requires:
+            - elixir-orb/test
+            - elixir-orb/static-check
           filters:
             branches:
               only:
