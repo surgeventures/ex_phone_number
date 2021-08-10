@@ -19,24 +19,24 @@ defmodule ExPhoneNumber.Model.PhoneNumber do
   alias ExPhoneNumber.Model.PhoneNumber
   alias ExPhoneNumber.Constants.CountryCodeSource
 
-  def has_country_code?(phone_number = %PhoneNumber{}) do
+  def has_country_code?(%PhoneNumber{} = phone_number) do
     not is_nil(phone_number.country_code)
   end
 
-  def has_national_number?(phone_number = %PhoneNumber{}) do
+  def has_national_number?(%PhoneNumber{} = phone_number) do
     not is_nil(phone_number.national_number)
   end
 
-  def has_extension?(phone_number = %PhoneNumber{}) do
+  def has_extension?(%PhoneNumber{} = phone_number) do
     not is_nil(phone_number.extension)
   end
 
-  def has_italian_leading_zero?(phone_number = %PhoneNumber{}) do
+  def has_italian_leading_zero?(%PhoneNumber{} = phone_number) do
     not is_nil(phone_number.italian_leading_zero)
   end
 
   @number_of_leading_zeros_default 1
-  def get_number_of_leading_zeros_or_default(phone_number = %PhoneNumber{}) do
+  def get_number_of_leading_zeros_or_default(%PhoneNumber{} = phone_number) do
     if is_nil(phone_number.number_of_leading_zeros) do
       @number_of_leading_zeros_default
     else
@@ -44,16 +44,16 @@ defmodule ExPhoneNumber.Model.PhoneNumber do
     end
   end
 
-  def has_number_of_leading_zeros?(phone_number = %PhoneNumber{}) do
+  def has_number_of_leading_zeros?(%PhoneNumber{} = phone_number) do
     not is_nil(phone_number.number_of_leading_zeros)
   end
 
-  def has_raw_input?(phone_number = %PhoneNumber{}) do
+  def has_raw_input?(%PhoneNumber{} = phone_number) do
     not is_nil(phone_number.raw_input)
   end
 
   @country_code_source_default CountryCodeSource.from_number_with_plus_sign()
-  def get_country_code_source_or_default(phone_number = %PhoneNumber{}) do
+  def get_country_code_source_or_default(%PhoneNumber{} = phone_number) do
     if is_nil(phone_number.country_code_source) do
       @country_code_source_default
     else
@@ -61,15 +61,15 @@ defmodule ExPhoneNumber.Model.PhoneNumber do
     end
   end
 
-  def has_country_code_source?(phone_number = %PhoneNumber{}) do
+  def has_country_code_source?(%PhoneNumber{} = phone_number) do
     not is_nil(phone_number.country_code_source)
   end
 
-  def has_preferred_domestic_carrier_code?(phone_number = %PhoneNumber{}) do
+  def has_preferred_domestic_carrier_code?(%PhoneNumber{} = phone_number) do
     not is_nil(phone_number.preferred_domestic_carrier_code)
   end
 
-  def get_national_significant_number(phone_number = %PhoneNumber{}) do
+  def get_national_significant_number(%PhoneNumber{} = phone_number) do
     national_number =
       if has_national_number?(phone_number) do
         phone_number.national_number

@@ -143,7 +143,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
   defp get_possible_length(nil), do: []
 
-  defp get_possible_length(phone_number_description = %PhoneNumberDescription{}),
+  defp get_possible_length(%PhoneNumberDescription{} = phone_number_description),
     do: phone_number_description.possible_lengths || []
 
   defp normalize_rule(nil), do: nil
@@ -194,7 +194,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   end
 
   @same_mobile_and_fixed_line_pattern_default false
-  def get_same_mobile_and_fixed_line_pattern_or_default(phone_metadata = %PhoneMetadata{}) do
+  def get_same_mobile_and_fixed_line_pattern_or_default(%PhoneMetadata{} = phone_metadata) do
     if is_nil(phone_metadata.same_mobile_and_fixed_line_pattern) do
       @same_mobile_and_fixed_line_pattern_default
     else
@@ -203,7 +203,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   end
 
   @main_country_for_code_default false
-  def get_main_country_for_code_or_default(phone_metadata = %PhoneMetadata{}) do
+  def get_main_country_for_code_or_default(%PhoneMetadata{} = phone_metadata) do
     if is_nil(phone_metadata.main_country_for_code) do
       @main_country_for_code_default
     else
@@ -212,7 +212,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   end
 
   @mobile_number_portable_region_default false
-  def get_mobile_number_portable_region_or_default(phone_metadata = %PhoneMetadata{}) do
+  def get_mobile_number_portable_region_or_default(%PhoneMetadata{} = phone_metadata) do
     if is_nil(phone_metadata.mobile_number_portable_region) do
       @mobile_number_portable_region_default
     else
@@ -240,7 +240,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     not is_nil_or_empty?(phone_metadata.preferred_extn_prefix)
   end
 
-  def put_default_values(phone_metadata = %PhoneMetadata{}) do
+  def put_default_values(%PhoneMetadata{} = phone_metadata) do
     Logger.debug("----- Territory -----")
     Logger.debug("#{inspect(phone_metadata)}")
     Logger.debug("region_code: #{inspect(phone_metadata.id)}")

@@ -22,7 +22,7 @@ defmodule ExPhoneNumber.Validation do
     end
   end
 
-  def get_number_type_helper(national_number, metadata = %PhoneMetadata{}) do
+  def get_number_type_helper(national_number, %PhoneMetadata{} = metadata) do
     cond do
       not is_number_matching_description?(national_number, metadata.general) ->
         PhoneNumberTypes.unknown()
