@@ -3,14 +3,14 @@
 [![Build Status](https://travis-ci.org/socialpaymentsbv/ex_phone_number.svg?branch=develop)](https://travis-ci.org/socialpaymentsbv/ex_phone_number) [![Hex Version](http://img.shields.io/hexpm/v/ex_phone_number.svg?style=flat)](https://hex.pm/packages/ex_phone_number)
 
 It's a library for parsing, formatting, and validating international phone numbers.
-Based on Google's [libphonenumber](https://github.com/googlei18n/libphonenumber) (current metadata version: 8.12.28).
+Based on Google's [libphonenumber](https://github.com/googlei18n/libphonenumber) (current metadata version: 8.12.34).
 
 ## Installation
 
   1. Add `:ex_phone_number` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
-  [{:ex_phone_number_fresha, "~> 0.2.4"}]
+  [{:ex_phone_number_fresha, "~> 0.2.5"}]
 end
 ```
 
