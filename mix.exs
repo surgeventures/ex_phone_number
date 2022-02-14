@@ -23,11 +23,7 @@ defmodule ExPhoneNumber.Mixfile do
 
   defp deps do
     [
-<<<<<<< HEAD
-      {:sweet_xml, "~> 0.7.1"},
-=======
       {:sweet_xml, "~> 0.7.2"},
->>>>>>> origin/master
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:ex_spec, "~> 2.0", only: :test},
       {:credo, "~> 1.6.0", only: [:dev, :test], runtime: false},
