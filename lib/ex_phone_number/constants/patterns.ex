@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Constants.Patterns do
+  @moduledoc false
+
   alias ExPhoneNumber.Constants.Values
 
   @unique_international_prefix "[\d]+(?:[~\u2053\u223C\uFF5E][\d]+)?"

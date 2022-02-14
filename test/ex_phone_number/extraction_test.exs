@@ -3,9 +3,9 @@ defmodule ExPhoneNumber.ExtractionTest do
 
   doctest ExPhoneNumber.Extraction
   import ExPhoneNumber.Extraction
-  alias ExPhoneNumber.Metadata
   alias ExPhoneNumber.Constants.CountryCodeSource
   alias ExPhoneNumber.Constants.ErrorMessages
+  alias ExPhoneNumber.Metadata
 
   describe ".extract_possible_number/1" do
     context "removes preceding funky punctuation and letters" do

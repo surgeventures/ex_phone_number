@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Constants.ValidationResults do
+  @moduledoc false
+
   def is_possible(), do: :is_possible
 
   def invalid_country_code(), do: :invalid_country_code

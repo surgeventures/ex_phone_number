@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Parsing do
+  @moduledoc false
+
   import ExPhoneNumber.Extraction
   import ExPhoneNumber.Normalization
   import ExPhoneNumber.Validation

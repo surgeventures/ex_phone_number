@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Metadata.PhoneMetadata do
+  @moduledoc false
+
   # string
   defstruct id: nil,
             # number

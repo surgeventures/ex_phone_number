@@ -124,7 +124,7 @@ defmodule PhoneNumberFixture do
   def by_number2() do
     %PhoneNumber{
       country_code: 375,
-      national_number: 81234
+      national_number: 81_234
     }
   end
 
@@ -285,7 +285,7 @@ defmodule PhoneNumberFixture do
   def gb_invalid() do
     %PhoneNumber{
       country_code: 44,
-      national_number: 791_234_567_11
+      national_number: 79_123_456_711
     }
   end
 
@@ -656,7 +656,7 @@ defmodule PhoneNumberFixture do
   def unknown_country_code_no_raw_input() do
     %PhoneNumber{
       country_code: 2,
-      national_number: 12345
+      national_number: 12_345
     }
   end
 end

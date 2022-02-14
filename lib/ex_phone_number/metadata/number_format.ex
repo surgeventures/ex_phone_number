@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Metadata.NumberFormat do
+  @moduledoc false
+
   # string
   defstruct pattern: nil,
             # string
@@ -45,7 +47,8 @@ defmodule ExPhoneNumber.Metadata.NumberFormat do
        do: true
 
   defp normalize_pattern(nil), do: nil
-  defp normalize_pattern(string) when length(string) == 0, do: nil
+  defp normalize_pattern(""), do: nil
+  defp normalize_pattern([]), do: nil
 
   defp normalize_pattern(string) when is_binary(string) do
     string

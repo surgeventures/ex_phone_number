@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Normalization do
+  @moduledoc false
+
   import ExPhoneNumber.Utilities
   alias ExPhoneNumber.Constants.Mappings
   alias ExPhoneNumber.Constants.Patterns

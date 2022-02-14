@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Extraction do
+  @moduledoc false
+
   import ExPhoneNumber.Normalization
   import ExPhoneNumber.Validation
   import ExPhoneNumber.Utilities
@@ -53,7 +55,7 @@ defmodule ExPhoneNumber.Extraction do
     end
   end
 
-  def maybe_extract_country_code(number, _metadata, _keep_raw_input) when length(number) == 0,
+  def maybe_extract_country_code(number, _metadata, _keep_raw_input) when number == [],
     do: {false, number, %{country_code: 0}}
 
   def maybe_extract_country_code(number, metadata, keep_raw_input)
@@ -148,7 +150,7 @@ defmodule ExPhoneNumber.Extraction do
   end
 
   def maybe_strip_international_prefix_and_normalize(number, _possible_country_idd_prefix)
-      when length(number) == 0,
+      when number == [],
       do: {CountryCodeSource.from_default_country(), ""}
 
   def maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix) do
