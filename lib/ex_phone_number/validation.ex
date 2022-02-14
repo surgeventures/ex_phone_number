@@ -142,14 +142,13 @@ defmodule ExPhoneNumber.Validation do
   end
 
   defp test_number_length_for_type(number, metadata, type) do
-    possible_lengths =
-      # if type == PhoneNumberTypes.fixed_line_or_mobile() do
-      #   (possible_lengths_by_type(metadata, PhoneNumberTypes.fixed_line()) ++
-      #      possible_lengths_by_type(metadata, PhoneNumberTypes.mobile()))
-      #   |> Enum.uniq()
-      # else
-        possible_lengths_by_type(metadata, type)
-      # end
+    # if type == PhoneNumberTypes.fixed_line_or_mobile() do
+    #   (possible_lengths_by_type(metadata, PhoneNumberTypes.fixed_line()) ++
+    #      possible_lengths_by_type(metadata, PhoneNumberTypes.mobile()))
+    #   |> Enum.uniq()
+    # else
+    possible_lengths = possible_lengths_by_type(metadata, type)
+    # end
 
     min_length = Enum.min(possible_lengths)
     max_length = Enum.max(possible_lengths)
@@ -187,7 +186,7 @@ defmodule ExPhoneNumber.Validation do
 
   defp get_number_description_by_type(%PhoneMetadata{} = metadata, _type) do
     # type can be only :general from line 179 or :unknown from 133 -> 144..151 -> 177..178
-      metadata.general
+    metadata.general
     # cond do
     #   type == PhoneNumberTypes.premium_rate() -> metadata.premium_rate
     #   type == PhoneNumberTypes.toll_free() -> metadata.toll_free
