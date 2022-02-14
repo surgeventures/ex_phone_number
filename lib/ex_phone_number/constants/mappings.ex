@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Constants.Mappings do
+  @moduledoc false
+
   alias ExPhoneNumber.Constants.Values
 
   def digit_mappings() do

@@ -334,7 +334,7 @@ defmodule ExPhoneNumber.MetadataTest do
 
     context "-1" do
       it "should be empty" do
-        assert 0 == length(get_region_codes_for_country_code(-1))
+        assert [] == get_region_codes_for_country_code(-1)
       end
     end
   end

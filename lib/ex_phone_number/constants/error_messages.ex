@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Constants.ErrorMessages do
+  @moduledoc false
+
   def invalid_country_code(), do: "Invalid country calling code"
 
   def not_a_number(), do: "The string supplied did not seem to be a phone number"

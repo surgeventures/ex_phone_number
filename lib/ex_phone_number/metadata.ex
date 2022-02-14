@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Metadata do
+  @moduledoc false
+
   import SweetXml
   import ExPhoneNumber.Normalization
   import ExPhoneNumber.Validation
@@ -114,7 +116,9 @@ defmodule ExPhoneNumber.Metadata do
 
   def get_ndd_prefix_for_region_code(region_code, strip_non_digits)
       when is_binary(region_code) and is_boolean(strip_non_digits) do
-    if is_nil(metadata = get_for_region_code(region_code)) do
+    metadata = get_for_region_code(region_code)
+
+    if is_nil(metadata) do
       nil
     else
       if not (is_nil(metadata.national_prefix) or String.length(metadata.national_prefix) > 0) do
@@ -179,9 +183,10 @@ defmodule ExPhoneNumber.Metadata do
 
   # Ensure `GB` is first when checking numbers that match `country_code: 44`. In the Javascript official library it's the case.
   defp if_gb_regions_ensure_gb_first(regions) do
-    case Enum.member?(regions, "GB") do
-      false -> regions
-      true -> Enum.sort(regions)
+    if Enum.member?(regions, "GB") do
+      Enum.sort(regions)
+    else
+      regions
     end
   end
 
