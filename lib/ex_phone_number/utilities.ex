@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Utilities do
+  @moduledoc false
+
   alias ExPhoneNumber.Constants.Values
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
 

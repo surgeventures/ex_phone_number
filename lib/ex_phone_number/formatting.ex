@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Formatting do
+  @moduledoc false
+
   import ExPhoneNumber.Utilities
   alias ExPhoneNumber.Constants.Patterns
   alias ExPhoneNumber.Constants.PhoneNumberFormats
@@ -68,7 +70,7 @@ defmodule ExPhoneNumber.Formatting do
 
   def format_nsn(number, %PhoneMetadata{} = metadata, number_format, carrier_code \\ nil) do
     available_formats =
-      if length(metadata.intl_number_format) == 0 or
+      if metadata.intl_number_format == [] or
            PhoneNumberFormats.national() == number_format do
         metadata.number_format
       else

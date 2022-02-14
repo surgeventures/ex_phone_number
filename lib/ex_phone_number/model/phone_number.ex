@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Model.PhoneNumber do
+  @moduledoc false
+
   # number
   defstruct country_code: nil,
             # number
@@ -16,8 +18,8 @@ defmodule ExPhoneNumber.Model.PhoneNumber do
             # string
             preferred_domestic_carrier_code: nil
 
-  alias ExPhoneNumber.Model.PhoneNumber
   alias ExPhoneNumber.Constants.CountryCodeSource
+  alias ExPhoneNumber.Model.PhoneNumber
 
   def has_country_code?(phone_number = %PhoneNumber{}) do
     not is_nil(phone_number.country_code)

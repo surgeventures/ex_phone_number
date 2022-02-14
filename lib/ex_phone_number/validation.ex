@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Validation do
+  @moduledoc false
+
   import ExPhoneNumber.Utilities
   alias ExPhoneNumber.Constants.ErrorMessages
   alias ExPhoneNumber.Constants.Patterns
@@ -152,7 +154,7 @@ defmodule ExPhoneNumber.Validation do
     min_length = Enum.min(possible_lengths)
     max_length = Enum.max(possible_lengths)
 
-    if(min_length == -1) do
+    if min_length == -1 do
       ValidationResults.invalid_length()
     else
       case String.length(number) do

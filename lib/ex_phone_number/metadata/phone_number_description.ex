@@ -1,4 +1,5 @@
 defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
+  @moduledoc false
   # string
   defstruct national_number_pattern: nil,
             # list
@@ -43,7 +44,7 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
   defp normalize_string(nil), do: nil
 
   defp normalize_string(char_list) when is_list(char_list),
-    do: List.to_string(char_list) |> clean_string
+    do: char_list |> List.to_string() |> clean_string()
 
   defp normalize_pattern(nil), do: nil
 
@@ -71,12 +72,12 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
     case String.first(range_or_number) do
       "[" ->
         [range_start, range_end] =
-          String.slice(range_or_number, 1, String.length(range_or_number) - 2)
+          range_or_number
+          |> String.slice(1, String.length(range_or_number) - 2)
           |> String.split("-")
           |> Enum.map(fn n -> String.to_integer(n) end)
 
-        Range.new(range_start, range_end)
-        |> Enum.to_list()
+        Enum.to_list(Range.new(range_start, range_end))
 
       _ ->
         String.to_integer(range_or_number)

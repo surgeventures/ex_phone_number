@@ -1,4 +1,6 @@
 defmodule ExPhoneNumber.Constants.MatchTypes do
+  @moduledoc false
+
   def not_a_number(), do: :not_a_number
 
   def no_match(), do: :no_match
