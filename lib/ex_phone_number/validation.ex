@@ -185,7 +185,7 @@ defmodule ExPhoneNumber.Validation do
     end
   end
 
-  defp get_number_description_by_type(%PhoneMetadata{} = metadata, type) do
+  defp get_number_description_by_type(%PhoneMetadata{} = metadata, _type) do
     # type can be only :general from line 179 or :unknown from 133 -> 144..151 -> 177..178
       metadata.general
     # cond do
