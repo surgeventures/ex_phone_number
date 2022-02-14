@@ -143,13 +143,13 @@ defmodule ExPhoneNumber.Validation do
 
   defp test_number_length_for_type(number, metadata, type) do
     possible_lengths =
-      if type == PhoneNumberTypes.fixed_line_or_mobile() do
-        (possible_lengths_by_type(metadata, PhoneNumberTypes.fixed_line()) ++
-           possible_lengths_by_type(metadata, PhoneNumberTypes.mobile()))
-        |> Enum.uniq()
-      else
+      # if type == PhoneNumberTypes.fixed_line_or_mobile() do
+      #   (possible_lengths_by_type(metadata, PhoneNumberTypes.fixed_line()) ++
+      #      possible_lengths_by_type(metadata, PhoneNumberTypes.mobile()))
+      #   |> Enum.uniq()
+      # else
         possible_lengths_by_type(metadata, type)
-      end
+      # end
 
     min_length = Enum.min(possible_lengths)
     max_length = Enum.max(possible_lengths)
@@ -186,18 +186,20 @@ defmodule ExPhoneNumber.Validation do
   end
 
   defp get_number_description_by_type(%PhoneMetadata{} = metadata, type) do
-    cond do
-      type == PhoneNumberTypes.premium_rate() -> metadata.premium_rate
-      type == PhoneNumberTypes.toll_free() -> metadata.toll_free
-      type == PhoneNumberTypes.mobile() -> metadata.mobile
-      type == PhoneNumberTypes.fixed_line() -> metadata.fixed_line
-      type == PhoneNumberTypes.shared_cost() -> metadata.shared_cost
-      type == PhoneNumberTypes.voip() -> metadata.voip
-      type == PhoneNumberTypes.personal_number() -> metadata.personal_number
-      type == PhoneNumberTypes.pager() -> metadata.pager
-      type == PhoneNumberTypes.uan() -> metadata.uan
-      type == PhoneNumberTypes.voicemail() -> metadata.voicemail
-      true -> metadata.general
-    end
+    # type can be only :general from line 179 or :unknown from 133 -> 144..151 -> 177..178
+      metadata.general
+    # cond do
+    #   type == PhoneNumberTypes.premium_rate() -> metadata.premium_rate
+    #   type == PhoneNumberTypes.toll_free() -> metadata.toll_free
+    #   type == PhoneNumberTypes.mobile() -> metadata.mobile
+    #   type == PhoneNumberTypes.fixed_line() -> metadata.fixed_line
+    #   type == PhoneNumberTypes.shared_cost() -> metadata.shared_cost
+    #   type == PhoneNumberTypes.voip() -> metadata.voip
+    #   type == PhoneNumberTypes.personal_number() -> metadata.personal_number
+    #   type == PhoneNumberTypes.pager() -> metadata.pager
+    #   type == PhoneNumberTypes.uan() -> metadata.uan
+    #   type == PhoneNumberTypes.voicemail() -> metadata.voicemail
+    #   true -> metadata.general
+    # end
   end
 end

@@ -1,6 +1,4 @@
 defmodule ExPhoneNumber.Constants.PhoneNumberTypes do
-  @moduledoc false
-
   def fixed_line(), do: :fixed_line
 
   def mobile(), do: :mobile
