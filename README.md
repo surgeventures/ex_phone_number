@@ -10,7 +10,7 @@ Based on Google's [libphonenumber](https://github.com/googlei18n/libphonenumber)
   1. Add `:ex_phone_number` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
-  [{:ex_phone_number_fresha, "~> 0.2.5"}]
+  [{:ex_phone_number_fresha, "~> 0.3.0"}]
 end
 ```
 
