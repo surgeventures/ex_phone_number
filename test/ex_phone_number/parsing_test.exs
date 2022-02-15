@@ -130,21 +130,24 @@ defmodule ExPhoneNumber.ParsingTest do
       end
 
       it "should return correct value #8" do
-        {result, phone_number} = parse("My number is tel:03-331-6005;phone-context=+64", RegionCodeFixture.nz())
+        {result, phone_number} =
+          parse("My number is tel:03-331-6005;phone-context=+64", RegionCodeFixture.nz())
 
         assert :ok == result
         assert PhoneNumberFixture.nz_number() == phone_number
       end
 
       it "should return correct value #9" do
-        {result, phone_number} = parse("tel:03-331-6005;phone-context=+64;a=%A1", RegionCodeFixture.nz())
+        {result, phone_number} =
+          parse("tel:03-331-6005;phone-context=+64;a=%A1", RegionCodeFixture.nz())
 
         assert :ok == result
         assert PhoneNumberFixture.nz_number() == phone_number
       end
 
       it "should return correct value #10" do
-        {result, phone_number} = parse("tel:03-331-6005;isub=12345;phone-context=+64", RegionCodeFixture.nz())
+        {result, phone_number} =
+          parse("tel:03-331-6005;isub=12345;phone-context=+64", RegionCodeFixture.nz())
 
         assert :ok == result
         assert PhoneNumberFixture.nz_number() == phone_number
@@ -241,28 +244,32 @@ defmodule ExPhoneNumber.ParsingTest do
 
     context "US local number" do
       it "should return correct value #1" do
-        {result, phone_number} = parse("tel:253-0000;phone-context=www.google.com", RegionCodeFixture.us())
+        {result, phone_number} =
+          parse("tel:253-0000;phone-context=www.google.com", RegionCodeFixture.us())
 
         assert :ok == result
         assert PhoneNumberFixture.us_local_number() == phone_number
       end
 
       it "should return correct value #2" do
-        {result, phone_number} = parse("tel:253-0000;isub=12345;phone-context=www.google.com", RegionCodeFixture.us())
+        {result, phone_number} =
+          parse("tel:253-0000;isub=12345;phone-context=www.google.com", RegionCodeFixture.us())
 
         assert :ok == result
         assert PhoneNumberFixture.us_local_number() == phone_number
       end
 
       it "should return correct value #3" do
-        {result, phone_number} = parse("tel:2530000;isub=12345;phone-context=1-650", RegionCodeFixture.us())
+        {result, phone_number} =
+          parse("tel:2530000;isub=12345;phone-context=1-650", RegionCodeFixture.us())
 
         assert :ok == result
         assert PhoneNumberFixture.us_local_number() == phone_number
       end
 
       it "should return correct value #4" do
-        {result, phone_number} = parse("tel:2530000;isub=12345;phone-context=1234.com", RegionCodeFixture.us())
+        {result, phone_number} =
+          parse("tel:2530000;isub=12345;phone-context=1234.com", RegionCodeFixture.us())
 
         assert :ok == result
         assert PhoneNumberFixture.us_local_number() == phone_number
@@ -677,7 +684,8 @@ defmodule ExPhoneNumber.ParsingTest do
       end
 
       it "should match the error message #22" do
-        {result, message} = parse("tel:555-1234;phone-context=www.google.com", RegionCodeFixture.zz())
+        {result, message} =
+          parse("tel:555-1234;phone-context=www.google.com", RegionCodeFixture.zz())
 
         assert :error == result
         assert ErrorMessages.invalid_country_code() == message
@@ -735,14 +743,16 @@ defmodule ExPhoneNumber.ParsingTest do
       end
 
       it "should match the phone number #8" do
-        {result, phone_number} = parse("  tel:03-331-6005;phone-context=+64", RegionCodeFixture.zz())
+        {result, phone_number} =
+          parse("  tel:03-331-6005;phone-context=+64", RegionCodeFixture.zz())
 
         assert :ok == result
         assert PhoneNumberFixture.nz_number() == phone_number
       end
 
       it "should match the phone number #9" do
-        {result, phone_number} = parse("tel:03-331-6005;isub=12345;phone-context=+64", RegionCodeFixture.zz())
+        {result, phone_number} =
+          parse("tel:03-331-6005;isub=12345;phone-context=+64", RegionCodeFixture.zz())
 
         assert :ok == result
         assert PhoneNumberFixture.nz_number() == phone_number
@@ -885,14 +895,16 @@ defmodule ExPhoneNumber.ParsingTest do
       end
 
       it "should match the phone number #19" do
-        {result, phone_number} = parse("tel:2034567890;ext=456;phone-context=+44", RegionCodeFixture.zz())
+        {result, phone_number} =
+          parse("tel:2034567890;ext=456;phone-context=+44", RegionCodeFixture.zz())
 
         assert :ok == result
         assert PhoneNumberFixture.gb_number2() == phone_number
       end
 
       it "should match the phone number #20" do
-        {result, phone_number} = parse("+442034567890\uFF45\uFF58\uFF54\uFF4E456", RegionCodeFixture.zz())
+        {result, phone_number} =
+          parse("+442034567890\uFF45\uFF58\uFF54\uFF4E456", RegionCodeFixture.zz())
 
         assert :ok == result
         assert PhoneNumberFixture.gb_number2() == phone_number

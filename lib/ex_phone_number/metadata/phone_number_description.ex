@@ -17,9 +17,12 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
     kwlist =
       xmap(
         xpath_node,
-        national_number_pattern: ~x"./nationalNumberPattern/text()"o |> transform_by(&normalize_pattern/1),
-        national_possible_lengths: ~x"./possibleLengths/@national"o |> transform_by(&normalize_range/1),
-        local_possible_lengths: ~x"./possibleLengths/@localOnly"o |> transform_by(&normalize_range/1),
+        national_number_pattern:
+          ~x"./nationalNumberPattern/text()"o |> transform_by(&normalize_pattern/1),
+        national_possible_lengths:
+          ~x"./possibleLengths/@national"o |> transform_by(&normalize_range/1),
+        local_possible_lengths:
+          ~x"./possibleLengths/@localOnly"o |> transform_by(&normalize_range/1),
         example_number: ~x"./exampleNumber/text()"o |> transform_by(&normalize_string/1)
       )
 
@@ -69,19 +72,16 @@ defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
     |> Enum.uniq()
   end
 
-  defp range_to_list(range_or_number) do
-    case String.first(range_or_number) do
-      "[" ->
-        [range_start, range_end] =
-          range_or_number
-          |> String.slice(1, String.length(range_or_number) - 2)
-          |> String.split("-")
-          |> Enum.map(fn n -> String.to_integer(n) end)
+  defp range_to_list("[" <> range) do
+    [{range_start, ""}, {range_end, "]"}] =
+      range
+      |> String.split("-")
+      |> Enum.map(&Integer.parse/1)
 
-        Enum.to_list(Range.new(range_start, range_end))
+    Enum.to_list(Range.new(range_start, range_end))
+  end
 
-      _ ->
-        String.to_integer(range_or_number)
-    end
+  defp range_to_list(number) do
+    [String.to_integer(number)]
   end
 end

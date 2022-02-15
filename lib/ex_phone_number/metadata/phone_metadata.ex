@@ -53,14 +53,18 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         country_code: ~x"./@countryCode"i,
         leading_digits: ~x"./@leadingDigits"o |> transform_by(&normalize_pattern/1),
         international_prefix: ~x"./@internationalPrefix"s,
-        preferred_international_prefix: ~x"./@preferredInternationalPrefix"o |> transform_by(&normalize_string/1),
+        preferred_international_prefix:
+          ~x"./@preferredInternationalPrefix"o |> transform_by(&normalize_string/1),
         national_prefix: ~x"./@nationalPrefix"s,
-        national_prefix_for_parsing: ~x"./@nationalPrefixForParsing"o |> transform_by(&normalize_string/1),
-        national_prefix_transform_rule: ~x"./@nationalPrefixTransformRule"o |> transform_by(&normalize_rule/1),
+        national_prefix_for_parsing:
+          ~x"./@nationalPrefixForParsing"o |> transform_by(&normalize_string/1),
+        national_prefix_transform_rule:
+          ~x"./@nationalPrefixTransformRule"o |> transform_by(&normalize_rule/1),
         national_prefix_formatting_rule: ~x"./@nationalPrefixFormattingRule"s,
         preferred_extn_prefix: ~x"./@preferredExtnPrefix"o |> transform_by(&normalize_string/1),
         main_country_for_code: ~x"./@mainCountryForCode"o |> transform_by(&normalize_boolean/1),
-        mobile_number_portable_region: ~x"./@mobileNumberPortableRegion"o |> transform_by(&normalize_boolean/1),
+        mobile_number_portable_region:
+          ~x"./@mobileNumberPortableRegion"o |> transform_by(&normalize_boolean/1),
         carrier_code_formatting_rule: ~x"./@carrierCodeFormattingRule"s,
         general: ~x"./generalDesc"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         fixed_line: ~x"./fixedLine"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
@@ -68,7 +72,8 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         toll_free: ~x"./tollFree"o |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         premium_rate: ~x"./premiumRate"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         shared_cost: ~x"./sharedCost"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
-        personal_number: ~x"./personalNumber"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
+        personal_number:
+          ~x"./personalNumber"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         voip: ~x"./voip"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         pager: ~x"./pager"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
         uan: ~x"./uan"e |> transform_by(&PhoneNumberDescription.from_xpath_node/1),
@@ -106,12 +111,7 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
       :voicemail,
       :no_international_dialing
     ]
-    |> Enum.flat_map(fn type ->
-      kwlist
-      |> Map.get(type)
-      |> get_possible_length()
-    end)
-    |> Enum.reject(&is_nil/1)
+    |> Enum.flat_map(&get_possible_length(Map.get(kwlist, &1)))
     |> Enum.sort()
     |> Enum.uniq()
   end
@@ -123,12 +123,12 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
   defp normalize_rule(nil), do: nil
 
-  defp normalize_rule(char_list) when is_list(char_list),
-    do: char_list |> List.to_string() |> normalize_rule()
+  defp normalize_rule(char_list) when is_list(char_list) do
+    char_list |> List.to_string() |> normalize_rule()
+  end
 
   defp normalize_rule(string) when is_binary(string) do
-    string
-    |> String.replace(~r/\$(\d)/, "\\\\g{\\g{1}}")
+    String.replace(string, ~r/\$(\d)/, "\\\\g{\\g{1}}")
   end
 
   defp normalize_pattern(nil), do: nil
@@ -148,11 +148,8 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
     |> List.to_string()
   end
 
+  defp normalize_boolean('true'), do: true
   defp normalize_boolean(nil), do: false
-
-  defp normalize_boolean(true_char_list)
-       when is_list(true_char_list) and length(true_char_list) == 4,
-       do: true
 
   defp get_map_key(%PhoneMetadata{} = phone_metadata) do
     if Integer.parse(phone_metadata.id) != :error do
@@ -241,14 +238,18 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
       | national_prefix_formatting_rule: get_national_prefix_formatting_rule(phone_metadata)
     }
 
-    Logger.debug("national_prefix_formatting_rule: #{inspect(phone_metadata.national_prefix_formatting_rule)}")
+    Logger.debug(
+      "national_prefix_formatting_rule: #{inspect(phone_metadata.national_prefix_formatting_rule)}"
+    )
 
     phone_metadata = %{
       phone_metadata
       | carrier_code_formatting_rule: get_domestic_carrier_code_formatting_rule(phone_metadata)
     }
 
-    Logger.debug("carrier_code_formatting_rule: #{inspect(phone_metadata.carrier_code_formatting_rule)}")
+    Logger.debug(
+      "carrier_code_formatting_rule: #{inspect(phone_metadata.carrier_code_formatting_rule)}"
+    )
 
     Logger.debug("available_formats count: #{inspect(length(phone_metadata.available_formats))}")
     formats = get_number_format(phone_metadata)
@@ -297,12 +298,14 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
     phone_metadata = %{
       phone_metadata
-      | premium_rate: process_other_phone_number_description(phone_metadata.premium_rate, phone_metadata)
+      | premium_rate:
+          process_other_phone_number_description(phone_metadata.premium_rate, phone_metadata)
     }
 
     phone_metadata = %{
       phone_metadata
-      | shared_cost: process_other_phone_number_description(phone_metadata.shared_cost, phone_metadata)
+      | shared_cost:
+          process_other_phone_number_description(phone_metadata.shared_cost, phone_metadata)
     }
 
     phone_metadata = %{
@@ -312,7 +315,8 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
 
     phone_metadata = %{
       phone_metadata
-      | personal_number: process_other_phone_number_description(phone_metadata.personal_number, phone_metadata)
+      | personal_number:
+          process_other_phone_number_description(phone_metadata.personal_number, phone_metadata)
     }
 
     phone_metadata = %{
@@ -399,28 +403,34 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         number_format,
         if not is_nil_or_empty?(number_format.national_prefix_formatting_rule) do
           %{
-            national_prefix_formatting_rule: get_national_prefix_formatting_rule(number_format, phone_metadata.national_prefix)
+            national_prefix_formatting_rule:
+              get_national_prefix_formatting_rule(number_format, phone_metadata.national_prefix)
           }
         else
           %{national_prefix_formatting_rule: phone_metadata.national_prefix_formatting_rule}
         end
       )
 
-    Logger.debug("\tnational_prefix_formatting_rule: #{inspect(number_format.national_prefix_formatting_rule)}")
+    Logger.debug(
+      "\tnational_prefix_formatting_rule: #{inspect(number_format.national_prefix_formatting_rule)}"
+    )
 
     number_format =
       Map.merge(
         number_format,
         if is_nil_or_empty?(number_format.national_prefix_optional_when_formatting) do
           %{
-            national_prefix_optional_when_formatting: has_national_prefix_optional_when_formatting?(phone_metadata)
+            national_prefix_optional_when_formatting:
+              has_national_prefix_optional_when_formatting?(phone_metadata)
           }
         else
           %{}
         end
       )
 
-    Logger.debug(~s"\tnational_prefix_optional_when_formatting: #{inspect(number_format.national_prefix_optional_when_formatting)}")
+    Logger.debug(
+      ~s"\tnational_prefix_optional_when_formatting: #{inspect(number_format.national_prefix_optional_when_formatting)}"
+    )
 
     number_format =
       Map.merge(
@@ -438,7 +448,9 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         end
       )
 
-    Logger.debug(~s"\tdomestic_carrier_code_formatting_rule: #{inspect(number_format.domestic_carrier_code_formatting_rule)}")
+    Logger.debug(
+      ~s"\tdomestic_carrier_code_formatting_rule: #{inspect(number_format.domestic_carrier_code_formatting_rule)}"
+    )
 
     number_format =
       Map.merge(

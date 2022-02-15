@@ -104,7 +104,9 @@ defmodule ExPhoneNumber.ValidationTest do
     context "International Toll Free long number" do
       it "should return correct value" do
         assert ValidationResults.too_long() ==
-                 is_possible_number_with_reason?(PhoneNumberFixture.international_toll_free_too_long())
+                 is_possible_number_with_reason?(
+                   PhoneNumberFixture.international_toll_free_too_long()
+                 )
       end
     end
   end

@@ -5,7 +5,7 @@ defmodule ExPhoneNumber.Utilities do
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
 
   def is_nil_or_empty?(nil), do: true
-  def is_nil_or_empty?(string) when is_binary(string), do: String.length(string) == 0
+  def is_nil_or_empty?(""), do: true
   def is_nil_or_empty?(_), do: false
 
   def is_number_matching_description?(number, %PhoneNumberDescription{} = description)

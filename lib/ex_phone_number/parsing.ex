@@ -80,18 +80,21 @@ defmodule ExPhoneNumber.Parsing do
       if :ok == elem(results_tuple, 0) do
         {_, national_number, _} = results_tuple
 
-        phone_number = if keep_raw_input, do: %PhoneNumber{raw_input: number_to_parse}, else: %PhoneNumber{}
+        phone_number =
+          if keep_raw_input, do: %PhoneNumber{raw_input: number_to_parse}, else: %PhoneNumber{}
 
         {ext, national_number} = maybe_strip_extension(national_number)
 
-        phone_number = if not is_nil_or_empty?(ext), do: %{phone_number | extension: ext}, else: phone_number
+        phone_number =
+          if not is_nil_or_empty?(ext), do: %{phone_number | extension: ext}, else: phone_number
 
         region_metadata = Metadata.get_for_region_code(default_region)
 
         case maybe_extract_country_code(national_number, region_metadata, keep_raw_input) do
           {true, normalized_national_number, phone_number_extract} ->
             if phone_number_extract.country_code != 0 do
-              phone_number_region_code = Metadata.get_region_code_for_country_code(phone_number_extract.country_code)
+              phone_number_region_code =
+                Metadata.get_region_code_for_country_code(phone_number_extract.country_code)
 
               phone_number_region_metadata =
                 if phone_number_region_code != default_region do
@@ -103,7 +106,8 @@ defmodule ExPhoneNumber.Parsing do
                   region_metadata
                 end
 
-              {:ok, normalized_national_number, phone_number_region_metadata, Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
+              {:ok, normalized_national_number, phone_number_region_metadata,
+               Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
             else
               new_normalized_national_number = normalize(national_number)
 
@@ -117,13 +121,15 @@ defmodule ExPhoneNumber.Parsing do
                   do: %{phone_number_extract | country_code_source: nil},
                   else: phone_number_extract
 
-              {:ok, new_normalized_national_number, region_metadata, Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
+              {:ok, new_normalized_national_number, region_metadata,
+               Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
             end
 
           {false, message} ->
             if message == ErrorMessages.invalid_country_code() and
                  Regex.match?(Patterns.leading_plus_chars_pattern(), national_number) do
-              national_number_without_plus_sign = String.replace(national_number, Patterns.leading_plus_chars_pattern(), "")
+              national_number_without_plus_sign =
+                String.replace(national_number, Patterns.leading_plus_chars_pattern(), "")
 
               case maybe_extract_country_code(
                      national_number_without_plus_sign,
@@ -134,7 +140,8 @@ defmodule ExPhoneNumber.Parsing do
                   if phone_number_extract.country_code == 0 do
                     {:error, message}
                   else
-                    {:ok, normalized_national_number, region_metadata, Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
+                    {:ok, normalized_national_number, region_metadata,
+                     Map.merge(phone_number, phone_number_extract, &update_if_nil/3)}
                   end
 
                 {false, message} ->
@@ -192,7 +199,8 @@ defmodule ExPhoneNumber.Parsing do
             {:error, ErrorMessages.too_long()}
 
           true ->
-            phone_number_add = PhoneNumber.set_italian_leading_zeros(normalized_national_number, phone_number)
+            phone_number_add =
+              PhoneNumber.set_italian_leading_zeros(normalized_national_number, phone_number)
 
             case Integer.parse(normalized_national_number) do
               {int, _} ->

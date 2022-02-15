@@ -62,9 +62,11 @@ defmodule ExPhoneNumber.Extraction do
       when is_binary(number) and is_boolean(keep_raw_input) do
     possible_country_idd_prefix = if not is_nil(metadata), do: metadata.international_prefix
 
-    possible_country_idd_prefix = if is_nil(possible_country_idd_prefix), do: "NonMatch", else: possible_country_idd_prefix
+    possible_country_idd_prefix =
+      if is_nil(possible_country_idd_prefix), do: "NonMatch", else: possible_country_idd_prefix
 
-    {country_code_source, full_number} = maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix)
+    {country_code_source, full_number} =
+      maybe_strip_international_prefix_and_normalize(number, possible_country_idd_prefix)
 
     phone_number =
       if keep_raw_input,
@@ -88,11 +90,14 @@ defmodule ExPhoneNumber.Extraction do
         country_code_string = Integer.to_string(metadata.country_code)
 
         if String.starts_with?(full_number, country_code_string) do
-          {_, potential_national_number} = String.split_at(full_number, String.length(country_code_string))
+          {_, potential_national_number} =
+            String.split_at(full_number, String.length(country_code_string))
 
-          {result, _, possible_national_number} = maybe_strip_national_prefix_and_carrier_code(potential_national_number, metadata)
+          {result, _, possible_national_number} =
+            maybe_strip_national_prefix_and_carrier_code(potential_national_number, metadata)
 
-          potential_national_number = if result, do: possible_national_number, else: potential_national_number
+          potential_national_number =
+            if result, do: possible_national_number, else: potential_national_number
 
           if (not matches_entirely?(metadata.general.national_number_pattern, full_number) and
                 matches_entirely?(

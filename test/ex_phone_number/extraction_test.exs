@@ -63,7 +63,8 @@ defmodule ExPhoneNumber.ExtractionTest do
       end
 
       it "should strip national prefix", state do
-        {result, _, number} = maybe_strip_national_prefix_and_carrier_code("34356778", state[:metadata])
+        {result, _, number} =
+          maybe_strip_national_prefix_and_carrier_code("34356778", state[:metadata])
 
         assert result
         assert "356778" == number
@@ -102,7 +103,8 @@ defmodule ExPhoneNumber.ExtractionTest do
           }
         }
 
-        {result, carrier_code, number} = maybe_strip_national_prefix_and_carrier_code("08122123456", metadata)
+        {result, carrier_code, number} =
+          maybe_strip_national_prefix_and_carrier_code("08122123456", metadata)
 
         assert result
         assert "81" == carrier_code
@@ -130,7 +132,8 @@ defmodule ExPhoneNumber.ExtractionTest do
   describe ".maybe_strip_international_prefix_and_normalize/2" do
     context "case 1" do
       it "should strip international prefix" do
-        {result, number} = maybe_strip_international_prefix_and_normalize("0034567700-3898003", "00[39]")
+        {result, number} =
+          maybe_strip_international_prefix_and_normalize("0034567700-3898003", "00[39]")
 
         assert result == CountryCodeSource.from_number_with_idd()
         assert "45677003898003" == number
@@ -146,21 +149,24 @@ defmodule ExPhoneNumber.ExtractionTest do
 
     context "case 2" do
       it "should strip international prefix" do
-        {result, number} = maybe_strip_international_prefix_and_normalize("00945677003898003", "00[39]")
+        {result, number} =
+          maybe_strip_international_prefix_and_normalize("00945677003898003", "00[39]")
 
         assert result == CountryCodeSource.from_number_with_idd()
         assert "45677003898003" == number
       end
 
       it "should strip international prefix when is broken up by spaces" do
-        {result, number} = maybe_strip_international_prefix_and_normalize("00 9 45677003898003", "00[39]")
+        {result, number} =
+          maybe_strip_international_prefix_and_normalize("00 9 45677003898003", "00[39]")
 
         assert result == CountryCodeSource.from_number_with_idd()
         assert "45677003898003" == number
       end
 
       it "should return correct CountryCodeSource" do
-        {_, number} = maybe_strip_international_prefix_and_normalize("00 9 45677003898003", "00[39]")
+        {_, number} =
+          maybe_strip_international_prefix_and_normalize("00 9 45677003898003", "00[39]")
 
         {result, _} = maybe_strip_international_prefix_and_normalize(number, "00[39]")
         assert result == CountryCodeSource.from_default_country()
@@ -169,7 +175,8 @@ defmodule ExPhoneNumber.ExtractionTest do
 
     context "case 3" do
       it "should strip international prefix when contains leading plus sign" do
-        {result, number} = maybe_strip_international_prefix_and_normalize("+45677003898003", "00[39]")
+        {result, number} =
+          maybe_strip_international_prefix_and_normalize("+45677003898003", "00[39]")
 
         assert result == CountryCodeSource.from_number_with_plus_sign()
         assert "45677003898003" == number
@@ -196,7 +203,8 @@ defmodule ExPhoneNumber.ExtractionTest do
       it "should return correct values" do
         metadata = Metadata.get_for_region_code(RegionCodeFixture.us())
 
-        {result, number, phone_number} = maybe_extract_country_code("011112-3456789", metadata, true)
+        {result, number, phone_number} =
+          maybe_extract_country_code("011112-3456789", metadata, true)
 
         assert result
         assert 1 == phone_number.country_code

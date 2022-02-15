@@ -27,9 +27,12 @@ defmodule ExPhoneNumber.Metadata.NumberFormat do
           ~x"./leadingDigits"el,
           pattern: ~x"./text()"s |> transform_by(&normalize_pattern/1)
         ],
-        national_prefix_formatting_rule: ~x"./@nationalPrefixFormattingRule"o |> transform_by(&normalize_string/1),
-        national_prefix_optional_when_formatting: ~x"./@nationalPrefixOptionalWhenFormatting"o |> transform_by(&normalize_boolean/1),
-        domestic_carrier_code_formatting_rule: ~x"./@carrierCodeFormattingRule"o |> transform_by(&normalize_string/1),
+        national_prefix_formatting_rule:
+          ~x"./@nationalPrefixFormattingRule"o |> transform_by(&normalize_string/1),
+        national_prefix_optional_when_formatting:
+          ~x"./@nationalPrefixOptionalWhenFormatting"o |> transform_by(&normalize_boolean/1),
+        domestic_carrier_code_formatting_rule:
+          ~x"./@carrierCodeFormattingRule"o |> transform_by(&normalize_string/1),
         intl_format: ~x"./intlFormat/text()"o |> transform_by(&normalize_rule/1)
       )
 

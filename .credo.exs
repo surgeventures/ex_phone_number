@@ -98,7 +98,7 @@
           {Credo.Check.Readability.AliasOrder, []},
           {Credo.Check.Readability.FunctionNames, []},
           {Credo.Check.Readability.LargeNumbers, []},
-          {Credo.Check.Readability.MaxLineLength, [priority: :low, max_length: 135]},
+          {Credo.Check.Readability.MaxLineLength, [priority: :low, max_length: 100]},
           {Credo.Check.Readability.ModuleAttributeNames, []},
           # TODO refactor to remove false
           {Credo.Check.Readability.ModuleDoc, false},

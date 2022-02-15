@@ -51,11 +51,14 @@ defmodule ExPhoneNumber.Formatting do
         else
           region_code = Metadata.get_region_code_for_country_code(phone_number.country_code)
 
-          metadata = Metadata.get_for_region_code_or_calling_code(phone_number.country_code, region_code)
+          metadata =
+            Metadata.get_for_region_code_or_calling_code(phone_number.country_code, region_code)
 
-          formatted_extension = maybe_get_formatted_extension(phone_number, metadata, phone_number_format)
+          formatted_extension =
+            maybe_get_formatted_extension(phone_number, metadata, phone_number_format)
 
-          formatted_national_number = format_nsn(national_significant_number, metadata, phone_number_format)
+          formatted_national_number =
+            format_nsn(national_significant_number, metadata, phone_number_format)
 
           prefix_number_with_country_calling_code(
             phone_number.country_code,
@@ -124,7 +127,8 @@ defmodule ExPhoneNumber.Formatting do
       end
 
     if PhoneNumberFormats.rfc3966() == phone_number_format do
-      new_formatted_national_number = Regex.replace(~r/^#{Patterns.separator_pattern().source}/, formatted_national_number, "")
+      new_formatted_national_number =
+        Regex.replace(~r/^#{Patterns.separator_pattern().source}/, formatted_national_number, "")
 
       Regex.replace(Patterns.separator_pattern(), new_formatted_national_number, "-")
     else
