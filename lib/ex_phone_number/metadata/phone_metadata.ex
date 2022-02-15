@@ -395,29 +395,17 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   end
 
   def get_number_format(%{number_format: number_format}, %PhoneMetadata{} = phone_metadata) do
-    Logger.debug("---> number_format")
-    Logger.debug("\t#{inspect(number_format)}")
-
     number_format =
-      Map.merge(
-        number_format,
+      number_format
+      |> Map.put(
+        :national_prefix_formatting_rule,
         if not is_nil_or_empty?(number_format.national_prefix_formatting_rule) do
-          %{
-            national_prefix_formatting_rule:
-              get_national_prefix_formatting_rule(number_format, phone_metadata.national_prefix)
-          }
+          get_national_prefix_formatting_rule(number_format, phone_metadata.national_prefix)
         else
-          %{national_prefix_formatting_rule: phone_metadata.national_prefix_formatting_rule}
+          phone_metadata.national_prefix_formatting_rule
         end
       )
-
-    Logger.debug(
-      "\tnational_prefix_formatting_rule: #{inspect(number_format.national_prefix_formatting_rule)}"
-    )
-
-    number_format =
-      Map.merge(
-        number_format,
+      |> Map.merge(
         if is_nil_or_empty?(number_format.national_prefix_optional_when_formatting) do
           %{
             national_prefix_optional_when_formatting:
@@ -427,45 +415,23 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
           %{}
         end
       )
-
-    Logger.debug(
-      ~s"\tnational_prefix_optional_when_formatting: #{inspect(number_format.national_prefix_optional_when_formatting)}"
-    )
-
-    number_format =
-      Map.merge(
-        number_format,
+      |> Map.put(
+        :domestic_carrier_code_formatting_rule,
         if not is_nil_or_empty?(number_format.domestic_carrier_code_formatting_rule) do
-          %{
-            domestic_carrier_code_formatting_rule:
-              get_domestic_carrier_code_formatting_rule(
-                number_format,
-                phone_metadata.national_prefix
-              )
-          }
+          get_domestic_carrier_code_formatting_rule(
+            number_format,
+            phone_metadata.national_prefix
+          )
         else
-          %{domestic_carrier_code_formatting_rule: phone_metadata.carrier_code_formatting_rule}
+          phone_metadata.carrier_code_formatting_rule
         end
       )
-
-    Logger.debug(
-      ~s"\tdomestic_carrier_code_formatting_rule: #{inspect(number_format.domestic_carrier_code_formatting_rule)}"
-    )
-
-    number_format =
-      Map.merge(
-        number_format,
-        %{
-          leading_digits_pattern:
-            List.wrap(
-              Enum.reduce(number_format.leading_digits_pattern, [], fn %{pattern: pattern}, _ ->
-                pattern
-              end)
-            )
-        }
+      |> Map.put(
+        :leading_digits_pattern,
+        Enum.reduce(number_format.leading_digits_pattern, [], fn %{pattern: pattern}, acc ->
+          [pattern | acc]
+        end)
       )
-
-    Logger.debug(~s"\tleading_digits_pattern: #{inspect(number_format.leading_digits_pattern)}")
 
     intl_number_format = get_intl_format(number_format)
     Logger.debug("---> intl_number_format")
