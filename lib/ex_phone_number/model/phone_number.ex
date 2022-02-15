@@ -1,22 +1,17 @@
 defmodule ExPhoneNumber.Model.PhoneNumber do
   @moduledoc false
+  use TypedStruct
 
-  # number
-  defstruct country_code: nil,
-            # number
-            national_number: nil,
-            # string
-            extension: nil,
-            # boolean
-            italian_leading_zero: nil,
-            # number
-            number_of_leading_zeros: nil,
-            # string
-            raw_input: nil,
-            # atom
-            country_code_source: nil,
-            # string
-            preferred_domestic_carrier_code: nil
+  typedstruct do
+    field(:country_code, integer())
+    field(:national_number, integer())
+    field(:number_of_leading_zeros, integer())
+    field(:extension, String.t())
+    field(:raw_input, String.t())
+    field(:country_code_source, atom())
+    field(:preferred_domestic_carrier_code, String.t())
+    field(:italian_leading_zero, boolean)
+  end
 
   alias ExPhoneNumber.Constants.CountryCodeSource
   alias ExPhoneNumber.Model.PhoneNumber

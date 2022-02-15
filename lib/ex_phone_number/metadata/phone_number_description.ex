@@ -1,14 +1,15 @@
 defmodule ExPhoneNumber.Metadata.PhoneNumberDescription do
   @moduledoc false
-  # string
-  defstruct national_number_pattern: nil,
-            # list
-            possible_lengths: nil,
-            # string
-            example_number: nil
+  use TypedStruct
 
   import SweetXml
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
+
+  typedstruct do
+    field(:national_number_pattern, String.t())
+    field(:possible_lengths, [integer])
+    field(:example_number, String.t())
+  end
 
   def from_xpath_node(nil), do: nil
 

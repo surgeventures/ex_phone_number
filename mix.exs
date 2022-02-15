@@ -23,6 +23,7 @@ defmodule ExPhoneNumber.Mixfile do
 
   defp deps do
     [
+      {:typed_struct, "~> 0.2.1"},
       {:sweet_xml, "~> 0.7.2"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:ex_spec, "~> 2.0", only: :test},

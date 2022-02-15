@@ -1,76 +1,49 @@
 defmodule ExPhoneNumber.Metadata.PhoneMetadata do
   @moduledoc false
+  use TypedStruct
 
-  # string
-  defstruct id: nil,
-            # number
-            country_code: nil,
-            # string
-            leading_digits: nil,
-            # string
-            international_prefix: nil,
-            # string
-            preferred_international_prefix: nil,
-            # string
-            national_prefix: nil,
-            # string
-            national_prefix_for_parsing: nil,
-            # string
-            national_prefix_transform_rule: nil,
-            # string
-            national_prefix_formatting_rule: nil,
-            # string
-            national_prefix_optional_when_formatting: nil,
-            # string
-            preferred_extn_prefix: nil,
-            # boolean
-            main_country_for_code: nil,
-            # boolean
-            mobile_number_portable_region: nil,
-            # string
-            carrier_code_formatting_rule: nil,
-            # %PhoneNumberDescription{}
-            general: nil,
-            # %PhoneNumberDescription{}
-            fixed_line: nil,
-            # %PhoneNumberDescription{}
-            mobile: nil,
-            # %PhoneNumberDescription{}
-            toll_free: nil,
-            # %PhoneNumberDescription{}
-            premium_rate: nil,
-            # %PhoneNumberDescription{}
-            shared_cost: nil,
-            # %PhoneNumberDescription{}
-            personal_number: nil,
-            # %PhoneNumberDescription{}
-            voip: nil,
-            # %PhoneNumberDescription{}
-            pager: nil,
-            # %PhoneNumberDescription{}
-            uan: nil,
-            # %PhoneNumberDescription{}
-            voicemail: nil,
-            # %PhoneNumberDescription{}
-            no_international_dialing: nil,
-            # boolean
-            same_mobile_and_fixed_line_pattern: nil,
-            # [%NumberFormat{}]
-            available_formats: [],
-            # [%NumberFormat{}]
-            number_format: [],
-            # [%NumberFormat{}]
-            intl_number_format: []
-
-  import SweetXml
-  import ExPhoneNumber.Utilities
   alias ExPhoneNumber.Constants.Values
-  alias ExPhoneNumber.Metadata.NumberFormat
   alias ExPhoneNumber.Metadata.PhoneMetadata
+  import ExPhoneNumber.Utilities
+  import SweetXml
+  alias ExPhoneNumber.Metadata.NumberFormat
   alias ExPhoneNumber.Metadata.PhoneNumberDescription
 
   require Logger
   Logger.configure(level: Application.get_env(:ex_phone_number, :log_level, :warn))
+
+  typedstruct do
+    field(:id, integer)
+    field(:country_code, integer)
+    field(:leading_digits, String.t())
+    field(:international_prefix, String.t())
+    field(:preferred_international_prefix, String.t())
+    field(:national_prefix, String.t())
+    field(:national_prefix_for_parsing, String.t())
+    field(:national_prefix_transform_rule, String.t())
+    field(:national_prefix_formatting_rule, String.t())
+    field(:national_prefix_optional_when_formatting, String.t())
+    field(:preferred_extn_prefix, String.t())
+    field(:main_country_for_code, boolean)
+    field(:mobile_number_portable_region, boolean)
+    field(:carrier_code_formatting_rule, String.t())
+    field(:general, PhoneNumberDescription.t())
+    field(:fixed_line, PhoneNumberDescription.t())
+    field(:mobile, PhoneNumberDescription.t())
+    field(:toll_free, PhoneNumberDescription.t())
+    field(:premium_rate, PhoneNumberDescription.t())
+    field(:shared_cost, PhoneNumberDescription.t())
+    field(:personal_number, PhoneNumberDescription.t())
+    field(:voip, PhoneNumberDescription.t())
+    field(:pager, PhoneNumberDescription.t())
+    field(:uan, PhoneNumberDescription.t())
+    field(:voicemail, PhoneNumberDescription.t())
+    field(:no_international_dialing, PhoneNumberDescription.t())
+    field(:same_mobile_and_fixed_line_pattern, boolean)
+    field(:available_formats, [NumberFormat.t()])
+    field(:number_format, [NumberFormat.t()])
+    field(:intl_number_format, [NumberFormat.t()])
+  end
 
   def from_xpath_node(xpath_node) do
     kwlist =

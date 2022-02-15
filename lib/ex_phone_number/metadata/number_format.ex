@@ -1,20 +1,16 @@
 defmodule ExPhoneNumber.Metadata.NumberFormat do
   @moduledoc false
+  use TypedStruct
 
-  # string
-  defstruct pattern: nil,
-            # string
-            format: nil,
-            # string
-            leading_digits_pattern: nil,
-            # string
-            national_prefix_formatting_rule: nil,
-            # boolean
-            national_prefix_optional_when_formatting: nil,
-            # string
-            domestic_carrier_code_formatting_rule: nil,
-            # string
-            intl_format: nil
+  typedstruct do
+    field(:pattern, String.t())
+    field(:format, String.t())
+    field(:leading_digits_pattern, String.t())
+    field(:domestic_carrier_code_formatting_rule, String.t())
+    field(:intl_format, String.t())
+    field(:national_prefix_formatting_rule, String.t())
+    field(:national_prefix_optional_when_formatting, boolean)
+  end
 
   import SweetXml
   alias ExPhoneNumber.Metadata.NumberFormat
