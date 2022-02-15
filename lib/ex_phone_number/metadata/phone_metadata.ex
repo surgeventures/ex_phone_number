@@ -472,11 +472,9 @@ defmodule ExPhoneNumber.Metadata.PhoneMetadata do
         number_format,
         %{
           leading_digits_pattern:
-            List.wrap(
-              Enum.reduce(number_format.leading_digits_pattern, [], fn %{pattern: pattern}, _ ->
-                pattern
-              end)
-            )
+            Enum.reduce(number_format.leading_digits_pattern, [], fn %{pattern: pattern}, acc ->
+              [pattern | acc]
+            end)
         }
       )
 

@@ -11,22 +11,16 @@ defmodule ExPhoneNumber.Formatting do
 
   def choose_formatting_pattern_for_number(available_formats, national_number) do
     Enum.find(available_formats, fn number_format ->
-      leading_digits_pattern_size = length(number_format.leading_digits_pattern)
-
-      match_index =
-        if not (leading_digits_pattern_size == 0) do
-          last_leading_digits_pattern = List.last(number_format.leading_digits_pattern)
-
-          case Regex.run(last_leading_digits_pattern, national_number, return: :index) do
-            nil -> -1
-            [{match_index, _match_length} | _tail] -> match_index
-          end
-        else
-          -1
-        end
-
-      if leading_digits_pattern_size == 0 or match_index == 0 do
+      if number_format.leading_digits_pattern == [] do
         matches_entirely?(number_format.pattern, national_number)
+      else
+        Enum.find(number_format.leading_digits_pattern, fn leading_digits_pattern ->
+          case Regex.run(leading_digits_pattern, national_number, return: :index) do
+            nil -> false
+            [{0, _match_length} | _tail] -> matches_entirely?(number_format.pattern, national_number)
+            [{_index, _match_length} | _tail] -> false
+          end
+        end)
       end
     end)
   end
@@ -78,12 +72,11 @@ defmodule ExPhoneNumber.Formatting do
       end
 
     formatting_pattern = choose_formatting_pattern_for_number(available_formats, number)
+    format_nsn_using_pattern(number, formatting_pattern, number_format, carrier_code)
+  end
 
-    if is_nil(formatting_pattern) do
-      number
-    else
-      format_nsn_using_pattern(number, formatting_pattern, number_format, carrier_code)
-    end
+  def format_nsn_using_pattern(number, nil, _phone_number_format, _carrier_code) do
+    number
   end
 
   def format_nsn_using_pattern(number, formatting_pattern, phone_number_format, carrier_code) do
