@@ -13,7 +13,10 @@ defmodule ExPhoneNumber.Mixfile do
       description: description(),
       name: "ExPhoneNumber",
       source_url: "https://github.com/surgeventures/ex_phone_number",
-      homepage_url: "https://github.com/surgeventures/ex_phone_number"
+      homepage_url: "https://github.com/surgeventures/ex_phone_number",
+      dialyzer: [
+        plt_add_apps: [:inets, :mix]
+      ]
     ]
   end
 
