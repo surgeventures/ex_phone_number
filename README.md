@@ -14,6 +14,10 @@ def deps do
 end
 ```
 
+## Updating
+
+To bump the version run `mix update_metadata`, update the version in mix.exs and create a pr
+
 ## Usage
 ```elixir
 iex> {:ok, phone_number} = ExPhoneNumber.parse("044 668 18 00", "CH")
